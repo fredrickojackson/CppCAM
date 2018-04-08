@@ -1,3 +1,4 @@
+build
 src/Makefile
 src/Makefile.Release
 src/Makefile.Debug
