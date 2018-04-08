@@ -1,3 +1,4 @@
+/* added by fredirck.o.jackson@gmail.com */
 #include "rectcutdialog.h"
 #include "ui_rectcutdialog.h"
 
