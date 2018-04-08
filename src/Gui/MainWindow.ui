@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>pycam</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="pycam.qrc">
+    <normaloff>:/pycam/icons/logo_16px.png</normaloff>:/pycam/icons/logo_16px.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuProject">
+    <property name="title">
+     <string>P&amp;roject</string>
+    </property>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionClose"/>
+    <addaction name="separator"/>
+    <addaction name="actionPreferences"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionShowCutter"/>
+    <addaction name="actionShowStock"/>
+    <addaction name="actionShowModel"/>
+    <addaction name="actionShowModelBoundingBox"/>
+    <addaction name="actionShowNormals"/>
+    <addaction name="actionShowHeightField"/>
+    <addaction name="actionShowPath"/>
+    <addaction name="separator"/>
+    <addaction name="actionResetView"/>
+    <addaction name="actionFrontView"/>
+    <addaction name="actionTopView"/>
+    <addaction name="actionLeftView"/>
+    <addaction name="actionRightView"/>
+    <addaction name="actionZoom_in"/>
+    <addaction name="actionZoom_Out"/>
+   </widget>
+   <widget class="QMenu" name="menuTest">
+    <property name="title">
+     <string>Test</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionTestStockModel"/>
+    <addaction name="actionTestTriangle"/>
+    <addaction name="actionTestModel"/>
+    <addaction name="actionTestPath"/>
+    <addaction name="separator"/>
+    <addaction name="actionpush"/>
+    <addaction name="actiondrop"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="actionheight_field"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actionEdit_Stock_Dimensions"/>
+    <addaction name="actionImport_Model"/>
+    <addaction name="actionTool_Size"/>
+    <addaction name="actionResize_Model"/>
+    <addaction name="actionAlign_Model_to_Stock"/>
+    <addaction name="actionRotate_Model"/>
+    <addaction name="actionExport_Model"/>
+    <addaction name="separator"/>
+    <addaction name="actionRun"/>
+    <addaction name="actionRectCut"/>
+    <addaction name="actionExport_GCode"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>He&amp;lp</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuProject"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
+   <addaction name="menuTest"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionNew">
+   <property name="text">
+    <string>&amp;New</string>
+   </property>
+  </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="text">
+    <string>&amp;Save</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>&amp;Preferences</string>
+   </property>
+  </action>
+  <action name="actionResetView">
+   <property name="text">
+    <string>&amp;Reset</string>
+   </property>
+   <property name="toolTip">
+    <string>Reset View</string>
+   </property>
+  </action>
+  <action name="actionDropTestModel">
+   <property name="text">
+    <string>drop testmodel</string>
+   </property>
+  </action>
+  <action name="actionTestModel">
+   <property name="text">
+    <string>test&amp;model</string>
+   </property>
+  </action>
+  <action name="actionTestPath">
+   <property name="text">
+    <string>te&amp;stpath</string>
+   </property>
+  </action>
+  <action name="actionPushTestModel">
+   <property name="text">
+    <string>push testmodel</string>
+   </property>
+  </action>
+  <action name="actionFrontView">
+   <property name="text">
+    <string>&amp;Front</string>
+   </property>
+  </action>
+  <action name="actionTopView">
+   <property name="text">
+    <string>&amp;Top</string>
+   </property>
+  </action>
+  <action name="actionLeftView">
+   <property name="text">
+    <string>&amp;Left</string>
+   </property>
+  </action>
+  <action name="actionRightView">
+   <property name="text">
+    <string>R&amp;ight</string>
+   </property>
+  </action>
+  <action name="actionTestTriangle">
+   <property name="text">
+    <string>t&amp;esttriangle</string>
+   </property>
+  </action>
+  <action name="actionShowStock">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>St&amp;ock</string>
+   </property>
+  </action>
+  <action name="actionShowModel">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Model</string>
+   </property>
+  </action>
+  <action name="actionShowPath">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Path</string>
+   </property>
+  </action>
+  <action name="actionShowNormals">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Normals</string>
+   </property>
+  </action>
+  <action name="actionShowCutter">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Startpoint</string>
+   </property>
+  </action>
+  <action name="actionTestStockModel">
+   <property name="text">
+    <string>&amp;teststock</string>
+   </property>
+  </action>
+  <action name="actionShowHeightField">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>&amp;Height Field</string>
+   </property>
+  </action>
+  <action name="actionShowModelBoundingBox">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Model &amp;Boundingbox</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="actionImport_Model">
+   <property name="text">
+    <string>&amp;Import Model</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>&amp;Exit</string>
+   </property>
+  </action>
+  <action name="actionEdit_Stock_Dimensions">
+   <property name="text">
+    <string>&amp;Edit Stock Dimensions</string>
+   </property>
+  </action>
+  <action name="actionTool_Size">
+   <property name="text">
+    <string>&amp;Tool Size and Type</string>
+   </property>
+  </action>
+  <action name="actionResize_Model">
+   <property name="text">
+    <string>&amp;Resize Model</string>
+   </property>
+  </action>
+  <action name="actionAlign_Model_to_Stock">
+   <property name="text">
+    <string>&amp;Align Model to Stock</string>
+   </property>
+  </action>
+  <action name="actionRotate_Model">
+   <property name="text">
+    <string>Rotate &amp;Model</string>
+   </property>
+  </action>
+  <action name="actionExport_Model">
+   <property name="text">
+    <string>E&amp;xport Model</string>
+   </property>
+  </action>
+  <action name="actionRun">
+   <property name="text">
+    <string>R&amp;un</string>
+   </property>
+  </action>
+  <action name="actionExport_GCode">
+   <property name="text">
+    <string>Export &amp;GCode</string>
+   </property>
+  </action>
+  <action name="actionheight_field">
+   <property name="text">
+    <string>&amp;height field</string>
+   </property>
+  </action>
+  <action name="actionZoom_in">
+   <property name="text">
+    <string>&amp;Zoom in+</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+-</string>
+   </property>
+  </action>
+  <action name="actionZoom_Out">
+   <property name="text">
+    <string>Zoom O&amp;ut-</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl++</string>
+   </property>
+  </action>
+  <action name="actiondrop">
+   <property name="text">
+    <string>&amp;drop</string>
+   </property>
+  </action>
+  <action name="actionpush">
+   <property name="text">
+    <string>&amp;push</string>
+   </property>
+  </action>
+  <action name="actionRectCut">
+   <property name="text">
+    <string>RectCut</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="pycam.qrc"/>
+ </resources>
+ <connections/>
+</ui>

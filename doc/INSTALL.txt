@@ -1,0 +1,13 @@
+Binary installs only require the presence of Qt shared libraries (DLLs) with OpenGL support.
+
+Installing from source requires Qt development package (with OpenGL support) to be installed on your computer.
+
+To compile for Windows, install the following download: qt-opensource-windows-x86-mingw48_opengl-5.2.1.exe
+
+Be sure to enable the installation of mingw (the gcc compiler), and add these to your enviroment:
+
+	set PATH=C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin;C:\Qt\Qt5.2.1\Tools\Mingw48_32\bin;%PATH%
+	set QMAKESPEC=C:/Qt/Qt5.2.1/5.2.1/mingw48_32/mkspecs/win32-g++
+
+BTW, this also works on linux, with some not too vintage Wine (http://www.winehq.org/)
+

@@ -1,0 +1,8 @@
+<RCC>
+  <qresource prefix="pycam">
+    <file>../icons/logo_16px.png</file>
+    <file>../icons/logo_gui.png</file>
+    <file>../icons/pycam.ico</file>
+    <file>../icons/logo_scalable.svg</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,8 @@
+src/Makefile
+src/Makefile.Release
+src/Makefile.Debug
+object_script.pycam.*
+*.o
+moc_*.cpp
+ui_*.h
+qrc_*.cpp

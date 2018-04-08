@@ -1,0 +1,24 @@
+TODO
+----
+
+
+ToroidalCutter
+
+
+PushCutter
+
+
+PolygonExtractor 
+
+
+ContourCutter
+
+
+CutterDialog
+* name, type, radius/diameter, GCode ID
+* config/Cutter.conf
+
+SimpleCutterDialog
+* add params that are now hardcoded in PathProcessors/SimpleCutter.cpp
+* config/SimpleCutter.conf
+
