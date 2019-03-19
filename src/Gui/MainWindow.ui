@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>pycam</string>
+   <string>cppCAM</string>
   </property>
   <property name="windowIcon">
    <iconset resource="pycam.qrc">
@@ -353,7 +353,7 @@
   </action>
   <action name="actionRectCut">
    <property name="text">
-    <string>RectCut</string>
+    <string>Re&amp;ctCut</string>
    </property>
   </action>
  </widget>
