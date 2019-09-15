@@ -41,7 +41,19 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
         return false;
     }
     QString header = settings->value("header").toString();
+    QString str;
     header.replace("$VERSION", "0.1");
+    time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
+
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    strftime(buffer,sizeof(buffer),"%m/%d/%Y %H:%M:%S",timeinfo);
+    str=buffer;
+
+    header.replace("$TIME", str);
     if (!header.endsWith("\n")) header.append("\n");
     QString metric = settings->value("metric").toString();
     if (!metric.endsWith("\n")) metric.append("\n");

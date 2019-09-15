@@ -97,6 +97,7 @@
      <string>He&amp;lp</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menuProject"/>
    <addaction name="menuEdit"/>

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>449</width>
-    <height>236</height>
+    <height>274</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,7 +74,7 @@
       <item row="4" column="0">
        <widget class="QRadioButton" name="radioButton_inch_to_mm">
         <property name="text">
-         <string>inch to mm</string>
+         <string>i&amp;nch to mm</string>
         </property>
        </widget>
       </item>
@@ -107,7 +107,7 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>X</string>
+           <string>&amp;X</string>
           </property>
           <property name="buddy">
            <cstring>lineEdit_dimx</cstring>
@@ -133,7 +133,7 @@
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Z</string>
+           <string>&amp;Z</string>
           </property>
           <property name="buddy">
            <cstring>lineEdit_dimx</cstring>

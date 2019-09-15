@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>443</width>
-    <height>256</height>
+    <height>259</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
       <item row="0" column="1">
        <widget class="QRadioButton" name="radioButton_xcen">
         <property name="text">
-         <string>Center</string>
+         <string>Ce&amp;nter</string>
         </property>
         <property name="checked">
          <bool>false</bool>
