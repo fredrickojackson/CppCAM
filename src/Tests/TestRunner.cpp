@@ -229,14 +229,13 @@ test2()
 #endif
 }
 
-int
-run_tests()
+int run_tests()
 {
-    //test_points();
-    //test_edge_closest_point();
-    //test_point_inside_triangle();
-    //test_intersect_plane_point();
-    //test_intersect_circle_line();
+    test_points();
+    test_edge_closest_point();
+    test_point_inside_triangle();
+    test_intersect_plane_point();
+    test_intersect_circle_line();
     test_intersect_cylinder_line();
     return 0;
 }

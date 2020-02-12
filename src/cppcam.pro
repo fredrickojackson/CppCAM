@@ -23,11 +23,13 @@ RCC_DIR = buildwin32
 }
 
 # Input
-SOURCES += pycam.cpp \ 
+SOURCES += \
     Gui/SimpleCutterDialog.cpp \
-    Gui/dlgcutter.cpp \
+    Gui/dlgroundcutter.cpp \
     Gui/rectcutdialog.cpp \
-    Gui/dlgtoolsize.cpp
+    Gui/dlgtoolsize.cpp \
+    cppcam.cpp
+
 SOURCES += Gui/MainWindow.cpp Gui/GLWidget.cpp 
 SOURCES += Gui/PreferencesDialog.cpp Gui/StockModelDialog.cpp
 SOURCES += Gui/ResizeModelDialog.cpp Gui/AlignModelDialog.cpp Gui/RotateModelDialog.cpp
@@ -44,7 +46,6 @@ SOURCES += Exporters/GCodeExporter.cpp Exporters/STLExporter.cpp
 SOURCES += Tests/TestRunner.cpp
 
 HEADERS += Gui/AboutDialog.h \
-    Gui/dlgcutter.h \
     Geometry/Point.h \
     Geometry/Triangle.h \
     Geometry/HeightField.h \
@@ -56,6 +57,7 @@ HEADERS += Gui/AboutDialog.h \
     Geometry/TestModel.h \
     Geometry/Edge.h \
     Geometry/intersection.h \
+    Gui/dlgroundcutter.h \
     Gui/rectcutdialog.h \
     Gui/dlgtoolsize.h
 HEADERS += Gui/MainWindow.h Gui/GLWidget.h
@@ -65,7 +67,7 @@ HEADERS += Gui/ResizeModelDialog.h Gui/AlignModelDialog.h Gui/RotateModelDialog.
 HEADERS += Gui/SimpleCutterDialog.h
 
 FORMS += Gui/MainWindow.ui Gui/AboutDialog.ui \
-    Gui/dlgcutter.ui \
+    Gui/dlgroundcutter.ui \
     Gui/rectcutdialog.ui \
     Gui/dlgtoolsize.ui
 FORMS += Gui/PreferencesDialog.ui Gui/StockModelDialog.ui 

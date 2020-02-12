@@ -29,6 +29,9 @@ public:
     GCodeExporter();
     bool ExportPath(const std::vector<Path*>& paths, std::string filename);
     double safez;
+    double feedspeed;
+    double plungespeed;
+    bool bEnableArcs;
 };
 
 #endif

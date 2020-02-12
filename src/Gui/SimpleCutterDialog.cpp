@@ -48,13 +48,17 @@ void SimpleCutterDialog::on_lineEdit_lines_editingFinished()
 {
     double step = 0.0;
     QString qs;
-    if(radioButton_xdir->isChecked())
-        step=(m_ymax-m_ymin)/(lineEdit_lines->text().toInt()-1);
-    else
-        step=(m_xmax-m_xmin)/(lineEdit_lines->text().toInt()-1);
-    qs="stepover=";
-    qs.append(QString::number(step));
-    textEditStatus->append(qs);
+    if (!isNear((m_ymax - m_ymin),0.0))
+    {
+
+        if(radioButton_xdir->isChecked())
+            step=(m_ymax-m_ymin)/(lineEdit_lines->text().toInt()-1);
+        else
+            step=(m_xmax-m_xmin)/(lineEdit_lines->text().toInt()-1);
+        qs="stepover=";
+        qs.append(QString::number(step));
+        textEditStatus->append(qs);
+    }
 }
 
 void SimpleCutterDialog::on_lineEdit_layers_editingFinished()
@@ -69,4 +73,13 @@ void SimpleCutterDialog::on_lineEdit_layers_editingFinished()
     qs="stepdown=";
     qs.append(QString::number(step));
     textEditStatus->append(qs);
+}
+
+
+void SimpleCutterDialog::on_leUseLine_textChanged(const QString &arg1)
+{
+    if(leUseLine->text().toInt() == 1)lblUseline->setText("Line");
+    if(leUseLine->text().toInt() == 2)lblUseline->setText("nd Line");
+    if(leUseLine->text().toInt() == 3)lblUseline->setText("rd Line");
+    if(leUseLine->text().toInt() == 4)lblUseline->setText("rth Line");
 }

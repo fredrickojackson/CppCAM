@@ -56,18 +56,61 @@ SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point
                                      Path& path)
 {
     SimplePathProcessors pathProcessors;
-    for(size_t j=0; j<heightfield.width(); j++) {
+
+    double xstep=m_stock->dim_x()/heightfield.width();
+    double ystep=m_stock->dim_y()/heightfield.height();
+    long di = 1+m_radius/xstep;
+    long dj = 1+m_radius/ystep;
+    long di1=0;
+    long di2=0;
+    long dj1=0;
+    long dj2=0;
+
+
+    for(size_t j=0; j<heightfield.width(); j+=(m_useLine)) {
         path.m_runs.resize(path.m_runs.size()+1);
         Run& run = path.m_runs.back();
-        double last_z = 0;
+        size_t last_z = heightfield.height();
         for(size_t ii=0; ii<heightfield.height(); ii++) {
             size_t i = ii;
             if (m_zigzag) i = heightfield.height()-ii;
+            double z = 0.0;
 
-            double z = heightfield.point(j,i);
+            z = heightfield.point(j,i);
+
+            di1=j-di;
+            if(di1<0) di1=0;
+            di2=j+di;
+            if(di2>(heightfield.width()-1))di2=heightfield.width()-1;
+            dj1=i-dj;
+            if(dj1<0) dj1=0;
+            dj2=i+dj;
+            if(dj2>(heightfield.height()-1))dj2=heightfield.height()-1;
+            for(long lj=dj1; lj<=dj2; lj++)
+                for(long li=di1; li<=di2; li++)
+                {
+                    double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
+                    double zc = 0.0;
+                    if((li != j) && (lj != i))
+                    {
+                        if(!m_isSpherical)
+                        {
+                            zc=heightfield.point(li,lj);
+                        }else
+                        {
+                            zc=heightfield.point(li,lj)-m_radius*sin((dis*3.1415926/(2.0*m_radius)));
+                        }
+                        if((dis<(m_radius+m_compmargin)) && (zc>z))
+                        {
+                            z=zc;
+                        }
+                    }
+                }//lj//li
+
             if (z < z_layer) {
                 z = z_layer;
             }
+            z+=m_compmargin;
             run.m_points.push_back(Point(heightfield.x(j), heightfield.y(i), z));
         }
         pathProcessors.process(run.m_points);
@@ -80,7 +123,18 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
                                      Path& path)
 {
     SimplePathProcessors pathProcessors;
-    for(size_t i=0; i<heightfield.height(); i++) {
+
+    double xstep=m_stock->dim_x()/heightfield.width();
+    double ystep=m_stock->dim_y()/heightfield.height();
+    long di = 1+m_radius/xstep;
+    long dj = 1+m_radius/ystep;
+    long di1=0;
+    long di2=0;
+    long dj1=0;
+    long dj2=0;
+
+
+    for(size_t i=0; i<heightfield.height(); i+=(m_useLine)) {
         path.m_runs.resize(path.m_runs.size()+1);
         Run& run = path.m_runs.back();
         double last_z = 0;
@@ -89,9 +143,41 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
             if (m_zigzag) j = heightfield.width()-jj;
 
             double z = heightfield.point(j,i);
+
+
+            di1=j-di;
+            if(di1<0) di1=0;
+            di2=j+di;
+            if(di2>(heightfield.width()-1))di2=heightfield.width()-1;
+            dj1=i-dj;
+            if(dj1<0) dj1=0;
+            dj2=i+dj;
+            if(dj2>(heightfield.height()-1))dj2=heightfield.height()-1;
+            for(long lj=dj1; lj<=dj2; lj++)
+                for(long li=di1; li<=di2; li++)
+                {
+                    double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
+                    double zc = 0.0;
+                    if((li != j) && (lj != i))
+                    {
+                        if(!m_isSpherical)
+                        {
+                            zc=heightfield.point(li,lj);
+                        }else
+                        {
+                            zc=heightfield.point(li,lj)-m_radius*sin((dis*3.1415926/(2.0*m_radius)));
+                        }
+                        if((dis<(m_radius+m_compmargin)) && (zc>z))
+                        {
+                            z=zc;
+                        }
+                    }
+                }//lj//li
+
             if (z < z_layer) {
                 z = z_layer;
             }
+            z+=m_compmargin;
             run.m_points.push_back(Point(heightfield.x(j), heightfield.y(i), z));
         }
         pathProcessors.process(run.m_points);

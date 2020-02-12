@@ -53,28 +53,27 @@ public:
     bool p_runRotate;
     double p_runRotStep;
     bool p_runDirectionx;
+    double p_safez;
+    double p_FeedSpeed;
+    double p_PlungeSpeed;
+    bool bEnableArcs;
+    int p_useLine;
+private slots:
     void on_actionTestTriangle_triggered();
+
     void on_actionTestModel_triggered();
+
     void on_actionTestPath_triggered();
 
     void on_actionTestStockModel_triggered();
 
-
-    void on_actionDrop_triggered();
-    void on_actionPush_triggered();
-
-
-
     void on_actionAbout_triggered();
 
-private slots:
     void on_actionOpen_triggered();
 
     void on_actionSave_triggered();
 
     void on_actionImport_Model_triggered();
-
-
 
     void on_actionPreferences_triggered();
 
@@ -130,6 +129,7 @@ private:
     void clearPath();
     void clearHeightfield();
     void clearModelAndPath();
-
     PreferencesDialog* m_PreferencesDialog;
+    void toolcomp(double ang);
+
 };

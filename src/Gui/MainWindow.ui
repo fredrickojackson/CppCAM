@@ -61,6 +61,9 @@
     <addaction name="actionZoom_Out"/>
    </widget>
    <widget class="QMenu" name="menuTest">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="title">
      <string>Test</string>
     </property>

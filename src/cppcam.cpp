@@ -30,7 +30,7 @@ extern int run_tests();
 #include "HeightField.h"
 
 Stock* stock = NULL;
-Model* model;
+Model* model = NULL;
 Cutter* cutter = NULL;
 std::vector<Path*> paths;
 HeightField* heightfield = NULL;

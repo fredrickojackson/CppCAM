@@ -21,6 +21,7 @@ along with PyCAM.  If not, see <http://www.gnu.org/licenses/>.
 #define __SIMPLECUTTER_H
 
 #include "Path.h"
+#include "Stock.h"
 #include "HeightField.h"
 #include <vector>
 
@@ -29,6 +30,11 @@ public:
     SimpleCutter():m_zigzag(false) { }
     bool GenerateCutPath(const HeightField& heightfield, const Point& start, const Point& direction, const std::vector<double>& zlevels, std::vector<Path*>& paths, double angle);
     bool m_zigzag;
+    bool m_isSpherical;
+    double m_radius;
+    double m_compmargin;
+    Stock* m_stock;
+    int m_useLine;
 private:
     bool GenerateCutPathLayer_x(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path);
     bool GenerateCutPathLayer_y(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path);

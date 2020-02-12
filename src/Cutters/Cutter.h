@@ -73,6 +73,8 @@ public:
 
     virtual void to_OpenGL()=0;
 
+    bool m_isSpherical;
+
 protected:
     double m_radius;
     Point m_location;

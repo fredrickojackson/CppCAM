@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <QtGui>
+#include "Geometry/Geometry.h"
 
 #include "ui_SimpleCutterDialog.h"
 
@@ -50,4 +51,5 @@ private slots:
     void on_lineEdit_points_editingFinished();
     void on_lineEdit_lines_editingFinished();
     void on_lineEdit_layers_editingFinished();
+    void on_leUseLine_textChanged(const QString &arg1);
 };

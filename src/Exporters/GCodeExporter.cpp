@@ -54,6 +54,9 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
     str=buffer;
 
     header.replace("$TIME", str);
+    header.replace("$F", QString::number(feedspeed));
+    header.replace("$P", QString::number(plungespeed));
+
     if (!header.endsWith("\n")) header.append("\n");
     QString metric = settings->value("metric").toString();
     if (!metric.endsWith("\n")) metric.append("\n");
@@ -73,6 +76,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
     QString endrun = settings->value("endrun").toString();
     if (!endrun.endsWith("\n")) endrun.append("\n");
     QString point = settings->value("point").toString();
+    QString firstlinepoint = settings->value("firstlinepoint").toString();
     QString arc = settings->value("arc").toString();
     QString start_spindle = settings->value("start_spindle").toString();
     QString stop_spindle = settings->value("stop_spindle").toString();
@@ -87,6 +91,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
         std::vector<Point>::const_iterator pt;
         Point pp;
 
+        bool flag_firstlinepoint=true;
         int rodd=0;
         for(std::vector<Run>::const_iterator r = (*p)->m_runs.begin(); r!=(*p)->m_runs.end(); ++r) {
 
@@ -108,6 +113,8 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                             s.replace("$Z", QString::number(pt->z(),'f',3));
                             s.replace("$A", QString::number((*p)->rot_x,'f',3));
                             s.replace("$SAFEZ", QString::number(safez,'f',3));
+                            s.replace("$F",QString::number(feedspeed,'f',3));
+                            s.replace("$P",QString::number(plungespeed,'f',3));
                             gc.write(s.toUtf8());
                         }
                         if(flag_beginrun){
@@ -118,20 +125,29 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                             s.replace("$Z", QString::number(pt->z(),'f',3));
                             s.replace("$A", QString::number((*p)->rot_x,'f',3));
                             s.replace("$SAFEZ", QString::number(safez,'f',3));
+                            s.replace("$F",QString::number(feedspeed,'f',3));
+                            s.replace("$P",QString::number(plungespeed,'f',3));
                             gc.write(s.toUtf8());
                         }
-                        if(pt->m_rad==-1){
-                            s = point;
-                        }else{
+                        if(pt->m_rad>0 && bEnableArcs){
                             s=arc;
                             if(pt->isCC)s.replace("G2", "G3");
                             s.replace("$R", QString::number(pt->m_rad,'f',3));
-
+                        }else{
+                            if(flag_firstlinepoint)
+                            {
+                                s=firstlinepoint;
+                            }else
+                            {
+                                s=point;
+                            }
                         }
                         s.replace("$X", QString::number(pt->x(),'f',3));
                         s.replace("$Y", QString::number(pt->y(),'f',3));
                         s.replace("$Z", QString::number(pt->z(),'f',3));
                         s.replace("$SAFEZ", QString::number(safez,'f',3));
+                        s.replace("$F",QString::number(feedspeed,'f',3));
+                        s.replace("$P",QString::number(plungespeed,'f',3));
                         gc.write(s.toUtf8());
                         sz++;
                     }//for pt=+-
@@ -148,6 +164,8 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                             s.replace("$Z", QString::number(pp.m_z,'f',3));
                             s.replace("$A", QString::number((*p)->rot_x,'f',3));
                             s.replace("$SAFEZ", QString::number(safez,'f',3));
+                            s.replace("$F",QString::number(feedspeed,'f',3));
+                            s.replace("$P",QString::number(plungespeed,'f',3));
                             gc.write(s.toUtf8());
                         }
                         if(flag_beginrun){
@@ -158,18 +176,34 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                             s.replace("$Z", QString::number(pp.m_z,'f',3));
                             s.replace("$A", QString::number((*p)->rot_x,'f',3));
                             s.replace("$SAFEZ", QString::number(safez,'f',3));
+                            s.replace("$F",QString::number(feedspeed,'f',3));
+                            s.replace("$P",QString::number(plungespeed,'f',3));
                             gc.write(s.toUtf8());
                         }
-                        s = point;
+                        if(pt->m_rad>0 && bEnableArcs){
+                            s=arc;
+                            if(pt->isCC)s.replace("G2", "G3");
+                            s.replace("$R", QString::number(pt->m_rad,'f',3));
+                        }else{
+                            if(flag_firstlinepoint)
+                            {
+                                s=firstlinepoint;
+                            }else
+                            {
+                                s=point;
+                            }
+                        }
                         s.replace("$X", QString::number(pp.m_x,'f',3));
                         s.replace("$Y", QString::number(pp.m_y,'f',3));
                         s.replace("$Z", QString::number(pp.m_z,'f',3));
                         s.replace("$SAFEZ", QString::number(safez,'f',3));
+                        s.replace("$F",QString::number(feedspeed,'f',3));
+                        s.replace("$P",QString::number(plungespeed,'f',3));
                         gc.write(s.toUtf8());
                     }//for pt=+-
                 }//else
 
-
+                flag_firstlinepoint=false;
                 rodd=1-rodd;
                 //const Point* pt = &r->m_points.back();
                 s = endrun;
@@ -177,6 +211,8 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                 s.replace("$Y", QString::number(pp.m_y,'f',3));
                 s.replace("$Z", QString::number(pp.m_z,'f',3));
                 s.replace("$SAFEZ", QString::number(safez,'f',3));
+                s.replace("$F",QString::number(feedspeed,'f',3));
+                s.replace("$P",QString::number(plungespeed,'f',3));
                 gc.write(s.toUtf8());
         }//for m_runs iterator
         s = endpath;
@@ -184,6 +220,8 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
         s.replace("$Y", QString::number(pp.m_y,'f',3));
         s.replace("$Z", QString::number(pp.m_z,'f',3));
         s.replace("$SAFEZ", QString::number(safez,'f',3));
+        s.replace("$F",QString::number(feedspeed,'f',3));
+        s.replace("$P",QString::number(plungespeed,'f',3));
         gc.write(s.toUtf8());
     }//for paths iterator
     gc.write(stop_spindle.toUtf8());

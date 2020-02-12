@@ -113,9 +113,9 @@ StepUpDetector::process(std::vector<Point>& points)
 {
     if (points.size() <= 2) return;
 
-    size_t last = points.size()-1;
+    size_t last = points.size()-1;//index to last item in list .. one less than count
 
-    if (points[0].y() == points[last].y()) {
+    if (points[0].y() == points[last].y()) { // first and last y's are equal
         for(size_t pt = 1; pt < last; ) {
             if (points[pt].z() - points[pt-1].z() > fabs(points[pt].x() - points[pt-1].x()) * max_slope) {
                 if (policy == flat) {
