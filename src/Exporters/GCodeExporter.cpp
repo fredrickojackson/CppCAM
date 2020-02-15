@@ -92,6 +92,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
         Point pp;
 
         bool flag_firstlinepoint=true;
+        if(m_rectcut)flag_firstlinepoint=false;
         int rodd=0;
         for(std::vector<Run>::const_iterator r = (*p)->m_runs.begin(); r!=(*p)->m_runs.end(); ++r) {
 
@@ -103,7 +104,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                 if(rodd==0){
                     pt = r->m_points.begin();
                     sz=0;
-                    for(; pt!=r->m_points.end(); ++pt) {
+                    for(; pt!=r->m_points.end(); ++pt){
                         pp=r->m_points[sz];
                         if(flag_beginpath){
                             flag_beginpath=false;
@@ -129,7 +130,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                             s.replace("$P",QString::number(plungespeed,'f',3));
                             gc.write(s.toUtf8());
                         }
-                        if(pt->m_rad>0 && bEnableArcs){
+                        if(pt->m_rad>0.0 && bEnableArcs){
                             s=arc;
                             if(pt->isCC)s.replace("G2", "G3");
                             s.replace("$R", QString::number(pt->m_rad,'f',3));

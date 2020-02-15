@@ -154,3 +154,16 @@ void RectCutDialog::updSize()
 
 
 
+
+void RectCutDialog::on_buttonBox_accepted()
+{
+
+}
+
+void RectCutDialog::on_dsbroundcorner_valueChanged(const QString &arg1)
+{
+    //if(dsbroundcorner->value() > 0.0)cbroundcorner->setChecked(true);
+    //double x = dsbroundcorner->value();
+    m_droundcorner=arg1.toDouble();
+    //m_droundcorner=dsbroundcorner->value();
+}

@@ -53,8 +53,9 @@ extern HeightField* heightfield;
 MainWindow::MainWindow() 
 {
     setupUi(this);
-    theGLWidget = new GLWidget();
-    setCentralWidget(theGLWidget);
+    theGLWidget = new GLWidget(frmogl);
+    //setCentralWidget(theGLWidget);
+    theGLWidget->resize(frmogl->width(),frmogl->height());
     m_PreferencesDialog = new PreferencesDialog();
 
 //    QObject::connect(actionResetView, SIGNAL(triggered()), theGLWidget, SLOT(resetView()));
@@ -87,7 +88,7 @@ MainWindow::MainWindow()
      p_mminy=model->min_y();
      p_mminz=model->min_z();
      p_CutterSize=1.5875;
-    QString p_CutterType="Sph";
+    //QString p_CutterType="Sph";
      p_sminx=stock->min_x();
      p_sminy=stock->min_y();
      p_sminz=stock->min_z();
@@ -105,6 +106,9 @@ MainWindow::MainWindow()
      p_runDirectionx=true;
      menuTest->setVisible(false);
      bEnableArcs=false;
+     p_FeedSpeed=5000.0;
+     p_PlungeSpeed=500.0;
+     p_safez=25.0;
 }
 
 MainWindow::~MainWindow() 
@@ -761,6 +765,7 @@ void MainWindow::on_actionExport_Model_triggered()
 void MainWindow::on_actionRun_triggered()
 {
     QString ss;
+    p_rectcut=false;
     bEnableArcs=false;
     if (model == NULL) return;
 
@@ -787,6 +792,8 @@ void MainWindow::on_actionRun_triggered()
     }
 
     SimpleCutterDialog dlg;
+    dlg.m_comp=p_comp;
+    dlg.m_smooth=p_smooth;
     dlg.m_xmin=stock->min_x();
     dlg.m_ymin=stock->min_y();
     dlg.m_zmin=stock->min_z();
@@ -801,9 +808,9 @@ void MainWindow::on_actionRun_triggered()
     dlg.lePlungeSpeed->setText(ss);
     dlg.leUseLine->setText(QString::number(p_useLine));
 
-    dlg.lineEdit_lines->setPlaceholderText(QString::number(nx));
-    dlg.lineEdit_points->setPlaceholderText(QString::number(ny));
-    dlg.lineEdit_layers->setPlaceholderText(QString::number(nz));
+//    dlg.lineEdit_lines->setPlaceholderText(QString::number(nx));
+//    dlg.lineEdit_points->setPlaceholderText(QString::number(ny));
+//    dlg.lineEdit_layers->setPlaceholderText(QString::number(nz));
     dlg.lineEdit_lines->setText(QString::number(p_runLines));
     dlg.lineEdit_points->setText(QString::number(p_runPoints));
     dlg.lineEdit_layers->setText(QString::number(p_runLayers));
@@ -827,10 +834,16 @@ void MainWindow::on_actionRun_triggered()
     ss=QString("z (%1 : %2) %3").arg(stock->min_z()).arg(stock->max_z()).arg(stock->max_z()-stock->min_z());
     dlg.textEditStatus->append(ss);
 
+    dlg.checkBox_zigzag->setChecked(p_zigzag);
+
     dlg.exec();
 
 
     if (dlg.result() == QDialog::Accepted) {
+        p_runLayers=dlg.lineEdit_layers->text().toInt();
+        p_zigzag=dlg.checkBox_zigzag->isChecked();
+        p_comp=dlg.m_comp;
+        p_smooth=dlg.leSmooth->text().toInt();
         p_useLine=dlg.leUseLine->text().toUInt();
         p_FeedSpeed=dlg.leFeedSpeed->text().toDouble();
         p_PlungeSpeed=dlg.lePlungeSpeed->text().toDouble();
@@ -838,28 +851,28 @@ void MainWindow::on_actionRun_triggered()
         clearPath();
  //       model = STLImporter::ImportModel(p_modelfilename.toStdString());
 
-        if (!dlg.lineEdit_stepdown->text().isEmpty()) {
-            double stepdown = dlg.lineEdit_stepdown->text().toDouble();
-            nz = 1;
-            if (stepdown > 0) {
-                nz += (z1-z0)/stepdown;
-            }
-        } else if (!dlg.lineEdit_layers->text().isEmpty()) {
+//        if (!dlg.le_stepdown->text().isEmpty()) {
+//            double stepdown = dlg.le_stepdown->text().toDouble();
+//            nz = 1;
+//            if (stepdown > 0) {
+//                nz += (z1-z0)/stepdown;
+//            }
+//        } else if (!dlg.lineEdit_layers->text().isEmpty()) {
             nz = dlg.lineEdit_layers->text().toInt();
-        }
+//        }
         if (dlg.radioButton_xdir->isChecked()) {
             dir = Point(1,0,0);
             if (!dlg.lineEdit_lines->text().isEmpty()) {
                 ny = dlg.lineEdit_lines->text().toInt();
-            } else if (!dlg.lineEdit_overlap->text().isEmpty()) {
-                double overlap = dlg.lineEdit_overlap->text().toDouble();
+            } else if (!dlg.le_stepover->text().isEmpty()) {
+                double overlap = dlg.le_stepover->text().toDouble();
                 if (overlap > 1) overlap /= 100;
                 ny = (y1-y0)/(cutter->radius()*(1-overlap)*2);
             }
             if (!dlg.lineEdit_points->text().isEmpty()) {
                 nx = dlg.lineEdit_points->text().toInt();
-            } else if (!dlg.lineEdit_resolution->text().isEmpty()) {
-                double resolution = dlg.lineEdit_resolution->text().toDouble();
+            } else if (!dlg.le_resolution->text().isEmpty()) {
+                double resolution = dlg.le_resolution->text().toDouble();
                 if (resolution>0) {
                     nx = (x1-x0)/resolution;
                 }
@@ -869,15 +882,15 @@ void MainWindow::on_actionRun_triggered()
             dir = Point(0,1,0);
             if (!dlg.lineEdit_lines->text().isEmpty()) {
                 nx = dlg.lineEdit_lines->text().toInt();
-            } else if (!dlg.lineEdit_overlap->text().isEmpty()) {
-                double overlap = dlg.lineEdit_overlap->text().toDouble();
+            } else if (!dlg.le_stepover->text().isEmpty()) {
+                double overlap = dlg.le_stepover->text().toDouble();
                 if (overlap > 1) overlap /= 100;
                 nx = (x1-x0)/(cutter->radius()*(1-overlap)*2);
             }
             if (!dlg.lineEdit_points->text().isEmpty()) {
                 ny = dlg.lineEdit_points->text().toInt();
-            } else if (!dlg.lineEdit_resolution->text().isEmpty()) {
-                double resolution = dlg.lineEdit_resolution->text().toDouble();
+            } else if (!dlg.le_resolution->text().isEmpty()) {
+                double resolution = dlg.le_resolution->text().toDouble();
                 if (resolution>0) {
                     ny = (y1-y0)/resolution;
                 }
@@ -932,6 +945,7 @@ void MainWindow::on_actionRun_triggered()
             simplecutter.m_zigzag = dlg.checkBox_zigzag->isChecked();
             simplecutter.m_stock=stock;
             simplecutter.m_useLine=p_useLine;
+            simplecutter.m_smooth=dlg.leSmooth->text().toDouble();
             simplecutter.GenerateCutPath(*heightfield, Point(stock->min_x(), stock->min_y(), stock->max_z()), dir, zlevels, paths, ang);
             toolcomp(ang);
             if(dlg.checkBoxRotate->isChecked())model->rotate(ai,0,0);
@@ -970,6 +984,7 @@ void MainWindow::on_actionExport_GCode_triggered()
     if (!filename.isEmpty()) {
         lastFile = filename;
         GCodeExporter exp;
+        exp.m_rectcut=p_rectcut;
         exp.bEnableArcs=bEnableArcs;
         exp.safez=p_safez;
         exp.feedspeed=p_FeedSpeed;
@@ -1236,18 +1251,27 @@ void MainWindow::on_actionpush_triggered()
 void MainWindow::on_actionRectCut_triggered()
 {
     RectCutDialog rcdlg(this);
+
+    p_rectcut=true;
     rcdlg.m_stock = stock;
     rcdlg.m_model = model;
+    rcdlg.m_droundcorner=0.0;
+    //rcdlg.dsbroundcorner->setValue(0.0);
     bEnableArcs=true;
+
     if(rcdlg.exec() == QDialog::Accepted)
     {
         clearPath();
         Path* path = new Path();
         QMessageBox qmsg;
         QString ss;
+
+
         path->m_runs.resize(1);
+
         Point p = Point(rcdlg.dminX(),rcdlg.dminY(),rcdlg.dmaxZ());
-        p.m_x-=cutter->radius();
+        p.m_x-=(cutter->radius()+rcdlg.m_droundcorner);
+        path->m_runs[0].m_points.push_back(p);
         bool bdone=false;
         while(bdone==false){
             p.m_z-=rcdlg.dStepDown();
@@ -1257,48 +1281,60 @@ void MainWindow::on_actionRectCut_triggered()
                 bdone=true;
             }
 
-            path->m_runs[0].m_points.push_back(p);
-
-            p.m_y+=rcdlg.dSzY();
-            path->m_runs[0].m_points.push_back(p);
-
-            p.m_x+=cutter->radius();
-            p.m_y+=cutter->radius();
-            p.m_rad=cutter->radius();
-            path->m_runs[0].m_points.push_back(p);
             p.m_rad=-1.0;
+            path->m_runs[0].m_points.push_back(p);
+            p.m_y+=rcdlg.dSzY();
+            p.m_rad=-1.0;
+            path->m_runs[0].m_points.push_back(p);
 
+            p.m_x+=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
+            p.m_y+=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
+            p.m_rad=cutter->radius()+rcdlg.m_droundcorner;
+            path->m_runs[0].m_points.push_back(p);
+
+
+            p.m_rad=-1.0;
             p.m_x+=rcdlg.dSzX();
             path->m_runs[0].m_points.push_back(p);
 
-            p.m_x+=cutter->radius();
-            p.m_y-=cutter->radius();
-            p.m_rad=cutter->radius();
-            path->m_runs[0].m_points.push_back(p);
-            p.m_rad=-1.0;
 
+            p.m_x+=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
+            p.m_y-=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
+            p.m_rad=cutter->radius()+rcdlg.m_droundcorner;
+            path->m_runs[0].m_points.push_back(p);
+
+            p.m_rad=-1.0;
             p.m_y-=rcdlg.dSzY();
             path->m_runs[0].m_points.push_back(p);
 
-            p.m_x-=cutter->radius();
-            p.m_y-=cutter->radius();
-            p.m_rad=cutter->radius();
+            p.m_x-=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
+            p.m_y-=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
+            p.m_rad=cutter->radius()+rcdlg.m_droundcorner;
             path->m_runs[0].m_points.push_back(p);
-            p.m_rad=-1.0;
 
+            p.m_rad=-1.0;
             p.m_x-=rcdlg.dSzX();
             path->m_runs[0].m_points.push_back(p);
 
-            p.m_x-=cutter->radius();
-            p.m_y+=cutter->radius();
-            p.m_rad=cutter->radius();
-            path->m_runs[0].m_points.push_back(p);
-            p.m_rad=-1.0;
 
+            p.m_x-=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
+            p.m_y+=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
+            p.m_rad=cutter->radius()+rcdlg.m_droundcorner;
+            path->m_runs[0].m_points.push_back(p);
         }
 
         paths.push_back(path);
     }
 
+
+}
+
+void MainWindow::on_pbTst_clicked()
+{
+    theGLWidget->resize(frmogl->width(),frmogl->height());
+}
+
+void MainWindow::on_MainWindow_iconSizeChanged(const QSize &iconSize)
+{
 
 }

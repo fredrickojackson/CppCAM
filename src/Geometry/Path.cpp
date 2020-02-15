@@ -27,18 +27,24 @@ void Path::to_OpenGL()
         glBegin(GL_LINE_STRIP);
         //glBegin(GL_POINTS);
         for(std::vector<Point>::iterator p = r->m_points.begin(); p != r->m_points.end(); ++p) {
+            if(p->m_rad>0)
+                glColor3f(1,1,1);
+            else
+                glColor3f(1,0,1);
+
             glVertex3f(p->x(),p->y(),p->z());
         }
         glEnd();
 
         glBegin(GL_LINES);
         for(std::vector<Point>::iterator p = r->m_points.begin(); p != r->m_points.end(); ++p) {
-            glVertex3f(p->x()-0.1,p->y(),p->z());
-            glVertex3f(p->x()+0.1,p->y(),p->z());
-            glVertex3f(p->x(),p->y()-0.1,p->z());
-            glVertex3f(p->x(),p->y()+0.1,p->z());
-            glVertex3f(p->x(),p->y(),p->z()-0.1);
-            glVertex3f(p->x(),p->y(),p->z()+0.1);
+
+            glVertex3f(p->x()-0.03,p->y(),p->z());
+            glVertex3f(p->x()+0.03,p->y(),p->z());
+            glVertex3f(p->x(),p->y()-0.03,p->z());
+            glVertex3f(p->x(),p->y()+0.03,p->z());
+            glVertex3f(p->x(),p->y(),p->z()-0.03);
+            glVertex3f(p->x(),p->y(),p->z()+0.03);
         }
         glEnd();
     }

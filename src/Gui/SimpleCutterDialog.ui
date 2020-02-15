@@ -101,7 +101,7 @@
     <string>Stepover (dLine2Line):</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_overlap">
+  <widget class="QLineEdit" name="le_stepover">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -147,7 +147,7 @@
     <string>Resolution:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_resolution">
+  <widget class="QLineEdit" name="le_resolution">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -193,7 +193,7 @@
     <string>Stepdown:</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_stepdown">
+  <widget class="QLineEdit" name="le_stepdown">
    <property name="geometry">
     <rect>
      <x>380</x>
@@ -454,6 +454,29 @@
    </property>
    <property name="text">
     <string>nd Line</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="leSmooth">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>280</y>
+     <width>135</width>
+     <height>32</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_13">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>290</y>
+     <width>65</width>
+     <height>18</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>smooth</string>
    </property>
   </widget>
  </widget>

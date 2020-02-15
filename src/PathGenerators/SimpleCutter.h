@@ -35,6 +35,7 @@ public:
     double m_compmargin;
     Stock* m_stock;
     int m_useLine;
+    int m_smooth;
 private:
     bool GenerateCutPathLayer_x(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path);
     bool GenerateCutPathLayer_y(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path);

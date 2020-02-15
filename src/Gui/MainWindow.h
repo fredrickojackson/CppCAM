@@ -58,6 +58,10 @@ public:
     double p_PlungeSpeed;
     bool bEnableArcs;
     int p_useLine;
+    bool p_rectcut;
+    int p_smooth;
+    double p_comp;
+    bool p_zigzag;
 private slots:
     void on_actionTestTriangle_triggered();
 
@@ -124,6 +128,10 @@ private slots:
     void on_actionpush_triggered();
 
     void on_actionRectCut_triggered();
+
+    void on_pbTst_clicked();
+
+    void on_MainWindow_iconSizeChanged(const QSize &iconSize);
 
 private:
     void clearPath();

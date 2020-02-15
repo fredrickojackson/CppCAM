@@ -32,6 +32,7 @@ public:
     double feedspeed;
     double plungespeed;
     bool bEnableArcs;
+    bool m_rectcut;
 };
 
 #endif

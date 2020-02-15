@@ -32,6 +32,7 @@ public:
     double dSzZ();
     double dStepDown();
     void updSize();
+    double m_droundcorner;
 
     Stock* m_stock;
     Model* m_model;
@@ -50,6 +51,8 @@ private slots:
     void on_dblmaxX_valueChanged(const QString &arg1);
     void on_dblmaxY_valueChanged(const QString &arg1);
     void on_dblmaxZ_valueChanged(const QString &arg1);
+    void on_buttonBox_accepted();
+    void on_dsbroundcorner_valueChanged(const QString &arg1);
 };
 
 #endif // RECTCUTDIALOG_H
