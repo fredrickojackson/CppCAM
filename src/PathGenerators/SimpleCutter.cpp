@@ -73,7 +73,7 @@ SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point
 //        size_t last_z = heightfield.height();
         for(size_t ii=0; ii<heightfield.height(); ii++) {
             size_t i = ii;
-            if (m_zigzag) i = heightfield.height()-ii;
+//            if (m_zigzag) i = heightfield.height()-ii;
             double z = 0.0;
 
             z = heightfield.point(j,i);
@@ -152,7 +152,7 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
 //        double last_z = 0;
         for(size_t jj=0; jj<heightfield.width(); jj++) {
             size_t j = jj;
-            if (m_zigzag) j = heightfield.width()-jj;
+//            if (m_zigzag) j = heightfield.width()-jj;
 
             double z = heightfield.point(j,i);
 

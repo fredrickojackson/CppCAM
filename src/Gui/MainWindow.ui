@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>900</width>
     <height>600</height>
    </rect>
+  </property>
+  <property name="mouseTracking">
+   <bool>true</bool>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
    <string>cppCAM</string>
@@ -18,33 +24,11 @@
     <normaloff>:/pycam/icons/logo_16px.png</normaloff>:/pycam/icons/logo_16px.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="gridLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>0</y>
-      <width>671</width>
-      <height>571</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QFrame" name="frmogl">
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QPushButton" name="pbTst">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>450</y>
+      <x>10</x>
+      <y>10</y>
       <width>88</width>
       <height>34</height>
      </rect>
@@ -63,13 +47,29 @@
      </rect>
     </property>
    </widget>
+   <widget class="QWidget" name="frmogl" native="true">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>50</y>
+      <width>600</width>
+      <height>471</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>900</width>
      <height>30</height>
     </rect>
    </property>
@@ -138,6 +138,7 @@
     <addaction name="actionExport_Model"/>
     <addaction name="separator"/>
     <addaction name="actionRun"/>
+    <addaction name="actionRack_Cut"/>
     <addaction name="actionRectCut"/>
     <addaction name="actionExport_GCode"/>
    </widget>
@@ -404,6 +405,11 @@
   <action name="actionRectCut">
    <property name="text">
     <string>Re&amp;ctCut</string>
+   </property>
+  </action>
+  <action name="actionRack_Cut">
+   <property name="text">
+    <string>Rack Cut</string>
    </property>
   </action>
  </widget>

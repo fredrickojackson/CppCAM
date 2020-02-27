@@ -31,6 +31,8 @@ class MainWindow :
 public:
     MainWindow();
     ~MainWindow();
+    void resizeEvent(QResizeEvent* event);
+    void mouseMoveEvent(QMouseEvent *ev);
     GLWidget* theGLWidget;
     QString p_modelfilename;
     double p_mminx;
@@ -56,12 +58,12 @@ public:
     double p_safez;
     double p_FeedSpeed;
     double p_PlungeSpeed;
-    bool bEnableArcs;
     int p_useLine;
     bool p_rectcut;
     int p_smooth;
     double p_comp;
-    bool p_zigzag;
+
+    bool bEnableArcs;
 private slots:
     void on_actionTestTriangle_triggered();
 
@@ -132,6 +134,8 @@ private slots:
     void on_pbTst_clicked();
 
     void on_MainWindow_iconSizeChanged(const QSize &iconSize);
+
+    void on_actionRack_Cut_triggered();
 
 private:
     void clearPath();

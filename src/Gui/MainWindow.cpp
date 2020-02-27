@@ -43,6 +43,8 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "GCodeExporter.h"
 #include "STLExporter.h"
 #include "rectcutdialog.h"
+#include "rackcutdlg.h"
+
 
 extern Stock* stock;
 extern Model* model;
@@ -55,7 +57,7 @@ MainWindow::MainWindow()
     setupUi(this);
     theGLWidget = new GLWidget(frmogl);
     //setCentralWidget(theGLWidget);
-    theGLWidget->resize(frmogl->width(),frmogl->height());
+//    theGLWidget->resize(frmogl->width(),frmogl->height());
     m_PreferencesDialog = new PreferencesDialog();
 
 //    QObject::connect(actionResetView, SIGNAL(triggered()), theGLWidget, SLOT(resetView()));
@@ -88,7 +90,7 @@ MainWindow::MainWindow()
      p_mminy=model->min_y();
      p_mminz=model->min_z();
      p_CutterSize=1.5875;
-    //QString p_CutterType="Sph";
+     QString p_CutterType="Sph";
      p_sminx=stock->min_x();
      p_sminy=stock->min_y();
      p_sminz=stock->min_z();
@@ -207,126 +209,79 @@ MainWindow::on_actionTestPath_triggered()
 void MainWindow::on_actionOpen_triggered()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Select Project File", "/home/fred", "Cam files (*.cam)");
-    //p_modelfilename=filename;
-    QFile gc(filename);
-    if (!gc.open(QIODevice::ReadOnly)) {
-        return;
-    }
-    QTextStream ts(&gc);
-    ts >> p_modelfilename;
-    model = STLImporter::ImportModel(p_modelfilename.toStdString());
-    ts >> p_mminx;
-    ts >> p_mminy;
-    ts >> p_mminz;
-    model->resize(p_mminx,1.0,p_mminy,1.0,p_mminz,1.0);
-    ts >> p_CutterSize;
-    ts >> p_CutterType;
-    if(p_CutterType.compare("Cyl")==0){
-        cutter = Cutter::CreateCylindricalCutter(p_CutterSize, Point(0,0,0));
-        cutter->m_isSpherical=false;
-    }else{
-        cutter = Cutter::CreateSphericalCutter(p_CutterSize, Point(0,0,0));
-        cutter->m_isSpherical=true;
-    }
-    ts >> p_sminx;
-    ts >> p_sminy;
-    ts >> p_sminz;
-    ts >> p_smaxx;
-    ts >> p_smaxy;
-    ts >> p_smaxz;
-    if(stock)delete stock;
-    stock = new Stock();
-    stock->m_min_x=p_sminx;
-    stock->m_min_y=p_sminy;
-    stock->m_min_z=p_sminz;
+    QSettings setproj(filename,QSettings::IniFormat);
+    p_modelfilename=setproj.value("p_modelfilename","~/tmp.cam").toString();
+    p_mminx=setproj.value("p_mminx",0.0).toDouble();
+    p_mminy=setproj.value("p_mminy",0.0).toDouble();
+    p_mminz=setproj.value("p_mminz",0.0).toDouble();
+    p_CutterSize=setproj.value("p_CutterSize",0.0).toDouble();
+    p_sminx=setproj.value("p_sminx",0.0).toDouble();
+    stock->m_min_x=p_mminx;
+    p_sminy=setproj.value("p_sminy",0.0).toDouble();
+    stock->m_min_y=p_mminy;
+    p_sminz=setproj.value("p_sminz",0.0).toDouble();
+    stock->m_min_z=p_mminz;
+    p_smaxx=setproj.value("p_smaxx",0.0).toDouble();
     stock->m_max_x=p_smaxx;
+    p_smaxy=setproj.value("p_smaxy",0.0).toDouble();
     stock->m_max_y=p_smaxy;
+    p_smaxz=setproj.value("p_smaxz",0.0).toDouble();
     stock->m_max_z=p_smaxz;
-    ts >> p_runLines;
-    ts >> p_runStepover;
-    ts >> p_runPoints;
-    ts >> p_runResolution;
-    ts >> p_runLayers;
-    ts >> p_runStepdown;
-    ts >> filename;
-    if(filename.compare("1")==0){
-        p_runRotate=true;
-    }else{
-        p_runRotate=false;
-    }
-    ts >> p_runRotStep;
-    ts >> filename;
-    if(filename.compare("1")==0){
-        p_runDirectionx=true;
-    }else{
-        p_runDirectionx=false;
-    }
 
-
-
-
+    p_runLines=setproj.value("p_runLines",0.0).toInt();
+    p_runPoints=setproj.value("p_runPoints",0.0).toInt();
+    p_runLayers=setproj.value("p_runLayers",0.0).toInt();
+    p_runStepover=setproj.value("p_runStepover",0.0).toDouble();
+    p_runResolution=setproj.value("p_runResolution",0.0).toDouble();
+    p_runStepdown=setproj.value("p_runStepdown",0.0).toDouble();
+    p_runRotStep=setproj.value("p_runRotStep",0.0).toDouble();
+    p_safez=setproj.value("p_safez",0.0).toDouble();
+    p_FeedSpeed=setproj.value("p_FeedSpeed",0.0).toDouble();
+    p_PlungeSpeed=setproj.value("p_PlungeSpeed",0.0).toDouble();
+    p_comp=setproj.value("p_comp",0.0).toDouble();
+    p_runRotate=setproj.value("p_runRotate",0.0).toBool();
+    p_runDirectionx=setproj.value("p_runDirectionx",0.0).toBool();
+    p_rectcut=setproj.value("p_rectcut",0.0).toBool();
+    p_useLine=setproj.value("p_useLine",0.0).toInt();
+    p_smooth=setproj.value("p_smooth",0.0).toInt();
+    p_CutterType=setproj.value("p_CutterType","Sph").toString();
 }
 
 void MainWindow::on_actionSave_triggered()
 {
     QString filename = QFileDialog::getSaveFileName(this, "Select Project File", "/home/fred", "Cam files (*.cam)");
-    QString pname=filename;
-    pname.replace(".","_.");
-    QSettings setproj(pname,QSettings::IniFormat);
+    QSettings setproj(filename,QSettings::IniFormat);
 
-    QFile gc(filename);
-    if (!gc.open(QIODevice::WriteOnly)) {
-        return;
-    }
-    QTextStream ts(&gc);
-    ts << p_modelfilename << "\n";
     setproj.setValue("p_modelfilename",p_modelfilename);
-    ts << p_mminx << "\n";
     setproj.setValue("p_mminx",p_mminx);
-    ts << p_mminy << "\n";
     setproj.setValue("p_mminy",p_mminy);
-    ts << p_mminz << "\n";
     setproj.setValue("p_mminz",p_mminz);
-    ts << p_CutterSize << "\n";
     setproj.setValue("p_CutterSize",p_CutterSize);
-    ts << p_CutterType << "\n";
     setproj.setValue("p_CutterType",p_CutterType);
-    ts << p_sminx << "\n";
     setproj.setValue("p_sminx",p_sminx);
-    ts << p_sminy << "\n";
     setproj.setValue("p_sminy",p_sminy);
-    ts << p_sminz << "\n";
     setproj.setValue("p_sminz",p_sminz);
-    ts << p_smaxx << "\n";
     setproj.setValue("p_smaxx",p_smaxx);
-    ts << p_smaxy << "\n";
     setproj.setValue("p_smaxy",p_smaxy);
-    ts << p_smaxz << "\n";
     setproj.setValue("p_smaxz",p_smaxz);
-    ts << p_runLines << "\n";
     QVariant qv = (qlonglong)p_runLines;
     setproj.setValue("p_runLines",qv);
-    ts << p_runStepover << "\n";
     setproj.setValue("p_runStepover",p_runStepover);
-    ts << p_runPoints << "\n";
     setproj.setValue("p_runPoints",(qlonglong)p_runPoints);
-    ts << p_runResolution << "\n";
     setproj.setValue("p_runResolution",p_runResolution);
-    ts << p_runLayers << "\n";
     setproj.setValue("p_runLayers",p_runLayers);
-    ts << p_runStepdown << "\n";
     setproj.setValue("p_runStepdown",p_runStepdown);
-    ts << p_runRotate << "\n";
     setproj.setValue("p_runRotate",p_runRotate);
-    ts << p_runRotStep << "\n";
     setproj.setValue("p_runRotStep",p_runRotStep);
-    ts << p_runDirectionx << "\n";
     setproj.setValue("p_runDirectionx",p_runDirectionx);
-    gc.close();
-
+    setproj.setValue("p_safez",p_safez);
+    setproj.setValue("p_FeedSpeed",p_FeedSpeed);
+    setproj.setValue("p_PlungeSpeed",p_PlungeSpeed);
+    setproj.setValue("p_useLine",p_useLine);
+    setproj.setValue("p_rectcut",p_rectcut);
+    setproj.setValue("p_smooth",p_smooth);
+    setproj.setValue("p_comp",p_comp);
     setproj.sync();
-
-
 }
 
 void MainWindow::on_actionImport_Model_triggered()
@@ -834,14 +789,11 @@ void MainWindow::on_actionRun_triggered()
     ss=QString("z (%1 : %2) %3").arg(stock->min_z()).arg(stock->max_z()).arg(stock->max_z()-stock->min_z());
     dlg.textEditStatus->append(ss);
 
-    dlg.checkBox_zigzag->setChecked(p_zigzag);
-
     dlg.exec();
 
 
     if (dlg.result() == QDialog::Accepted) {
         p_runLayers=dlg.lineEdit_layers->text().toInt();
-        p_zigzag=dlg.checkBox_zigzag->isChecked();
         p_comp=dlg.m_comp;
         p_smooth=dlg.leSmooth->text().toInt();
         p_useLine=dlg.leUseLine->text().toUInt();
@@ -921,19 +873,20 @@ void MainWindow::on_actionRun_triggered()
                 delete heightfield;
             }
             heightfield = new HeightField(x0, x1, y0, y1, z0, z1, nx, ny);
-            //QProgressBar progress(this);
-            //progress.setMaximum(100);
-            //progress.show();
+            QProgressBar progress(this);
+            progress.setMaximum(100);
+            progress.show();
             DropCutter dropcutter;
             double workdone = 0;
             dropcutter.setAsync(false);
             dropcutter.GeneratePath(*cutter, *model, *heightfield);
             while (!dropcutter.finished(&workdone)) {
                 update();
-                //progress.setValue(workdone);
+                progress.setValue(workdone);
                 QCoreApplication::processEvents();
             }
-            //progress.hide();
+            progress.hide();
+            //return;
             SimpleCutter simplecutter;
             simplecutter.m_radius=cutter->radius();
             simplecutter.m_isSpherical=cutter->m_isSpherical;
@@ -942,7 +895,6 @@ void MainWindow::on_actionRun_triggered()
                 simplecutter.m_compmargin=dlg.leMargin->text().toDouble();
             else
                 simplecutter.m_compmargin=0.0;
-            simplecutter.m_zigzag = dlg.checkBox_zigzag->isChecked();
             simplecutter.m_stock=stock;
             simplecutter.m_useLine=p_useLine;
             simplecutter.m_smooth=dlg.leSmooth->text().toDouble();
@@ -1257,10 +1209,10 @@ void MainWindow::on_actionRectCut_triggered()
     rcdlg.m_model = model;
     rcdlg.m_droundcorner=0.0;
     //rcdlg.dsbroundcorner->setValue(0.0);
-    bEnableArcs=true;
 
     if(rcdlg.exec() == QDialog::Accepted)
     {
+        bEnableArcs=true;
         clearPath();
         Path* path = new Path();
         QMessageBox qmsg;
@@ -1331,10 +1283,149 @@ void MainWindow::on_actionRectCut_triggered()
 
 void MainWindow::on_pbTst_clicked()
 {
-    theGLWidget->resize(frmogl->width(),frmogl->height());
+
 }
 
 void MainWindow::on_MainWindow_iconSizeChanged(const QSize &iconSize)
 {
 
 }
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    // Your code here.
+    int xx = this->width();
+    xx-=150;
+    int yy = this->height()-50;
+    //frmogl->setFrameRect(QRect(150,50,xx,yy));
+    frmogl->setGeometry(150,50,xx-10,yy-10);
+//    theGLWidget->resizeGL(xx,yy);
+    theGLWidget->move(0,0);
+    theGLWidget->resize(xx,yy);
+//    theGLWidget->updateGL();
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *ev)
+{
+    QString qs=QString::number(ev->x());
+    qs.append(",").append(QString::number(ev->y()));
+    leStat->setText(qs);
+}
+
+void MainWindow::on_actionRack_Cut_triggered()
+{
+    rackcutdlg dlg;
+
+    if (dlg.exec() == QDialog::Accepted)
+    {
+        bEnableArcs=true;
+        clearPath();
+        Path* path = new Path();
+        path->m_runs.resize(1);
+
+        double rmod = dlg.ui->dsbMod->value();
+        double rlen = dlg.ui->dsbLen->value();
+        double step = dlg.ui->dsbStep->value();
+        double rwid = dlg.ui->dsbWid->value();
+        double pitch = M_PI * rmod;
+        double prang = dlg.ui->dsbPrAngle->value();
+        double ha = rmod;
+        double hf = 1.25 * rmod;
+        double hw = 2.0 * rmod;
+        double c = 0.25 * rmod;
+        double pf = 0.38 * rmod;
+
+        double ttip = pf-pf*sin(prang*M_PI/180.0);
+        double d0 = 0.0;
+        double d1 = pf*cos(prang*M_PI/180.0);
+        double d2 = (M_PI * rmod / 2.0) - d1;
+        double ylin=((d2-d1)/tan(prang*M_PI/180.0))/2.0;
+        double hlin2 = ylin-pf*sin(prang*M_PI/180.0)+pf;
+        double hd1= ylin;
+        double htot = hlin2*2;
+        double hd2 = -ylin;
+        double hd0=ylin-pf*sin(prang*M_PI/180.0)+pf;
+
+
+
+        double d3 = (M_PI * rmod / 2.0) + d1;
+        double hd3=hd2;
+
+        double d4 =3*d1+2*(d2-d1);
+        //hd1 = hd0-pf*sin(prang*M_PI/180.0);
+        double hd4= hd1;
+        double slope1=(hd2-hd1)/(d2-d1);
+        double slope2=(hd4-hd3)/(d4-d3);
+
+
+
+        double d5 = M_PI * rmod;
+        double hd5= hd0;
+
+        double dis=0.0;
+        double hh=0.0;
+        double hpf=0.0;
+        double zl=0.0;
+
+        double cd0=-0.475;
+        double cd1=0.0;
+        double cd2=0.0;
+        double cd3=0.0;
+        double cd4=0.0;
+        double cd5=0.0;
+        double ang=0.0;
+
+        for(dis=0;dis<=rlen;dis+=step)
+        {
+            double tdist=dis-int(dis/pitch);
+            if(tdist<d1)
+            {
+                //zl=pf*cos(()*tdist/pf);
+                double dy=pow((pow(pf,2.0)-pow(tdist,2.0)),0.5);
+                double ang=atan(dy/tdist);
+                hpf=ylin+pf-pf*sin(ang);
+                hpf=dy-pf;
+                zl=hpf;
+            }else if(tdist>=d1 && tdist<d2)
+            {
+                zl=-0.286027381562+slope1*(tdist-d1);
+            }else if(tdist>=d2 && tdist<d3)
+            {
+                if(tdist<(M_PI*rmod/2.0))
+                {
+                    zl=-3.03826249552-pow(pow(pf,2)-pow((M_PI*rmod/2.0)-tdist,2),0.5);
+                }else
+                {
+                    zl=-3.03826249552-pow(pow(pf,2)-pow(tdist-(M_PI*rmod/2.0),2),0.5);
+                }
+            }else if(tdist>=d3 && tdist<d4)
+            {
+                zl=slope2*(tdist-d3);
+            }else if(tdist>=d4 && tdist<d5)
+            {
+                hpf=pow((pow(pf,2.0)-pow(pitch-tdist,2.0)),0.5);
+                zl=hf+ha+hpf;
+            }
+
+            Point p = Point(0.0,dis,zl);
+
+            path->m_runs[0].m_points.push_back(p);
+
+
+
+        }//dis
+        paths.push_back(path);
+
+
+    }
+}
+
+
+
+
+
+
+
+
+

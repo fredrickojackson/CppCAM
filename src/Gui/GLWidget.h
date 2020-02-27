@@ -24,9 +24,9 @@ class GLWidget : public QGLWidget {
 public:
     GLWidget(QWidget* parent=NULL);
     double scale;
+    void resizeGL(int w, int h);
 private:
     void initializeGL();
-    void resizeGL(int w, int h);
     void paintGL();
     void keyPressEvent(QKeyEvent *event);
     void mousePressEvent(QMouseEvent *event);

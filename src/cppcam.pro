@@ -28,7 +28,8 @@ SOURCES += \
     Gui/dlgroundcutter.cpp \
     Gui/rectcutdialog.cpp \
     Gui/dlgtoolsize.cpp \
-    cppcam.cpp
+    cppcam.cpp \
+    rackcutdlg.cpp
 
 SOURCES += Gui/MainWindow.cpp Gui/GLWidget.cpp 
 SOURCES += Gui/PreferencesDialog.cpp Gui/StockModelDialog.cpp
@@ -59,7 +60,8 @@ HEADERS += Gui/AboutDialog.h \
     Geometry/intersection.h \
     Gui/dlgroundcutter.h \
     Gui/rectcutdialog.h \
-    Gui/dlgtoolsize.h
+    Gui/dlgtoolsize.h \
+    rackcutdlg.h
 HEADERS += Gui/MainWindow.h Gui/GLWidget.h
 HEADERS += Gui/PreferencesDialog.h
 HEADERS += Gui/StockModelDialog.h 
@@ -69,7 +71,8 @@ HEADERS += Gui/SimpleCutterDialog.h
 FORMS += Gui/MainWindow.ui Gui/AboutDialog.ui \
     Gui/dlgroundcutter.ui \
     Gui/rectcutdialog.ui \
-    Gui/dlgtoolsize.ui
+    Gui/dlgtoolsize.ui \
+    rackcutdlg.ui
 FORMS += Gui/PreferencesDialog.ui Gui/StockModelDialog.ui 
 FORMS += Gui/ResizeModelDialog.ui Gui/AlignModelDialog.ui Gui/RotateModelDialog.ui 
 FORMS += Gui/SimpleCutterDialog.ui
