@@ -35,8 +35,8 @@ public:
     double m_xmax;
     double m_ymax;
     double m_zmax;
-    int m_smooth;
-    double m_comp;
+    int m_smooth=0;
+    double m_comp=0;
     void showEvent(QShowEvent *event);
     
 private slots:
@@ -47,4 +47,5 @@ private slots:
     void on_leUseLine_textChanged(const QString &arg1);
     void on_leMargin_editingFinished();
     void on_cbLeaveMargin_stateChanged(int arg1);
+    void on_buttonBox_accepted();
 };

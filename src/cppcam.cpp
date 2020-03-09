@@ -35,8 +35,7 @@ Cutter* cutter = NULL;
 std::vector<Path*> paths;
 HeightField* heightfield = NULL;
 
-int
-main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     if (argc>1 && strcmp(argv[1],"--test")==0) {
         return run_tests();

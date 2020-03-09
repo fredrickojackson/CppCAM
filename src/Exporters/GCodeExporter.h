@@ -28,6 +28,7 @@ class GCodeExporter
 public:
     GCodeExporter();
     bool ExportPath(const std::vector<Path*>& paths, std::string filename);
+    void replace(QString *s, Point pt, double a);
     double safez;
     double feedspeed;
     double plungespeed;

@@ -43,7 +43,7 @@ PreferencesDialog::on_tabWidget_currentChanged(int index)
 {
     if (index==1) {
         if (m_gcodeSettings == NULL) {
-            m_gcodeSettings = new QSettings("/data/projects/cppcam/config/GCode.conf", QSettings::IniFormat);
+            m_gcodeSettings = new QSettings("/home/fred/GCode.conf", QSettings::IniFormat);
             QStringList headers = QStringList() << "header" << "preamble" << "postamble";
             Q_FOREACH(QString s, m_gcodeSettings->allKeys()) {
                 if (!headers.contains(s)) {

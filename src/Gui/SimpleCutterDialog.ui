@@ -427,7 +427,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>2</string>
+    <string>1</string>
    </property>
   </widget>
   <widget class="QLabel" name="lblUseline">
@@ -446,19 +446,22 @@
   <widget class="QLineEdit" name="leSmooth">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>280</y>
+     <x>70</x>
+     <y>230</y>
      <width>135</width>
      <height>32</height>
     </rect>
+   </property>
+   <property name="text">
+    <string>0</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_13">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>290</y>
-     <width>65</width>
+     <x>10</x>
+     <y>240</y>
+     <width>51</width>
      <height>18</height>
     </rect>
    </property>

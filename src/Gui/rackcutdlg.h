@@ -17,6 +17,11 @@ public:
     ~rackcutdlg();
     Ui::rackcutdlg *ui;
 
+private slots:
+    void on_cbClear_clicked();
+
+    void on_cbClear_stateChanged(int arg1);
+
 private:
 };
 

@@ -50,7 +50,7 @@
    <widget class="QWidget" name="frmogl" native="true">
     <property name="geometry">
      <rect>
-      <x>150</x>
+      <x>260</x>
       <y>50</y>
       <width>600</width>
       <height>471</height>
@@ -61,6 +61,42 @@
       <horstretch>0</horstretch>
       <verstretch>0</verstretch>
      </sizepolicy>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbt">
+    <property name="geometry">
+     <rect>
+      <x>110</x>
+      <y>10</y>
+      <width>88</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>tst</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbt_hole">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>10</y>
+      <width>88</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>hole</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="letime">
+    <property name="geometry">
+     <rect>
+      <x>780</x>
+      <y>0</y>
+      <width>113</width>
+      <height>32</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -84,6 +120,7 @@
     <addaction name="separator"/>
     <addaction name="actionPreferences"/>
     <addaction name="separator"/>
+    <addaction name="actionExport_GCode"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -124,6 +161,7 @@
     <addaction name="separator"/>
     <addaction name="separator"/>
     <addaction name="actionheight_field"/>
+    <addaction name="actionClear_Path"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -140,7 +178,7 @@
     <addaction name="actionRun"/>
     <addaction name="actionRack_Cut"/>
     <addaction name="actionRectCut"/>
-    <addaction name="actionExport_GCode"/>
+    <addaction name="actionHole_Cut"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -410,6 +448,16 @@
   <action name="actionRack_Cut">
    <property name="text">
     <string>Rack Cut</string>
+   </property>
+  </action>
+  <action name="actionHole_Cut">
+   <property name="text">
+    <string>Hole Cut</string>
+   </property>
+  </action>
+  <action name="actionClear_Path">
+   <property name="text">
+    <string>Clear Path</string>
    </property>
   </action>
  </widget>

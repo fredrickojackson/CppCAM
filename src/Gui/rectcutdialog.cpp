@@ -1,4 +1,4 @@
-/* added by fredirck.o.jackson@gmail.com */
+/* added by fredrick.o.jackson@gmail.com */
 #include "rectcutdialog.h"
 #include "ui_rectcutdialog.h"
 #include <QMessageBox>

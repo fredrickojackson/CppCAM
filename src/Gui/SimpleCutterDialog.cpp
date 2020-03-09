@@ -32,6 +32,8 @@ SimpleCutterDialog::SimpleCutterDialog(QWidget* parent){
     m_xmax=0.0;
     m_ymax=0.0;
     m_zmax=0.0;
+    m_comp=0.0;
+    m_smooth=0;
 }
 
 void SimpleCutterDialog::showEvent(QShowEvent *event){
@@ -118,4 +120,9 @@ void SimpleCutterDialog::on_cbLeaveMargin_stateChanged(int arg1)
         m_comp=leMargin->text().toDouble();
     else
         m_comp=0.0;
+}
+
+void SimpleCutterDialog::on_buttonBox_accepted()
+{
+
 }

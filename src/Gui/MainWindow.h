@@ -62,9 +62,11 @@ public:
     bool p_rectcut;
     int p_smooth;
     double p_comp;
-
     bool bEnableArcs;
+    QTimer *qtimer;
 private slots:
+    void mytimeout();
+
     void on_actionTestTriangle_triggered();
 
     void on_actionTestModel_triggered();
@@ -137,11 +139,19 @@ private slots:
 
     void on_actionRack_Cut_triggered();
 
+    void on_pbt_clicked();
+
+    void on_pbt_hole_clicked();
+
+    void on_actionHole_Cut_triggered();
+
+    void on_actionClear_Path_triggered();
+
 private:
     void clearPath();
     void clearHeightfield();
     void clearModelAndPath();
     PreferencesDialog* m_PreferencesDialog;
-    void toolcomp(double ang);
+    void sim();
 
 };

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1085</width>
+    <width>740</width>
     <height>386</height>
    </rect>
   </property>
@@ -51,7 +51,7 @@
      <height>34</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="hlx">
     <item>
      <widget class="QLabel" name="label_3">
       <property name="enabled">
@@ -115,7 +115,7 @@
      <height>34</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QHBoxLayout" name="hl2">
     <item>
      <widget class="QLabel" name="label_2">
       <property name="text">
@@ -167,7 +167,7 @@
      <height>34</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_3">
+   <layout class="QHBoxLayout" name="hl3">
     <item>
      <widget class="QLabel" name="label_4">
       <property name="text">
@@ -193,8 +193,8 @@
   <widget class="QPushButton" name="pbUsestock">
    <property name="geometry">
     <rect>
-     <x>950</x>
-     <y>190</y>
+     <x>80</x>
+     <y>290</y>
      <width>88</width>
      <height>34</height>
     </rect>
@@ -212,7 +212,7 @@
      <height>34</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_4">
+   <layout class="QHBoxLayout" name="hl4">
     <item>
      <widget class="QLabel" name="label_6">
       <property name="text">
@@ -255,8 +255,8 @@
   <widget class="QLabel" name="lblModel">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>60</y>
+     <x>520</x>
+     <y>30</y>
      <width>191</width>
      <height>91</height>
     </rect>
@@ -271,8 +271,8 @@
   <widget class="QLabel" name="lblStock">
    <property name="geometry">
     <rect>
-     <x>830</x>
-     <y>60</y>
+     <x>510</x>
+     <y>150</y>
      <width>211</width>
      <height>91</height>
     </rect>
