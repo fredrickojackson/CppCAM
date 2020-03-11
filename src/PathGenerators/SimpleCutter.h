@@ -39,6 +39,7 @@ public:
 private:
     bool GenerateCutPathLayer_x(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path);
     bool GenerateCutPathLayer_y(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path);
+    bool GenerateCutPathLayer_rect(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path);
 };
 
 #endif

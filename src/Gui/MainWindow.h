@@ -31,6 +31,7 @@ class MainWindow :
 public:
     MainWindow();
     ~MainWindow();
+
     void resizeEvent(QResizeEvent* event);
     void mouseMoveEvent(QMouseEvent *ev);
     GLWidget* theGLWidget;

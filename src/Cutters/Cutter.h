@@ -75,8 +75,9 @@ public:
 
     bool m_isSpherical;
 
-protected:
     double m_radius;
+
+protected:
     Point m_location;
     double m_height;
     Point m_axis;

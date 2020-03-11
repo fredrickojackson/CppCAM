@@ -17,6 +17,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+#include <QFile>
+#include <QTextStream>
 #include "SimpleCutter.h"
 #include "PathProcessors.h"
 
@@ -25,7 +28,7 @@ SimpleCutter::GenerateCutPath(const HeightField& heightfield, const Point& start
                               std::vector<Path*>& paths, double angle)
 {
     if (direction.z() != 0) return false;
-    if (direction.x() != 0 && direction.y() != 0) return false;
+    //if (direction.x() != 0 && direction.y() != 0) return false;
     if (direction.x() != 0 && direction.y() == 0) {
         for(size_t i=0; i<zlevels.size(); i++) {
             Path* path = new Path();
@@ -41,7 +44,20 @@ SimpleCutter::GenerateCutPath(const HeightField& heightfield, const Point& start
     if (direction.x() == 0 && direction.y() != 0) {
         for(size_t i=0; i<zlevels.size(); i++) {
             Path* path = new Path();
+            path->rot_x=angle;
             if (!GenerateCutPathLayer_x(heightfield, start, direction, zlevels[zlevels.size()-i-1], *path)) {
+                delete path;
+                return false;
+            }
+            paths.push_back(path);
+        }
+        return true;
+    }
+    if (direction.x() != 0 && direction.y() != 0) {
+        for(size_t i=0; i<zlevels.size(); i++) {
+            Path* path = new Path();
+            path->rot_x=angle;
+            if (!GenerateCutPathLayer_rect(heightfield, start, direction, zlevels[zlevels.size()-i-1], *path)) {
                 delete path;
                 return false;
             }
@@ -102,7 +118,7 @@ SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point
                             zc=heightfield.point(li,lj);
                         }else
                         {
-                            zc=heightfield.point(li,lj)-m_radius*sin((dis*3.1415926/(2.0*m_radius)));
+                            zc=heightfield.point(li,lj)-m_radius*cos((dis*3.1415926/(2.0*m_radius)));
                         }
                         if((dis<(m_radius+m_compmargin)) && (zc>zcc))
                         {
@@ -181,7 +197,7 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
                             zc=heightfield.point(li,lj);
                         }else
                         {
-                            zc=heightfield.point(li,lj)-m_radius*sin((dis*3.1415926/(2.0*m_radius)));
+                            zc=heightfield.point(li,lj)-m_radius*cos((dis*3.1415926/(2.0*m_radius)));
                         }
                         if((dis<(m_radius+m_compmargin)) && (zc>zcc))
                         {
@@ -204,8 +220,127 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
             }
             z+=m_compmargin;
             run.m_points.push_back(Point(heightfield.x(j), heightfield.y(i), z));
-        }
+        }//j or jj
         pathProcessors.process(run.m_points);
-    }
+    }//i
     return true;
 }
+
+bool
+SimpleCutter::GenerateCutPathLayer_rect(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path)
+{
+    SimplePathProcessors pathProcessors;
+
+    double xstep=m_stock->dim_x()/heightfield.width();
+    double ystep=m_stock->dim_y()/heightfield.height();
+    size_t di = 1+m_radius/xstep;
+    size_t dj = 1+m_radius/ystep;
+    long di1=0;
+    long di2=0;
+    long dj1=0;
+    long dj2=0;
+    int firstflag=1;
+
+    path.m_runs.resize(path.m_runs.size()+1);
+    Run& run = path.m_runs.back();
+    QFile logfile("/home/fred/logfile.txt");
+//    logfile.open(QIODevice::WriteOnly | QIODevice::Append);
+    logfile.open(QIODevice::WriteOnly);
+    QTextStream qts(&logfile);
+
+    size_t i=0;
+    size_t j=0;
+    size_t pos=0;
+newpos:
+    double z = heightfield.point(i,j);
+    if(z_layer > z) z=z_layer;
+//    di1=i-di;
+//    if(di1<0) di1=0;
+//    di2=i+di;
+//    if(di2>(size_t)(heightfield.width()-1))di2=heightfield.width()-1;
+//    dj1=j-dj;
+//    if(dj1<0) dj1=0;
+//    dj2=j+dj;
+//    if(dj2>(heightfield.height()-1))dj2=heightfield.height()-1;
+//    double zav = 0.0;
+//    int zcnt = 0;
+//    double zcc = -1000.0;
+
+//    for(long lj=dj1; lj<=dj2; lj++)
+//        for(long li=di1; li<=di2; li++)
+//        {
+//            double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
+//            double zc = -1000.0;
+//            if(!((li == j) && (lj == i)))
+//            {
+//                if(!m_isSpherical)
+//                {
+//                    zc=heightfield.point(li,lj);
+//                }else
+//                {
+//                    zc=heightfield.point(li,lj)-m_radius*sin((dis*3.1415926/(2.0*m_radius)));
+//                }
+//                if((dis<(m_radius+m_compmargin)) && (zc>zcc))
+//                {
+//                    zcc=zc;
+//                }
+//            }
+//            if((labs(li-(long)j)<=m_smooth) && (labs(lj-(long)i)<=m_smooth))
+//            {
+//                zav += heightfield.point(li,lj);
+//                zcnt++;
+//            }
+//        }//lj//li
+
+//    if(m_smooth && zcnt)
+//        z=zav/zcnt;
+
+//    if(zcc>z)z=zcc;
+//    if (z < z_layer) {
+//        z = z_layer;
+//    }
+    z+=m_compmargin;
+    run.m_points.push_back(Point(heightfield.x(i), heightfield.y(j), z));
+    qts << i << "," << j << "," << z << "\n";
+
+
+    if(j==pos && i==pos && firstflag==0)
+    {
+        pos++;
+        i++;
+        j++;
+        if(pos>(heightfield.width()/2+1) || (pos>(heightfield.height()/2+1)))
+        {
+            qts << "endofrun " << i << "," << j << "," << z << "\n";
+            goto myexi;
+        }
+        firstflag=1;
+        goto newpos;
+    }
+    if(i<(heightfield.width()-pos-1) && j==pos)
+    {
+        i++;
+        firstflag=0;
+        goto newpos;
+    }else if(i==(heightfield.width()-pos-1) && j<(heightfield.height()-pos-1))
+    {
+        j++;
+        goto newpos;
+    }else if(j==(heightfield.height()-pos-1) && (i > pos))
+    {
+        i--;
+        goto newpos;
+    }else if(i == pos && j > pos)
+    {
+        j--;
+        goto newpos;
+    }
+
+myexi:
+    //pathProcessors.process(run.m_points);
+    return true;
+}
+
+
+
+

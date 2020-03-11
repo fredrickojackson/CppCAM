@@ -469,6 +469,22 @@
     <string>smooth</string>
    </property>
   </widget>
+  <widget class="QRadioButton" name="rbRect">
+   <property name="geometry">
+    <rect>
+     <x>210</x>
+     <y>30</y>
+     <width>105</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Rectangelar</string>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
  </widget>
  <resources>
   <include location="pycam.qrc"/>
