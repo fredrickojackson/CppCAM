@@ -217,11 +217,11 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
 
 void GCodeExporter::replace(QString *s, Point pt, double ang)
 {
-    s->replace("$X", QString::number(pt.x(),'f',3).rightJustified(7,' '));
-    s->replace("$Y", QString::number(pt.y(),'f',3).rightJustified(7,' '));
-    s->replace("$Z", QString::number(pt.z(),'f',3).rightJustified(7,' '));
-    s->replace("$A", QString::number(ang,'f',3).rightJustified(7,' '));
-    s->replace("$SAFEZ", QString::number(safez,'f',3).rightJustified(7,' '));
-    s->replace("$F",QString::number(feedspeed,'f',3).rightJustified(7,' '));
-    s->replace("$P",QString::number(plungespeed,'f',3).rightJustified(7,' '));
+    s->replace("$X", QString::number(pt.x(),'f',3));
+    s->replace("$Y", QString::number(pt.y(),'f',3));
+    s->replace("$Z", QString::number(pt.z(),'f',3));
+    s->replace("$A", QString::number(ang,'f',3));
+    s->replace("$SAFEZ", QString::number(safez,'f',3));
+    s->replace("$F",QString::number(feedspeed,'f',3));
+    s->replace("$P",QString::number(plungespeed,'f',3));
 }

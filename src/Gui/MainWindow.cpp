@@ -55,8 +55,6 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 extern Stock* stock;
 extern Model* model;
 extern Cutter* cutter;
-//extern Cutter* cutter2;
-
 extern std::vector<Path*> paths;
 extern HeightField* heightfield;
 
@@ -81,18 +79,16 @@ MainWindow::MainWindow()
 //    QObject::connect(actionShowNormals, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowNormals(bool)));
 //    QObject::connect(actionShowCutter, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowCutter(bool)));
 //    QObject::connect(actionShowHeightField, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowHeightField(bool)));
-//    cutter2 = Cutter::CreateSphericalCutter(0.01, Point(0,0,0));
-//    cutter2->m_isSpherical=false;
     cutter = Cutter::CreateSphericalCutter(0.5, Point(0,0,0));
     cutter->m_isSpherical=true;
     stock = new Stock();
-    stock->m_min_x=-3.0;
-    stock->m_min_y=-3.0;
-    stock->m_min_z=-1;
+    stock->m_min_x=0.0;
+    stock->m_min_y=-5.0;
+    stock->m_min_z=9;
 
-    stock->m_max_x=3.0;
-    stock->m_max_y=3.0;
-    stock->m_max_z=1.0;
+    stock->m_max_x=12.0;
+    stock->m_max_y=5.0;
+    stock->m_max_z=15.0;
 
     model=new TestModel();
 
@@ -128,7 +124,7 @@ MainWindow::MainWindow()
      connect(qtimer, SIGNAL(timeout()), this, SLOT(mytimeout()));
      qtimer->setInterval(100);
      qtimer->start();
-     p_modelfilename="/home/fred/projects/cppcam/data/box.stl";
+     p_modelfilename="/home/fred/projects/cppcam/data/gear_m2_12t.stl";
      model = STLImporter::ImportModel(p_modelfilename.toStdString());
      model->rotate(0,90,0);
 
@@ -845,7 +841,11 @@ void MainWindow::on_actionRun_triggered()
     dlg.lineEdit_points->setText(QString::number(p_runPoints));
     dlg.lineEdit_layers->setText(QString::number(p_runLayers));
     dlg.le_SafeZ->setText(QString::number(p_safez));
-    dlg.radioButton_xdir->setChecked(true);
+    if(p_runDirectionx){
+        dlg.radioButton_xdir->setChecked(p_runDirectionx);
+    }else{
+        dlg.radioButton_ydir->setChecked(true);
+    }
 
     dlg.checkBoxRotate->setChecked(p_runRotate);
     ss="Stock:";
@@ -872,7 +872,17 @@ void MainWindow::on_actionRun_triggered()
         p_PlungeSpeed=dlg.lePlungeSpeed->text().toDouble();
         p_safez = dlg.le_SafeZ->text().toDouble();
         clearPath();
+ //       model = STLImporter::ImportModel(p_modelfilename.toStdString());
+
+//        if (!dlg.le_stepdown->text().isEmpty()) {
+//            double stepdown = dlg.le_stepdown->text().toDouble();
+//            nz = 1;
+//            if (stepdown > 0) {
+//                nz += (z1-z0)/stepdown;
+//            }
+//        } else if (!dlg.lineEdit_layers->text().isEmpty()) {
             nz = dlg.lineEdit_layers->text().toInt();
+//        }
         if (dlg.radioButton_xdir->isChecked()) {
             dir = Point(1,0,0);
             if (!dlg.lineEdit_lines->text().isEmpty()) {
@@ -890,7 +900,8 @@ void MainWindow::on_actionRun_triggered()
                     nx = (x1-x0)/resolution;
                 }
             }
-        }else if (dlg.radioButton_ydir->isChecked()) {
+        }
+        if (dlg.radioButton_ydir->isChecked()) {
             dir = Point(0,1,0);
             if (!dlg.lineEdit_lines->text().isEmpty()) {
                 nx = dlg.lineEdit_lines->text().toInt();
@@ -907,21 +918,22 @@ void MainWindow::on_actionRun_triggered()
                     ny = (y1-y0)/resolution;
                 }
             }
-        }else if(dlg.rbRect->isChecked()){
+        }
+        if (dlg.rbrect->isChecked()) {
             dir = Point(1,1,0);
             if (!dlg.lineEdit_lines->text().isEmpty()) {
-                nx = dlg.lineEdit_lines->text().toInt();
+                ny = dlg.lineEdit_lines->text().toInt();
             } else if (!dlg.le_stepover->text().isEmpty()) {
                 double overlap = dlg.le_stepover->text().toDouble();
                 if (overlap > 1) overlap /= 100;
-                nx = (x1-x0)/(cutter->radius()*(1-overlap)*2);
+                ny = (y1-y0)/(cutter->radius()*(1-overlap)*2);
             }
             if (!dlg.lineEdit_points->text().isEmpty()) {
-                ny = dlg.lineEdit_points->text().toInt();
+                nx = dlg.lineEdit_points->text().toInt();
             } else if (!dlg.le_resolution->text().isEmpty()) {
                 double resolution = dlg.le_resolution->text().toDouble();
                 if (resolution>0) {
-                    ny = (y1-y0)/resolution;
+                    nx = (x1-x0)/resolution;
                 }
             }
         }
@@ -954,15 +966,15 @@ void MainWindow::on_actionRun_triggered()
             progress.setMaximum(100);
             progress.show();
             DropCutter dropcutter;
-//            double workdone = 0;
+            double workdone = 0;
             dropcutter.setAsync(false);
             dropcutter.GeneratePath(*cutter, *model, *heightfield);
-//            while (!dropcutter.finished(&workdone)) {
-//                update();
-//                progress.setValue(workdone);
-//                QCoreApplication::processEvents();
-//            }
-//            progress.hide();
+            while (!dropcutter.finished(&workdone)) {
+                update();
+                progress.setValue(workdone);
+                QCoreApplication::processEvents();
+            }
+            progress.hide();
             //return;
             SimpleCutter simplecutter;
             simplecutter.m_radius=cutter->radius();
@@ -989,17 +1001,7 @@ void MainWindow::on_actionRun_triggered()
             p_runStepover=(p_smaxy-p_sminy)/ny;
             p_runResolution=(p_smaxx-p_sminx)/nx;
             p_runStepdown=(p_smaxz-p_sminz)/nz;
-        }
-        if(dlg.radioButton_ydir->isChecked()){
-            p_runLines=nx;
-            p_runPoints=ny;
-            p_runLayers=nz;
-            p_runStepover=(p_smaxx-p_sminx)/nx;
-            p_runResolution=(p_smaxy-p_sminy)/ny;
-            p_runStepdown=(p_smaxz-p_sminz)/nz;
-        }
-        if(dlg.rbRect->isChecked())
-        {
+        }else{
             p_runLines=nx;
             p_runPoints=ny;
             p_runLayers=nz;

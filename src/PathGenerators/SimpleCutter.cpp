@@ -240,6 +240,10 @@ SimpleCutter::GenerateCutPathLayer_rect(const HeightField& heightfield, const Po
     long dj1=0;
     long dj2=0;
     int firstflag=1;
+    Point p1=Point(0,0,0);
+    Point p2=Point(0,0,0);
+    Point p3=Point(0,0,0);
+    Point p4=Point(0,0,0);
 
     path.m_runs.resize(path.m_runs.size()+1);
     Run& run = path.m_runs.back();
@@ -254,6 +258,61 @@ SimpleCutter::GenerateCutPathLayer_rect(const HeightField& heightfield, const Po
 newpos:
     double z = heightfield.point(i,j);
     if(z_layer > z) z=z_layer;
+
+    z+=m_compmargin;
+    p4=p3;
+    p3=p2;
+    p2=p1;
+    p1=Point(heightfield.x(i), heightfield.y(j), z);
+    if((p2.x()==p1.x() && p2.y()==p1.y() && p2.z()==p1.z())
+            || (p3.x()==p1.x() && p3.y()==p1.y() && p3.z()==p1.z())
+                || (p4.x()==p1.x() && p4.y()==p1.y() && p4.z()==p1.z()))
+        {
+            goto myexi;
+        }
+    run.m_points.push_back(p1);
+    qts << i << "," << j << "," << z << "\n";
+
+    if(j==pos && i==pos && firstflag==0)
+    {
+        pos++;
+        i++;
+        j++;
+        if(pos>(heightfield.width()/2+1) || (pos>(heightfield.height()/2+1)))
+        {
+            qts << "endofrun " << i << "," << j << "," << z << "\n";
+            goto myexi;
+        }
+        firstflag=1;
+        goto newpos;
+    }
+    if(i<(heightfield.width()-pos-1) && j==pos)
+    {
+        i++;
+        firstflag=0;
+        goto newpos;
+    }else if(i==(heightfield.width()-pos-1) && j<(heightfield.height()-pos-1))
+    {
+        j++;
+        goto newpos;
+    }else if(j==(heightfield.height()-pos-1) && (i > pos))
+    {
+        i--;
+        goto newpos;
+    }else if(i == pos && j > pos)
+    {
+        j--;
+        goto newpos;
+    }
+
+myexi:
+    pathProcessors.process(run.m_points);
+    return true;
+}
+
+
+
+
 //    di1=i-di;
 //    if(di1<0) di1=0;
 //    di2=i+di;
@@ -299,48 +358,3 @@ newpos:
 //    if (z < z_layer) {
 //        z = z_layer;
 //    }
-    z+=m_compmargin;
-    run.m_points.push_back(Point(heightfield.x(i), heightfield.y(j), z));
-    qts << i << "," << j << "," << z << "\n";
-
-
-    if(j==pos && i==pos && firstflag==0)
-    {
-        pos++;
-        i++;
-        j++;
-        if(pos>(heightfield.width()/2+1) || (pos>(heightfield.height()/2+1)))
-        {
-            qts << "endofrun " << i << "," << j << "," << z << "\n";
-            goto myexi;
-        }
-        firstflag=1;
-        goto newpos;
-    }
-    if(i<(heightfield.width()-pos-1) && j==pos)
-    {
-        i++;
-        firstflag=0;
-        goto newpos;
-    }else if(i==(heightfield.width()-pos-1) && j<(heightfield.height()-pos-1))
-    {
-        j++;
-        goto newpos;
-    }else if(j==(heightfield.height()-pos-1) && (i > pos))
-    {
-        i--;
-        goto newpos;
-    }else if(i == pos && j > pos)
-    {
-        j--;
-        goto newpos;
-    }
-
-myexi:
-    //pathProcessors.process(run.m_points);
-    return true;
-}
-
-
-
-

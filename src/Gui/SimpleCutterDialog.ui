@@ -469,7 +469,7 @@
     <string>smooth</string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="rbRect">
+  <widget class="QRadioButton" name="rbrect">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -479,10 +479,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Rectangelar</string>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
+    <string>Rectangular</string>
    </property>
   </widget>
  </widget>

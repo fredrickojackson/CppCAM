@@ -32,7 +32,6 @@ extern int run_tests();
 Stock* stock = NULL;
 Model* model = NULL;
 Cutter* cutter = NULL;
-Cutter* cutter2 = NULL;
 std::vector<Path*> paths;
 HeightField* heightfield = NULL;
 
