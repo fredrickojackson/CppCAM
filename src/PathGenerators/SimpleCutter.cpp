@@ -104,27 +104,27 @@ SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point
             if(dj2>(heightfield.height()-1))dj2=heightfield.height()-1;
             double zav = 0.0;
             int zcnt = 0;
-            double zcc = -1000.0;
+//            double zcc = -1000.0;
 
             for(long lj=dj1; lj<=dj2; lj++)
                 for(long li=di1; li<=di2; li++)
                 {
-                    double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
-                    double zc = 0.0;
-                    if(!((li == j) && (lj == i)))
-                    {
-                        if(!m_isSpherical)
-                        {
-                            zc=heightfield.point(li,lj);
-                        }else
-                        {
-                            zc=heightfield.point(li,lj)-m_radius*cos((dis*3.1415926/(2.0*m_radius)));
-                        }
-                        if((dis<(m_radius+m_compmargin)) && (zc>zcc))
-                        {
-                            zcc=zc;
-                        }
-                    }
+//                    double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
+//                    double zc = 0.0;
+//                    if(!((li == j) && (lj == i)))
+//                    {
+//                        if(!m_isSpherical)
+//                        {
+//                            zc=heightfield.point(li,lj);
+//                        }else
+//                        {
+//                            zc=heightfield.point(li,lj)-m_radius*cos((dis*3.1415926/(2.0*m_radius)));
+//                        }
+//                        if((dis<(m_radius+m_compmargin)) && (zc>zcc))
+//                        {
+//                            zcc=zc;
+//                        }
+//                    }
                     if((labs(li-(long)j)<=m_smooth) && (labs(lj-(long)i)<=m_smooth))
                     {
                         zav += heightfield.point(li,lj);
@@ -183,27 +183,27 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
             if(dj2>(heightfield.height()-1))dj2=heightfield.height()-1;
             double zav = 0.0;
             int zcnt = 0;
-            double zcc = -1000.0;
+//            double zcc = -1000.0;
 
             for(long lj=dj1; lj<=dj2; lj++)
                 for(long li=di1; li<=di2; li++)
                 {
-                    double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
-                    double zc = -1000.0;
-                    if(!((li == j) && (lj == i)))
-                    {
-                        if(!m_isSpherical)
-                        {
-                            zc=heightfield.point(li,lj);
-                        }else
-                        {
-                            zc=heightfield.point(li,lj)-m_radius*cos((dis*3.1415926/(2.0*m_radius)));
-                        }
-                        if((dis<(m_radius+m_compmargin)) && (zc>zcc))
-                        {
-                            zcc=zc;
-                        }
-                    }
+//                    double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
+//                    double zc = -1000.0;
+//                    if(!((li == j) && (lj == i)))
+//                    {
+//                        if(!m_isSpherical)
+//                        {
+//                            zc=heightfield.point(li,lj);
+//                        }else
+//                        {
+//                            zc=heightfield.point(li,lj)-m_radius*cos((dis*3.1415926/(2.0*m_radius)));
+//                        }
+//                        if((dis<(m_radius+m_compmargin)) && (zc>zcc))
+//                        {
+//                            zcc=zc;
+//                        }
+//                    }
                     if((labs(li-(long)j)<=m_smooth) && (labs(lj-(long)i)<=m_smooth))
                     {
                         zav += heightfield.point(li,lj);
@@ -214,7 +214,7 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
             if(m_smooth && zcnt)
                 z=zav/zcnt;
 
-            if(zcc>z)z=zcc;
+//            if(zcc>z)z=zcc;
             if (z < z_layer) {
                 z = z_layer;
             }
@@ -244,6 +244,8 @@ SimpleCutter::GenerateCutPathLayer_rect(const HeightField& heightfield, const Po
     Point p2=Point(0,0,0);
     Point p3=Point(0,0,0);
     Point p4=Point(0,0,0);
+    Point pmem=Point(0,0,0);
+    bool skipflag=false;
 
     path.m_runs.resize(path.m_runs.size()+1);
     Run& run = path.m_runs.back();
@@ -267,10 +269,26 @@ newpos:
     if((p2.x()==p1.x() && p2.y()==p1.y() && p2.z()==p1.z())
             || (p3.x()==p1.x() && p3.y()==p1.y() && p3.z()==p1.z())
                 || (p4.x()==p1.x() && p4.y()==p1.y() && p4.z()==p1.z()))
+    {
+        goto myexi;
+    }
+    if(p1.x()==pmem.x() && p1.z()==pmem.z() && p1.y()!=pmem.y())
+    {
+        pmem=p1;
+        skipflag=true;
+    }else if(p1.y()==pmem.y() && p1.z()==pmem.z() && p1.x()!=pmem.x())
+    {
+        pmem=p1;
+        skipflag=true;
+    }else
+    {
+        if(skipflag)
         {
-            goto myexi;
+            skipflag=false;
+            run.m_points.push_back(pmem);
         }
-    run.m_points.push_back(p1);
+        run.m_points.push_back(p1);
+    }
     qts << i << "," << j << "," << z << "\n";
 
     if(j==pos && i==pos && firstflag==0)

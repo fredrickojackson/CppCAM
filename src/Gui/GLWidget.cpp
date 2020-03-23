@@ -240,7 +240,7 @@ GLWidget::paintGL()
         for(size_t i=0; i<paths.size(); i++) {
             glDisable(GL_LIGHTING);
             glColor3f(1,0,1);
-            paths[i]->to_OpenGL();
+            paths[i]->to_OpenGL(stock->min_z(),stock->max_z());
         }
     }
 

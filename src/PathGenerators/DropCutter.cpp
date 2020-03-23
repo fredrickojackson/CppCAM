@@ -42,7 +42,7 @@ public:
         m_model = NULL;
         m_heightfield = NULL;
 
-        m_numthreads = 3;
+        m_numthreads = 6;
         m_line = 0;
         m_count = 0;
         m_finished = false;

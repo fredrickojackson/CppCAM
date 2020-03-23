@@ -31,7 +31,7 @@ struct Run {
 struct Path {
     std::vector<Run> m_runs;
     double rot_x;
-    void to_OpenGL();
+    void to_OpenGL(float minz, float maxz);
 };
 
 #endif

@@ -21,16 +21,17 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtOpenGL>
 
-void Path::to_OpenGL()
+void Path::to_OpenGL( float minz, float maxz)
 {
     for(std::vector<Run>::iterator r = m_runs.begin(); r != m_runs.end(); ++r) {
         glBegin(GL_LINE_STRIP);
         //glBegin(GL_POINTS);
         for(std::vector<Point>::iterator p = r->m_points.begin(); p != r->m_points.end(); ++p) {
+            GLfloat color=fabs(p->z()-minz)/fabs(maxz-minz);
             if(p->m_rad>0)
                 glColor3f(1,1,1);
             else
-                glColor3f(1,0,1);
+                glColor3f(1,color,1);
 
             glVertex3f(p->x(),p->y(),p->z());
         }

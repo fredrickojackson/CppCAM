@@ -73,7 +73,7 @@ public:
 
     virtual void to_OpenGL()=0;
 
-    bool m_isSpherical;
+    bool m_cutterType;
 
 protected:
     double m_radius;

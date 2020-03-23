@@ -31,7 +31,6 @@ class MainWindow :
 public:
     MainWindow();
     ~MainWindow();
-
     void resizeEvent(QResizeEvent* event);
     void mouseMoveEvent(QMouseEvent *ev);
     GLWidget* theGLWidget;
@@ -40,7 +39,7 @@ public:
     double p_mminy;
     double p_mminz;
     double p_CutterSize;
-    QString p_CutterType;
+    QString p_CutterType;//"Sph, Cyl"
     double p_sminx;
     double p_sminy;
     double p_sminz;
@@ -65,6 +64,7 @@ public:
     double p_comp;
     bool bEnableArcs;
     QTimer *qtimer;
+
 private slots:
     void mytimeout();
 

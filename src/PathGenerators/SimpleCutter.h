@@ -30,7 +30,7 @@ public:
     SimpleCutter():m_zigzag(false) { }
     bool GenerateCutPath(const HeightField& heightfield, const Point& start, const Point& direction, const std::vector<double>& zlevels, std::vector<Path*>& paths, double angle);
     bool m_zigzag;
-    bool m_isSpherical;
+
     double m_radius;
     double m_compmargin;
     Stock* m_stock;

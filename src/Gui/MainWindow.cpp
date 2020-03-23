@@ -79,8 +79,8 @@ MainWindow::MainWindow()
 //    QObject::connect(actionShowNormals, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowNormals(bool)));
 //    QObject::connect(actionShowCutter, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowCutter(bool)));
 //    QObject::connect(actionShowHeightField, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowHeightField(bool)));
-    cutter = Cutter::CreateSphericalCutter(0.5, Point(0,0,0));
-    cutter->m_isSpherical=true;
+    cutter = Cutter::CreateSphericalCutter(1.0, Point(0,0,0));
+    cutter->m_cutterType="Sph";
     stock = new Stock();
     stock->m_min_x=0.0;
     stock->m_min_y=-5.0;
@@ -90,14 +90,6 @@ MainWindow::MainWindow()
     stock->m_max_y=5.0;
     stock->m_max_z=15.0;
 
-    model=new TestModel();
-
-
-     p_mminx=model->min_x();
-     p_mminy=model->min_y();
-     p_mminz=model->min_z();
-     p_CutterSize=1.5875;
-     QString p_CutterType="Sph";
      p_sminx=stock->min_x();
      p_sminy=stock->min_y();
      p_sminz=stock->min_z();
@@ -276,14 +268,14 @@ void MainWindow::on_actionSave_triggered()
     QSettings setproj(filename,QSettings::IniFormat);
 
     setproj.setValue("p_modelfilename",p_modelfilename);
-    setproj.setValue("p_mminx",p_mminx);
-    setproj.setValue("p_mminy",p_mminy);
-    setproj.setValue("p_mminz",p_mminz);
-    setproj.setValue("p_CutterSize",p_CutterSize);
-    setproj.setValue("p_CutterType",p_CutterType);
-    setproj.setValue("p_sminx",p_sminx);
-    setproj.setValue("p_sminy",p_sminy);
-    setproj.setValue("p_sminz",p_sminz);
+    setproj.setValue("p_mminx",model->min_x());
+    setproj.setValue("p_mminy",model->min_y());
+    setproj.setValue("p_mminz",model->min_z());
+    setproj.setValue("p_CutterSize",cutter->radius());
+    setproj.setValue("p_CutterType",cutter->m_cutterType);
+    setproj.setValue("p_sminx",stock->min_x());
+    setproj.setValue("p_sminy",stock->min_y());
+    setproj.setValue("p_sminz",stock->min_z());
     setproj.setValue("p_smaxx",p_smaxx);
     setproj.setValue("p_smaxy",p_smaxy);
     setproj.setValue("p_smaxz",p_smaxz);
@@ -401,12 +393,10 @@ void MainWindow::on_actionTool_Size_triggered()
         p_CutterSize=dlg.m_ts().toDouble();
         p_CutterType="Sph";
         cutter = Cutter::CreateSphericalCutter(p_CutterSize, Point(0,0,0));
-        cutter->m_isSpherical=true;
     }else{
         p_CutterSize=dlg.m_ts().toDouble();
         p_CutterType="Cyl";
         cutter = Cutter::CreateCylindricalCutter(p_CutterSize, Point(0,0,0));
-        cutter->m_isSpherical=false;
     }
 
 
@@ -978,7 +968,8 @@ void MainWindow::on_actionRun_triggered()
             //return;
             SimpleCutter simplecutter;
             simplecutter.m_radius=cutter->radius();
-            simplecutter.m_isSpherical=cutter->m_isSpherical;
+
+
 
             if(dlg.cbLeaveMargin->isChecked())
                 simplecutter.m_compmargin=dlg.leMargin->text().toDouble();
