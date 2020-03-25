@@ -20,8 +20,9 @@ along with PyCAM.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __GCODEEXPORTER_H
 #define __GCODEEXPORTER_H
 
-#include "Path.h"
+#include <QString>
 #include <string>
+#include "Path.h"
 
 class GCodeExporter
 {
@@ -33,7 +34,9 @@ public:
     double feedspeed;
     double plungespeed;
     bool bEnableArcs;
-    bool m_rectcut;
+    double cutter_radius;
+    QString cutter_type;
+
 };
 
 #endif

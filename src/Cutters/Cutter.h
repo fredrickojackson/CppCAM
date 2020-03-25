@@ -20,6 +20,8 @@ along with PyCAM.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __CUTTER_H
 #define __CUTTER_H
 
+#include <QString>
+
 #include "Geometry.h"
 #include "Model.h"
 
@@ -73,7 +75,7 @@ public:
 
     virtual void to_OpenGL()=0;
 
-    bool m_cutterType;
+    QString m_cutterType;
 
 protected:
     double m_radius;

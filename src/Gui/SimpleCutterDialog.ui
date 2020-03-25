@@ -234,7 +234,7 @@
    <property name="frameShadow">
     <enum>QFrame::Raised</enum>
    </property>
-   <widget class="QCheckBox" name="checkBoxRotate">
+   <widget class="QCheckBox" name="cbRotate">
     <property name="geometry">
      <rect>
       <x>23</x>
@@ -247,7 +247,7 @@
      <string>Rotate</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="leStepDegrees">
+   <widget class="QLineEdit" name="leRotateStep">
     <property name="geometry">
      <rect>
       <x>280</x>

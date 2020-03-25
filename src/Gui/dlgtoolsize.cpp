@@ -6,10 +6,12 @@ dlgToolSize::dlgToolSize(QWidget *parent) :
     ui(new Ui::dlgToolSize)
 {
     ui->setupUi(this);
+    ui->lineEditSize->setText(QString::number(m_cutterSize));
 }
 
 dlgToolSize::~dlgToolSize()
 {
+    m_cutterSize=ui->lineEditSize->text().toDouble();
     delete ui;
 }
 
@@ -20,4 +22,9 @@ bool dlgToolSize::isSph()
 
 QString dlgToolSize::m_ts(){
     return ui->lineEditSize->text();
+}
+
+void dlgToolSize::on_lineEditSize_editingFinished()
+{
+    m_cutterSize=ui->lineEditSize->text().toDouble();
 }

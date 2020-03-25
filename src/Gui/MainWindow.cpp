@@ -62,24 +62,15 @@ MainWindow::MainWindow()
 {
     setupUi(this);
     theGLWidget = new GLWidget(frmogl);
-    //setCentralWidget(theGLWidget);
-//    theGLWidget->resize(frmogl->width(),frmogl->height());
     m_PreferencesDialog = new PreferencesDialog();
 
-//    QObject::connect(actionResetView, SIGNAL(triggered()), theGLWidget, SLOT(resetView()));
     QObject::connect(actionTopView, SIGNAL(triggered()), theGLWidget, SLOT(setTopView()));
     QObject::connect(actionLeftView, SIGNAL(triggered()), theGLWidget, SLOT(setLeftView()));
     QObject::connect(actionFrontView, SIGNAL(triggered()), theGLWidget, SLOT(setFrontView()));
     QObject::connect(actionRightView, SIGNAL(triggered()), theGLWidget, SLOT(setRightView()));
 
-//    QObject::connect(actionShowStock, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowStock(bool)));
-//    QObject::connect(actionShowModel, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowModel(bool)));
-//    QObject::connect(actionShowModelBoundingBox, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowModelBoundingBox(bool)));
-//    QObject::connect(actionShowPath, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowPath(bool)));
-//    QObject::connect(actionShowNormals, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowNormals(bool)));
-//    QObject::connect(actionShowCutter, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowCutter(bool)));
-//    QObject::connect(actionShowHeightField, SIGNAL(triggered(bool)), theGLWidget, SLOT(setShowHeightField(bool)));
     cutter = Cutter::CreateSphericalCutter(1.0, Point(0,0,0));
+    p_runStepover=cutter->radius();
     cutter->m_cutterType="Sph";
     stock = new Stock();
     stock->m_min_x=0.0;
@@ -90,12 +81,6 @@ MainWindow::MainWindow()
     stock->m_max_y=5.0;
     stock->m_max_z=15.0;
 
-     p_sminx=stock->min_x();
-     p_sminy=stock->min_y();
-     p_sminz=stock->min_z();
-     p_smaxx=stock->max_x();
-     p_smaxy=stock->max_y();
-     p_smaxz=stock->max_z();
      p_runLines=100;
      p_runStepover=0.333;
      p_runPoints=125;
@@ -103,8 +88,9 @@ MainWindow::MainWindow()
      p_runLayers=5;
      p_runStepdown=2.0;
      p_runRotate=false;
-     p_runRotStep=15.0;
-     p_runDirectionx=true;
+     p_runRotateStep=15.0;
+     p_runRotateDegrees=360.0;
+     p_runDirection=0;
      p_useLine=1;
      p_smooth=0;
      menuTest->setVisible(false);
@@ -119,6 +105,8 @@ MainWindow::MainWindow()
      p_modelfilename="/home/fred/projects/cppcam/data/gear_m2_12t.stl";
      model = STLImporter::ImportModel(p_modelfilename.toStdString());
      model->rotate(0,90,0);
+     p_comp=0.0;
+
 
 
 }
@@ -226,21 +214,29 @@ void MainWindow::on_actionOpen_triggered()
     QString filename = QFileDialog::getOpenFileName(this, "Select Project File", "/home/fred", "Cam files (*.cam)");
     QSettings setproj(filename,QSettings::IniFormat);
     p_modelfilename=setproj.value("p_modelfilename","~/tmp.cam").toString();
-    p_mminx=setproj.value("p_mminx",0.0).toDouble();
-    p_mminy=setproj.value("p_mminy",0.0).toDouble();
-    p_mminz=setproj.value("p_mminz",0.0).toDouble();
-    p_CutterSize=setproj.value("p_CutterSize",0.0).toDouble();
-    p_sminx=setproj.value("p_sminx",0.0).toDouble();
-    stock->m_min_x=p_mminx;
-    p_sminy=setproj.value("p_sminy",0.0).toDouble();
-    stock->m_min_y=p_mminy;
-    p_sminz=setproj.value("p_sminz",0.0).toDouble();
-    stock->m_min_z=p_mminz;
-    p_smaxx=setproj.value("p_smaxx",0.0).toDouble();
+    model = STLImporter::ImportModel(p_modelfilename.toStdString());
+    if(setproj.value("p_CutterType","Sph").toString().compare("Sph") == 0)
+    {
+        cutter = Cutter::CreateSphericalCutter(setproj.value("p_CutterSize",0.0).toDouble(), Point(0,0,0));
+        cutter->m_cutterType="Sph";
+    }else
+    {
+        cutter = Cutter::CreateCylindricalCutter(setproj.value("p_CutterSize",0.0).toDouble(), Point(0,0,0));
+        cutter->m_cutterType="Sph";
+    }
+
+
+    double p_sminx=setproj.value("p_sminx",0.0).toDouble();
+    stock->m_min_x=p_sminx;
+    double p_sminy=setproj.value("p_sminy",0.0).toDouble();
+    stock->m_min_y=p_sminy;
+    double p_sminz=setproj.value("p_sminz",0.0).toDouble();
+    stock->m_min_z=p_sminz;
+    double p_smaxx=setproj.value("p_smaxx",0.0).toDouble();
     stock->m_max_x=p_smaxx;
-    p_smaxy=setproj.value("p_smaxy",0.0).toDouble();
+    double p_smaxy=setproj.value("p_smaxy",0.0).toDouble();
     stock->m_max_y=p_smaxy;
-    p_smaxz=setproj.value("p_smaxz",0.0).toDouble();
+    double p_smaxz=setproj.value("p_smaxz",0.0).toDouble();
     stock->m_max_z=p_smaxz;
 
     p_runLines=setproj.value("p_runLines",0.0).toInt();
@@ -249,17 +245,17 @@ void MainWindow::on_actionOpen_triggered()
     p_runStepover=setproj.value("p_runStepover",0.0).toDouble();
     p_runResolution=setproj.value("p_runResolution",0.0).toDouble();
     p_runStepdown=setproj.value("p_runStepdown",0.0).toDouble();
-    p_runRotStep=setproj.value("p_runRotStep",0.0).toDouble();
+    p_runRotate=setproj.value("p_runRotate",0.0).toBool();
+    p_runRotateDegrees=setproj.value("p_runRotateDegrees",0.0).toBool();
+    p_runRotateStep=setproj.value("p_runRotateStep",0.0).toDouble();
     p_safez=setproj.value("p_safez",0.0).toDouble();
     p_FeedSpeed=setproj.value("p_FeedSpeed",0.0).toDouble();
     p_PlungeSpeed=setproj.value("p_PlungeSpeed",0.0).toDouble();
     p_comp=setproj.value("p_comp",0.0).toDouble();
-    p_runRotate=setproj.value("p_runRotate",0.0).toBool();
-    p_runDirectionx=setproj.value("p_runDirectionx",0.0).toBool();
+    p_runDirection=setproj.value("p_runDirection",0.0).toInt();
     p_rectcut=setproj.value("p_rectcut",0.0).toBool();
     p_useLine=setproj.value("p_useLine",0.0).toInt();
     p_smooth=setproj.value("p_smooth",0.0).toInt();
-    p_CutterType=setproj.value("p_CutterType","Sph").toString();
 }
 
 void MainWindow::on_actionSave_triggered()
@@ -271,24 +267,26 @@ void MainWindow::on_actionSave_triggered()
     setproj.setValue("p_mminx",model->min_x());
     setproj.setValue("p_mminy",model->min_y());
     setproj.setValue("p_mminz",model->min_z());
+    filename.setNum(cutter->radius());
     setproj.setValue("p_CutterSize",cutter->radius());
     setproj.setValue("p_CutterType",cutter->m_cutterType);
     setproj.setValue("p_sminx",stock->min_x());
     setproj.setValue("p_sminy",stock->min_y());
     setproj.setValue("p_sminz",stock->min_z());
-    setproj.setValue("p_smaxx",p_smaxx);
-    setproj.setValue("p_smaxy",p_smaxy);
-    setproj.setValue("p_smaxz",p_smaxz);
-    QVariant qv = (qlonglong)p_runLines;
-    setproj.setValue("p_runLines",qv);
+    setproj.setValue("p_smaxx",stock->max_x());
+    setproj.setValue("p_smaxy",stock->max_y());
+    setproj.setValue("p_smaxz",stock->max_z());
+
+    setproj.setValue("p_runLines",(qlonglong)p_runLines);
     setproj.setValue("p_runStepover",p_runStepover);
     setproj.setValue("p_runPoints",(qlonglong)p_runPoints);
     setproj.setValue("p_runResolution",p_runResolution);
     setproj.setValue("p_runLayers",p_runLayers);
     setproj.setValue("p_runStepdown",p_runStepdown);
     setproj.setValue("p_runRotate",p_runRotate);
-    setproj.setValue("p_runRotStep",p_runRotStep);
-    setproj.setValue("p_runDirectionx",p_runDirectionx);
+    setproj.setValue("p_runRotateStep",p_runRotateStep);
+    setproj.setValue("p_runRotateDegrees",p_runRotateDegrees);
+    setproj.setValue("p_runDirection",p_runDirection);
     setproj.setValue("p_safez",p_safez);
     setproj.setValue("p_FeedSpeed",p_FeedSpeed);
     setproj.setValue("p_PlungeSpeed",p_PlungeSpeed);
@@ -311,9 +309,6 @@ void MainWindow::on_actionImport_Model_triggered()
         lastFile = filename;
         model = STLImporter::ImportModel(filename.toStdString());
         p_modelfilename=filename;
-        p_mminx=model->min_x();
-        p_mminy=model->min_y();
-        p_mminz=model->min_z();
     }
 
 }
@@ -374,12 +369,6 @@ void MainWindow::on_actionEdit_Stock_Dimensions_triggered()
             stock->m_max_y = stock->m_min_y + dlg.lineEdit_dimy->text().toDouble();
             stock->m_max_z = stock->m_min_z + dlg.lineEdit_dimz->text().toDouble();
         }
-        p_sminx=stock->min_x();
-        p_sminy=stock->min_y();
-        p_sminz=stock->min_z();
-        p_smaxx=stock->max_x();
-        p_smaxy=stock->max_y();
-        p_smaxz=stock->max_z();
     }
 
 }
@@ -387,16 +376,16 @@ void MainWindow::on_actionEdit_Stock_Dimensions_triggered()
 void MainWindow::on_actionTool_Size_triggered()
 {
     dlgToolSize dlg(this);
+    double p_cutterSize=0.0;
     dlg.exec();
+    p_cutterSize=dlg.m_cutterSize;
     delete cutter;
     if(dlg.isSph()){
-        p_CutterSize=dlg.m_ts().toDouble();
-        p_CutterType="Sph";
-        cutter = Cutter::CreateSphericalCutter(p_CutterSize, Point(0,0,0));
+        cutter = Cutter::CreateSphericalCutter(p_cutterSize, Point(0,0,0));
+        cutter->m_cutterType="Sph";
     }else{
-        p_CutterSize=dlg.m_ts().toDouble();
-        p_CutterType="Cyl";
-        cutter = Cutter::CreateCylindricalCutter(p_CutterSize, Point(0,0,0));
+        cutter = Cutter::CreateCylindricalCutter(p_cutterSize, Point(0,0,0));
+        cutter->m_cutterType="Cyl";
     }
 
 
@@ -506,9 +495,6 @@ void MainWindow::on_actionResize_Model_triggered()
             scale_x = scale_y = scale_z = 1/25.4;
         }
         model->resize(n_min_x * scale_x, scale_x, n_min_y * scale_y, scale_y, n_min_z * scale_z, scale_z);
-        p_mminx=n_min_x * scale_x;
-        p_mminy=n_min_y * scale_y;
-        p_mminz=n_min_z * scale_z;
     }
 }
 
@@ -596,9 +582,6 @@ void MainWindow::on_actionAlign_Model_to_Stock_triggered()
 
         }
         model->resize(min_x, 1.0, min_y, 1.0, min_z, 1.0);
-        p_mminx=min_x;
-        p_mminy=min_y;
-        p_mminz=min_z;
     }
 }
 
@@ -647,9 +630,6 @@ void MainWindow::on_actionRotate_Model_triggered()
             rot_z = +90;
         }
         model->rotate(rot_x, rot_y, rot_z);
-        p_mminx=model->min_x();
-        p_mminy=model->min_y();
-        p_mminz=model->min_z();
     }
 }
 
@@ -804,7 +784,7 @@ void MainWindow::on_actionRun_triggered()
     }
 
     SimpleCutterDialog dlg;
-    dlg.m_comp=p_comp;
+
     dlg.m_smooth=p_smooth;
     dlg.m_xmin=stock->min_x();
     dlg.m_ymin=stock->min_y();
@@ -821,23 +801,36 @@ void MainWindow::on_actionRun_triggered()
 
     //ss.setNum(1);
     dlg.leSmooth->setText("0");
-    dlg.leUseLine->setText("1");
     dlg.leUseLine->setText(QString::number(p_useLine));
+    if(p_comp>0.0)
+    {
+        dlg.cbLeaveMargin->setChecked(true);
+    }else
+    {
+        dlg.cbLeaveMargin->setChecked(false);
+    }
+    ss.setNum(p_comp);
+    dlg.leMargin->setText(ss);
 
-//    dlg.lineEdit_lines->setPlaceholderText(QString::number(nx));
-//    dlg.lineEdit_points->setPlaceholderText(QString::number(ny));
-//    dlg.lineEdit_layers->setPlaceholderText(QString::number(nz));
+
     dlg.lineEdit_lines->setText(QString::number(p_runLines));
     dlg.lineEdit_points->setText(QString::number(p_runPoints));
     dlg.lineEdit_layers->setText(QString::number(p_runLayers));
     dlg.le_SafeZ->setText(QString::number(p_safez));
-    if(p_runDirectionx){
-        dlg.radioButton_xdir->setChecked(p_runDirectionx);
-    }else{
+    if(p_runDirection==1){
+        dlg.radioButton_xdir->setChecked(true);
+    }else if(p_runDirection==2){
         dlg.radioButton_ydir->setChecked(true);
+    }else if(p_runDirection==3){
+        dlg.rbrect->setChecked(true);
     }
 
-    dlg.checkBoxRotate->setChecked(p_runRotate);
+    dlg.cbRotate->setChecked(p_runRotate);
+    ss.setNum(p_runRotateDegrees);
+    dlg.leRotateDegrees->setText(ss);
+    ss.setNum(p_runRotateStep);
+    dlg.leRotateStep->setText(ss);
+
     ss="Stock:";
     dlg.textEditStatus->append(ss);
 
@@ -854,25 +847,32 @@ void MainWindow::on_actionRun_triggered()
 
 
     if (dlg.result() == QDialog::Accepted) {
+        if(dlg.radioButton_xdir->isChecked()){
+            p_runDirection=1;
+        }else if(dlg.radioButton_ydir->isChecked()){
+            p_runDirection=2;
+        }else if(dlg.rbrect->isChecked()){
+            p_runDirection=3;
+        }
         p_runLayers=dlg.lineEdit_layers->text().toInt();
-        p_comp=dlg.m_comp;
         p_smooth=dlg.leSmooth->text().toInt();
         p_useLine=dlg.leUseLine->text().toUInt();
         p_FeedSpeed=dlg.leFeedSpeed->text().toDouble();
         p_PlungeSpeed=dlg.lePlungeSpeed->text().toDouble();
+        if(dlg.cbLeaveMargin->isChecked())
+        {
+            p_comp=dlg.leMargin->text().toDouble();
+        }else
+        {
+            p_comp=0.0;
+        }
         p_safez = dlg.le_SafeZ->text().toDouble();
+        p_runRotate=dlg.cbRotate->isChecked();
+        p_runRotateDegrees=dlg.leRotateDegrees->text().toDouble();
+        p_runRotateStep=dlg.leRotateStep->text().toDouble();
         clearPath();
- //       model = STLImporter::ImportModel(p_modelfilename.toStdString());
+        nz = dlg.lineEdit_layers->text().toInt();
 
-//        if (!dlg.le_stepdown->text().isEmpty()) {
-//            double stepdown = dlg.le_stepdown->text().toDouble();
-//            nz = 1;
-//            if (stepdown > 0) {
-//                nz += (z1-z0)/stepdown;
-//            }
-//        } else if (!dlg.lineEdit_layers->text().isEmpty()) {
-            nz = dlg.lineEdit_layers->text().toInt();
-//        }
         if (dlg.radioButton_xdir->isChecked()) {
             dir = Point(1,0,0);
             if (!dlg.lineEdit_lines->text().isEmpty()) {
@@ -890,7 +890,8 @@ void MainWindow::on_actionRun_triggered()
                     nx = (x1-x0)/resolution;
                 }
             }
-        }
+        }// if(xdir is checked
+
         if (dlg.radioButton_ydir->isChecked()) {
             dir = Point(0,1,0);
             if (!dlg.lineEdit_lines->text().isEmpty()) {
@@ -908,7 +909,8 @@ void MainWindow::on_actionRun_triggered()
                     ny = (y1-y0)/resolution;
                 }
             }
-        }
+        }// if ydir s checked
+
         if (dlg.rbrect->isChecked()) {
             dir = Point(1,1,0);
             if (!dlg.lineEdit_lines->text().isEmpty()) {
@@ -926,7 +928,7 @@ void MainWindow::on_actionRun_triggered()
                     nx = (x1-x0)/resolution;
                 }
             }
-        }
+        }// if rectangular is checked
 
         std::vector<double> zlevels;
         if (nz == 1) {
@@ -936,14 +938,21 @@ void MainWindow::on_actionRun_triggered()
                 zlevels.push_back(z1 - (z1-z0)*(nz-1-i)/(nz-1));
             }
         }
+        p_runLines=ny;
+        p_runPoints=nx;
+        p_runLayers=nz;
+        p_runStepover=(stock->max_y()-stock->min_y())/ny;
+        p_runResolution=(stock->max_x()-stock->min_x())/nx;
+        p_runStepdown=(stock->max_z()-stock->min_z())/nz;
+
 
 //        if (!heightfield || (heightfield->width() != nx || heightfield->height() != ny))
 
         double ai=375.0;//!!precondition
         double ang=0.0;
         double angrotatet=375.0;
-        if(dlg.checkBoxRotate->isChecked()){
-             ai = dlg.leStepDegrees->text().toDouble();
+        if(dlg.cbRotate->isChecked()){
+             ai = dlg.leRotateStep->text().toDouble();
              angrotatet = dlg.leRotateDegrees->text().toDouble();
         }
 
@@ -965,7 +974,6 @@ void MainWindow::on_actionRun_triggered()
                 QCoreApplication::processEvents();
             }
             progress.hide();
-            //return;
             SimpleCutter simplecutter;
             simplecutter.m_radius=cutter->radius();
 
@@ -980,30 +988,9 @@ void MainWindow::on_actionRun_triggered()
             simplecutter.m_smooth=dlg.leSmooth->text().toDouble();
             simplecutter.GenerateCutPath(*heightfield, Point(stock->min_x(), stock->min_y(), stock->max_z()), dir, zlevels, paths, ang);
 
-            if(dlg.checkBoxRotate->isChecked())model->rotate(ai,0,0);
+            if(p_runRotate)model->rotate(ai,0,0);
             theGLWidget->updateGL();
         }//for ang
-
-        /* store run vars */
-        if(dlg.radioButton_xdir->isChecked()){
-            p_runLines=ny;
-            p_runPoints=nx;
-            p_runLayers=nz;
-            p_runStepover=(p_smaxy-p_sminy)/ny;
-            p_runResolution=(p_smaxx-p_sminx)/nx;
-            p_runStepdown=(p_smaxz-p_sminz)/nz;
-        }else{
-            p_runLines=nx;
-            p_runPoints=ny;
-            p_runLayers=nz;
-            p_runStepover=(p_smaxx-p_sminx)/nx;
-            p_runResolution=(p_smaxy-p_sminy)/ny;
-            p_runStepdown=(p_smaxz-p_sminz)/nz;
-        }
-        p_runRotate=dlg.checkBoxRotate->isChecked();
-        p_runRotStep=dlg.leRotateDegrees->text().toDouble();
-        p_runDirectionx=dlg.radioButton_xdir->isChecked();
-
     }//if (dlg.result() == QDialog::Accepted)
 }
 
@@ -1016,11 +1003,13 @@ void MainWindow::on_actionExport_GCode_triggered()
     if (!filename.isEmpty()) {
         lastFile = filename;
         GCodeExporter exp;
-        exp.m_rectcut=p_rectcut;
+
         exp.bEnableArcs=bEnableArcs;
         exp.safez=p_safez;
         exp.feedspeed=p_FeedSpeed;
         exp.plungespeed=p_PlungeSpeed;
+        exp.cutter_radius=cutter->radius();
+        exp.cutter_type=cutter->m_cutterType;
         exp.ExportPath(paths, filename.toStdString());
     }
 }

@@ -60,6 +60,8 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
     header.replace("$SAFEZ", str);
     header.replace("$F", QString::number(feedspeed));
     header.replace("$P", QString::number(plungespeed));
+    header.replace("$TS", QString::number(cutter_radius));
+    header.replace("$TT", cutter_type);
 
     if (!header.endsWith("\n")) header.append("\n");
     QString metric = settings->value("metric").toString();

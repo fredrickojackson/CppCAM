@@ -35,26 +35,18 @@ public:
     void mouseMoveEvent(QMouseEvent *ev);
     GLWidget* theGLWidget;
     QString p_modelfilename;
-    double p_mminx;
-    double p_mminy;
-    double p_mminz;
-    double p_CutterSize;
-    QString p_CutterType;//"Sph, Cyl"
-    double p_sminx;
-    double p_sminy;
-    double p_sminz;
-    double p_smaxx;
-    double p_smaxy;
-    double p_smaxz;
     long p_runLines;
     double p_runStepover;
     long p_runPoints;
     double p_runResolution;
     int p_runLayers;
     double p_runStepdown;
+
     bool p_runRotate;
-    double p_runRotStep;
-    bool p_runDirectionx;
+    double p_runRotateDegrees;
+    double p_runRotateStep;
+
+    int p_runDirection;
     double p_safez;
     double p_FeedSpeed;
     double p_PlungeSpeed;

@@ -14,8 +14,12 @@ class dlgToolSize : public QDialog
 public:
     explicit dlgToolSize(QWidget *parent = 0);
     bool isSph();
+    double m_cutterSize;
     QString m_ts();
     ~dlgToolSize();
+
+private slots:
+    void on_lineEditSize_editingFinished();
 
 private:
     Ui::dlgToolSize *ui;
