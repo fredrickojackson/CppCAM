@@ -28,7 +28,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>70</y>
       <width>88</width>
       <height>34</height>
      </rect>
@@ -41,18 +41,18 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>60</y>
-      <width>113</width>
-      <height>32</height>
+      <y>300</y>
+      <width>141</width>
+      <height>111</height>
      </rect>
     </property>
    </widget>
    <widget class="QWidget" name="frmogl" native="true">
     <property name="geometry">
      <rect>
-      <x>260</x>
+      <x>159</x>
       <y>50</y>
-      <width>600</width>
+      <width>701</width>
       <height>471</height>
      </rect>
     </property>
@@ -66,8 +66,8 @@
    <widget class="QPushButton" name="pbt">
     <property name="geometry">
      <rect>
-      <x>110</x>
-      <y>10</y>
+      <x>10</x>
+      <y>110</y>
       <width>88</width>
       <height>34</height>
      </rect>
@@ -79,8 +79,8 @@
    <widget class="QPushButton" name="pbt_hole">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>10</y>
+      <x>10</x>
+      <y>150</y>
       <width>88</width>
       <height>34</height>
      </rect>

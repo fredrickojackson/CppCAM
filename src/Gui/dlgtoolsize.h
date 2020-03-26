@@ -17,12 +17,12 @@ public:
     double m_cutterSize;
     QString m_ts();
     ~dlgToolSize();
+    Ui::dlgToolSize *ui;
 
 private slots:
     void on_lineEditSize_editingFinished();
 
 private:
-    Ui::dlgToolSize *ui;
 };
 
 #endif // DLGTOOLSIZE_H

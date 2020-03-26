@@ -36,7 +36,10 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "AlignModelDialog.h"
 #include "RotateModelDialog.h"
 #include "SimpleCutterDialog.h"
+
 #include "dlgtoolsize.h"
+#include "ui_dlgtoolsize.h"
+
 #include "Stock.h"
 #include "Model.h"
 #include "Path.h"
@@ -146,8 +149,7 @@ MainWindow::clearHeightfield()
     }
 }
 
-void
-MainWindow::clearModelAndPath()
+void MainWindow::clearModelAndPath()
 {
     clearPath();
     clearHeightfield();
@@ -157,63 +159,12 @@ MainWindow::clearModelAndPath()
     }
 }
 
-void
-MainWindow::on_actionTestStockModel_triggered()
-{
-    if (stock != NULL) {
-        delete stock;
-    }
-    stock = new Stock();
-    stock->m_min_x = 0;
-    stock->m_min_y = 0;
-    stock->m_min_z = 0;
-    stock->m_max_x = 14;
-    stock->m_max_y = 10;
-    stock->m_max_z = 4;
-}
-
-void
-MainWindow::on_actionTestTriangle_triggered()
-{
-    clearModelAndPath();
-
-    model = new Model();
-    model->add_triangle(Point(3,0,1), Point(0,3,1.5), Point(3,3,0.5));
-}
-
-void
-MainWindow::on_actionTestModel_triggered()
-{
-    clearModelAndPath();
-
-    model = new TestModel();
-    //for(int i=0; i<2; ++i) model->subdivide(0.3);
-}
-
-void
-MainWindow::on_actionTestPath_triggered()
-{
-    clearModelAndPath();
-
-    Path* path = new Path();
-    path->m_runs.resize(2);
-    path->m_runs[0].m_points.push_back(Point(-6,-6,0));
-    path->m_runs[0].m_points.push_back(Point(-5,-5,5));
-    path->m_runs[0].m_points.push_back(Point(5,5,5));
-    path->m_runs[0].m_points.push_back(Point(6,6,0));
-
-    path->m_runs[1].m_points.push_back(Point(-6,-5,0));
-    path->m_runs[1].m_points.push_back(Point(-5,-4,5));
-    path->m_runs[1].m_points.push_back(Point(5,6,5));
-    path->m_runs[1].m_points.push_back(Point(6,7,0));
-    paths.push_back(path);
-}
-
 void MainWindow::on_actionOpen_triggered()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Select Project File", "/home/fred", "Cam files (*.cam)");
     QSettings setproj(filename,QSettings::IniFormat);
     p_modelfilename=setproj.value("p_modelfilename","~/tmp.cam").toString();
+
     model = STLImporter::ImportModel(p_modelfilename.toStdString());
     if(setproj.value("p_CutterType","Sph").toString().compare("Sph") == 0)
     {
@@ -376,6 +327,9 @@ void MainWindow::on_actionEdit_Stock_Dimensions_triggered()
 void MainWindow::on_actionTool_Size_triggered()
 {
     dlgToolSize dlg(this);
+    dlg.m_cutterSize=cutter->radius();
+    dlg.ui->lineEditSize->setText(QString::number(cutter->radius()));
+
     double p_cutterSize=0.0;
     dlg.exec();
     p_cutterSize=dlg.m_cutterSize;

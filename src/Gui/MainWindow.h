@@ -60,14 +60,6 @@ public:
 private slots:
     void mytimeout();
 
-    void on_actionTestTriangle_triggered();
-
-    void on_actionTestModel_triggered();
-
-    void on_actionTestPath_triggered();
-
-    void on_actionTestStockModel_triggered();
-
     void on_actionAbout_triggered();
 
     void on_actionOpen_triggered();
