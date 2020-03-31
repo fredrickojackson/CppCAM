@@ -15,8 +15,9 @@ public:
     explicit dlgGcodeProp(QWidget *parent = nullptr);
     ~dlgGcodeProp();
 
-private:
     Ui::dlgGcodeProp *ui;
+
+private:
 };
 
 #endif // DLGGCODEPROP_H

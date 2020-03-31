@@ -96,7 +96,7 @@ MainWindow::MainWindow()
      p_runDirection=0;
      p_useLine=1;
      p_smooth=0;
-     menuTest->setVisible(false);
+//     menuTest->setVisible(false);
      bEnableArcs=false;
      p_FeedSpeed=5000.0;
      p_PlungeSpeed=500.0;
@@ -197,7 +197,7 @@ void MainWindow::on_actionOpen_triggered()
     p_runResolution=setproj.value("p_runResolution",0.0).toDouble();
     p_runStepdown=setproj.value("p_runStepdown",0.0).toDouble();
     p_runRotate=setproj.value("p_runRotate",0.0).toBool();
-    p_runRotateDegrees=setproj.value("p_runRotateDegrees",0.0).toBool();
+    p_runRotateDegrees=setproj.value("p_runRotateDegrees",0.0).toDouble();
     p_runRotateStep=setproj.value("p_runRotateStep",0.0).toDouble();
     p_safez=setproj.value("p_safez",0.0).toDouble();
     p_FeedSpeed=setproj.value("p_FeedSpeed",0.0).toDouble();
@@ -454,89 +454,6 @@ void MainWindow::on_actionResize_Model_triggered()
 
 void MainWindow::on_actionAlign_Model_to_Stock_triggered()
 {
-    AlignModelDialog dlg(this);
-
-    if (model == NULL) return;
-    if (stock == NULL) return;
-
-    double m_min_x,m_min_y,m_min_z;
-    double m_max_x,m_max_y,m_max_z;
-
-    m_min_x = model->min_x();
-    m_min_y = model->min_y();
-    m_min_z = model->min_z();
-    m_max_x = model->max_x();
-    m_max_y = model->max_y();
-    m_max_z = model->max_z();
-
-    double m_dim_x = m_max_x - m_min_x;
-    double m_dim_y = m_max_y - m_min_y;
-    double m_dim_z = m_max_z - m_min_z;
-
-    double s_dim_x,s_dim_y,s_dim_z;
-    double s_min_x,s_min_y,s_min_z;
-    double s_max_x,s_max_y,s_max_z;
-
-    s_min_x = stock->min_x();
-    s_min_y = stock->min_y();
-    s_min_z = stock->min_z();
-    s_dim_x = stock->dim_x();
-    s_dim_y = stock->dim_y();
-    s_dim_z = stock->dim_z();
-    s_max_x = s_min_x + stock->dim_x();
-    s_max_y = s_min_y + stock->dim_y();
-    s_max_z = s_min_z + stock->dim_z();
-
-    dlg.radioButton_xcen->setChecked(true);
-    dlg.radioButton_ycen->setChecked(true);
-    dlg.radioButton_zcen->setChecked(true);
-    dlg.exec();
-
-    if (dlg.result() == QDialog::Accepted) {
-        clearPath();
-
-        double min_x,min_y,min_z;
-        if (dlg.radioButton_xmin->isChecked()) {
-            min_x = s_min_x;
-        }
-        if (dlg.radioButton_xcen->isChecked()) {
-            min_x = s_min_x + (s_dim_x - m_dim_x)/2;
-        }
-        if (dlg.radioButton_xmax->isChecked()) {
-            min_x = s_min_x + s_dim_x - m_dim_x;
-        }
-        if (dlg.radioButton_cx->isChecked()) {
-            min_x = -m_dim_x/2;
-        }
-
-        if (dlg.radioButton_ymin->isChecked()) {
-            min_y = s_min_y;
-        }
-        if (dlg.radioButton_ycen->isChecked()) {
-            min_y = s_min_y + (s_dim_y - m_dim_y)/2;
-        }
-        if (dlg.radioButton_ymax->isChecked()) {
-            min_y = s_min_y + s_dim_y - m_dim_y;
-        }
-        if (dlg.radioButton_cy->isChecked()) {
-            min_y = -m_dim_y/2;
-        }
-
-        if (dlg.radioButton_zmin->isChecked()) {
-            min_z = s_min_z;
-        }
-        if (dlg.radioButton_zcen->isChecked()) {
-            min_z = s_min_z + (s_dim_z - m_dim_z)/2;
-        }
-        if (dlg.radioButton_zmax->isChecked()) {
-            min_z = s_min_z + s_dim_z - m_dim_z;
-        }
-        if (dlg.radioButton_cz->isChecked()) {
-            min_z=-m_dim_z;
-
-        }
-        model->resize(min_x, 1.0, min_y, 1.0, min_z, 1.0);
-    }
 }
 
 
@@ -905,6 +822,8 @@ void MainWindow::on_actionRun_triggered()
         double ai=375.0;//!!precondition
         double ang=0.0;
         double angrotatet=375.0;
+        double oz = (model->m_min_z+model->m_max_z)/2.0;
+        double ozc = 0.0;
         if(dlg.cbRotate->isChecked()){
              ai = dlg.leRotateStep->text().toDouble();
              angrotatet = dlg.leRotateDegrees->text().toDouble();
@@ -942,7 +861,12 @@ void MainWindow::on_actionRun_triggered()
             simplecutter.m_smooth=dlg.leSmooth->text().toDouble();
             simplecutter.GenerateCutPath(*heightfield, Point(stock->min_x(), stock->min_y(), stock->max_z()), dir, zlevels, paths, ang);
 
-            if(p_runRotate)model->rotate(ai,0,0);
+            if(p_runRotate)
+            {
+                model->resize(model->m_min_x,1.0,model->m_min_y,1.0,model->m_min_z-oz,1.0);
+                model->rotate(ai,0,0);
+                model->resize(model->m_min_x,1.0,model->m_min_y,1.0,model->m_min_z+oz,1.0);
+            }
             theGLWidget->updateGL();
         }//for ang
     }//if (dlg.result() == QDialog::Accepted)
@@ -1671,4 +1595,91 @@ void MainWindow::on_actionHole_Cut_triggered()
 void MainWindow::on_actionClear_Path_triggered()
 {
     clearPath();
+}
+
+void MainWindow::on_actionAlign_Model_triggered()
+{
+    AlignModelDialog dlg(this);
+
+    if (model == NULL) return;
+    if (stock == NULL) return;
+
+    double m_min_x,m_min_y,m_min_z;
+    double m_max_x,m_max_y,m_max_z;
+
+    m_min_x = model->min_x();
+    m_min_y = model->min_y();
+    m_min_z = model->min_z();
+    m_max_x = model->max_x();
+    m_max_y = model->max_y();
+    m_max_z = model->max_z();
+
+    double m_dim_x = m_max_x - m_min_x;
+    double m_dim_y = m_max_y - m_min_y;
+    double m_dim_z = m_max_z - m_min_z;
+
+    double s_dim_x,s_dim_y,s_dim_z;
+    double s_min_x,s_min_y,s_min_z;
+    double s_max_x,s_max_y,s_max_z;
+
+    s_min_x = stock->min_x();
+    s_min_y = stock->min_y();
+    s_min_z = stock->min_z();
+    s_dim_x = stock->dim_x();
+    s_dim_y = stock->dim_y();
+    s_dim_z = stock->dim_z();
+    s_max_x = s_min_x + stock->dim_x();
+    s_max_y = s_min_y + stock->dim_y();
+    s_max_z = s_min_z + stock->dim_z();
+
+    dlg.radioButton_xcen->setChecked(true);
+    dlg.radioButton_ycen->setChecked(true);
+    dlg.radioButton_zcen->setChecked(true);
+    dlg.exec();
+
+    if (dlg.result() == QDialog::Accepted) {
+        clearPath();
+
+        double min_x,min_y,min_z;
+        if (dlg.radioButton_xmin->isChecked()) {
+            min_x = s_min_x;
+        }
+        if (dlg.radioButton_xcen->isChecked()) {
+            min_x = s_min_x + (s_dim_x - m_dim_x)/2;
+        }
+        if (dlg.radioButton_xmax->isChecked()) {
+            min_x = s_min_x + s_dim_x - m_dim_x;
+        }
+        if (dlg.radioButton_cx->isChecked()) {
+            min_x = -m_dim_x/2;
+        }
+
+        if (dlg.radioButton_ymin->isChecked()) {
+            min_y = s_min_y;
+        }
+        if (dlg.radioButton_ycen->isChecked()) {
+            min_y = s_min_y + (s_dim_y - m_dim_y)/2;
+        }
+        if (dlg.radioButton_ymax->isChecked()) {
+            min_y = s_min_y + s_dim_y - m_dim_y;
+        }
+        if (dlg.radioButton_cy->isChecked()) {
+            min_y = -m_dim_y/2;
+        }
+
+        if (dlg.radioButton_zmin->isChecked()) {
+            min_z = s_min_z;
+        }
+        if (dlg.radioButton_zcen->isChecked()) {
+            min_z = s_min_z + (s_dim_z - m_dim_z)/2;
+        }
+        if (dlg.radioButton_zmax->isChecked()) {
+            min_z = s_min_z + s_dim_z - m_dim_z;
+        }
+        if (dlg.radioButton_cz->isChecked()) {
+            min_z=-m_dim_z;
+
+        }
+        model->resize(min_x, 1.0, min_y, 1.0, min_z, 1.0);
+    }
 }

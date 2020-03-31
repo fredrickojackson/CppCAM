@@ -244,8 +244,37 @@ Model::resize(double min_x, double scale_x, double min_y, double scale_y, double
     }
 }
 
-void 
+void
 Model::rotate(double rot_x, double rot_y, double rot_z)
+{
+    QMatrix4x4 rot;
+    rot.rotate(rot_x, 1, 0, 0);
+    rot.rotate(rot_y, 0, 1, 0);
+    rot.rotate(rot_z, 0, 0, 1);
+
+    for(std::vector<Point>::iterator i=m_points.begin(); i!=m_points.end(); ++i)
+    {
+        QVector3D v = rot.map(QVector3D(i->x(), i->y(), i->z()));
+        i->m_x = v.x();
+        i->m_y = v.y();
+        i->m_z = v.z();
+    }
+    for(std::vector<Point>::iterator i=m_normals.begin(); i!=m_normals.end(); ++i)
+    {
+        QVector3D v = rot.map(QVector3D(i->x(), i->y(), i->z()));
+        i->m_x = v.x();
+        i->m_y = v.y();
+        i->m_z = v.z();
+    }
+
+    for(std::vector<Triangle>::iterator i=m_triangles.begin(); i!=m_triangles.end(); ++i) {
+        i->calculate_boundingbox();
+    }
+    calculate_boundingbox();
+}
+
+void
+Model::rotateip(double rot_x, double rot_y, double rot_z)
 {
     QMatrix4x4 rot;
     rot.rotate(rot_x, 1, 0, 0);

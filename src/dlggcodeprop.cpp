@@ -6,6 +6,7 @@ dlgGcodeProp::dlgGcodeProp(QWidget *parent) :
     ui(new Ui::dlgGcodeProp)
 {
     ui->setupUi(this);
+
 }
 
 dlgGcodeProp::~dlgGcodeProp()

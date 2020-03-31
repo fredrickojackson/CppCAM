@@ -32,6 +32,7 @@ public:
     void subdivide(double amount=0.2);
     void resize(double min_x, double scale_x, double min_y, double scale_y, double min_z, double scale_z);
     void rotate(double rot_x, double rot_y, double rot_z);
+    void rotateip(double rot_x, double rot_y, double rot_z);
 
     void add_triangle(const Point* p1, const Point* p2, const Point* p3, const Point* n = NULL);
     void add_triangle(const Point& p1, const Point& p2, const Point& p3, const Point& n) {

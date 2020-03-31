@@ -132,6 +132,8 @@ private slots:
 
     void on_actionClear_Path_triggered();
 
+    void on_actionAlign_Model_triggered();
+
 private:
     void clearPath();
     void clearHeightfield();

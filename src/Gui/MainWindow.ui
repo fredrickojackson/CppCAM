@@ -42,7 +42,7 @@
      <rect>
       <x>10</x>
       <y>300</y>
-      <width>141</width>
+      <width>131</width>
       <height>111</height>
      </rect>
     </property>
@@ -50,10 +50,10 @@
    <widget class="QWidget" name="frmogl" native="true">
     <property name="geometry">
      <rect>
-      <x>159</x>
-      <y>50</y>
-      <width>701</width>
-      <height>471</height>
+      <x>259</x>
+      <y>100</y>
+      <width>601</width>
+      <height>421</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -92,8 +92,8 @@
    <widget class="QLineEdit" name="letime">
     <property name="geometry">
      <rect>
-      <x>780</x>
-      <y>0</y>
+      <x>10</x>
+      <y>10</y>
       <width>113</width>
       <height>32</height>
      </rect>
@@ -171,7 +171,7 @@
     <addaction name="actionImport_Model"/>
     <addaction name="actionTool_Size"/>
     <addaction name="actionResize_Model"/>
-    <addaction name="actionAlign_Model_to_Stock"/>
+    <addaction name="actionAlign_Model"/>
     <addaction name="actionRotate_Model"/>
     <addaction name="actionExport_Model"/>
     <addaction name="separator"/>
@@ -384,9 +384,9 @@
     <string>&amp;Resize Model</string>
    </property>
   </action>
-  <action name="actionAlign_Model_to_Stock">
+  <action name="actionAlign_Model">
    <property name="text">
-    <string>&amp;Align Model to Stock</string>
+    <string>&amp;Align Model</string>
    </property>
   </action>
   <action name="actionRotate_Model">

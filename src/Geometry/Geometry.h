@@ -23,7 +23,7 @@ along with PyCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <cmath>
 
 namespace {
-    const double epsilon = 1e-3;
+    const double epsilon = 1e-5;
 #ifndef INFINITE
     const double INFINITE = 1e+5;
 #endif

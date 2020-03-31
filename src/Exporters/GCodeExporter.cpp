@@ -22,6 +22,8 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <QString>
 
 #include "GCodeExporter.h"
+#include "dlggcodeprop.h"
+#include "ui_dlggcodeprop.h"
 
 QSettings* settings = NULL;
 
@@ -41,6 +43,9 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
     if (!gc.open(QIODevice::WriteOnly)) {
         return false;
     }
+    dlgGcodeProp dlg;
+
+    dlg.exec();
     QString header = settings->value("header").toString();
     QString str;
     header.replace("$VERSION", "0.1");
@@ -82,6 +87,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
     QString endrun = settings->value("endrun").toString();
     if (!endrun.endsWith("\n")) endrun.append("\n");
     QString point = settings->value("point").toString();
+    QString slowline = settings->value("slowline").toString();
     QString firstlinepoint = settings->value("firstlinepoint").toString();
     QString arc = settings->value("arc").toString();
     QString start_spindle = settings->value("start_spindle").toString();
@@ -93,6 +99,14 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
     gc.write(metric.toUtf8());
     gc.write(start_spindle.toUtf8());
 
+    int slowlineflag=0;
+    int beginpathflag=0;
+    int beginrunflag=0;
+    int beginlineflag=0;
+    int endpathflag=0;
+    int endrunflag=0;
+    int endlineflag=0;
+    unsigned long count=0;
 
     for(std::vector<Path*>::const_iterator p = paths.begin(); p!=paths.end(); ++p) {
         QString s;
@@ -106,23 +120,31 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                 if(rodd==0){
                     pt = r->m_points.begin();
                     int sz = r->m_points.size();
+                    sz=0;
                     for(; pt!=r->m_points.end(); ++pt){
                         s=point;
-                        if(p == paths.begin() && r == (*p)->m_runs.begin() && pt == r->m_points.begin()){
-                            s=beginpath;
-                            replace(&s,*pt,(*p)->rot_x);
-                            gc.write(s.toUtf8());
+                        if(dlg.ui->cbbeginpath->isChecked() && p == paths.begin() && r == (*p)->m_runs.begin() && pt == r->m_points.begin()){
+//                            s=beginpath;
+//                            replace(&s,*pt,(*p)->rot_x);
+//                            gc.write(s.toUtf8());
+                            beginpathflag=1;
                         }
-                        if(r == (*p)->m_runs.begin() && pt == r->m_points.begin()){
-                            s=beginrun;
-                            replace(&s,*pt,(*p)->rot_x);
-                            gc.write(s.toUtf8());
+                        if(dlg.ui->cbbeginrun->isChecked() && r == (*p)->m_runs.begin() && pt == r->m_points.begin()){
+//                            s=beginrun;
+//                            replace(&s,*pt,(*p)->rot_x);
+//                            gc.write(s.toUtf8());
+                            beginrunflag=2;
                         }
-                        if(pt == r->m_points.begin()){
-                            s=beginline;
-                            replace(&s,*pt,(*p)->rot_x);
-                            gc.write(s.toUtf8());
+                        if(dlg.ui->cbbeginline->isChecked() && pt == r->m_points.begin()){
+//                            s=beginline;
+//                            replace(&s,*pt,(*p)->rot_x);
+//                            gc.write(s.toUtf8());
+                            beginlineflag=1;
                         }
+                        if(dlg.ui->cbendline->isChecked() && pt == --r->m_points.end())endlineflag=1;
+                        if(dlg.ui->cbendrun->isChecked() && r == --(*p)->m_runs.end() && pt == --r->m_points.end())endrunflag=1;
+                        if(dlg.ui->cbendpath->isChecked() && p == --paths.end() &&  r == --(*p)->m_runs.end() && pt == --r->m_points.end())endpathflag=1;
+
                         if(pt->m_rad>0.0 && bEnableArcs)
                         {
                             s=arc;
@@ -132,25 +154,59 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                             gc.write(s.toUtf8());
                         }else
                         {
-                            s=point;
-                            replace(&s,*pt,(*p)->rot_x);
-                            gc.write(s.toUtf8());
+                            if(beginpathflag)
+                            {
+                                s=beginpath;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(beginrunflag)
+                            {
+                                if(beginrunflag==1)
+                                {
+                                    s=slowline;
+                                    slowlineflag=1;
+                                }
+                                if(beginrunflag==2)s=beginrun;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(beginlineflag)
+                            {
+                                s=beginline;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(endlineflag && !slowlineflag){
+                                s=endline;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            slowlineflag=0;
+                            if(endrunflag){
+                                s=endrun;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(endpathflag){
+                                s=endpath;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(!beginpathflag && !beginrunflag && !beginlineflag && !endlineflag && !endrunflag && !endpathflag)
+                            {
+                                s=point;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(beginrunflag)beginrunflag--;
+                            if(beginpathflag)beginpathflag=0;
+                            if(beginlineflag)beginlineflag=0;
+                            if(endlineflag)endlineflag=0;
+                            if(endrunflag)endrunflag=0;
+                            if(endpathflag)endpathflag=0;
                         }
-                        if(pt == --r->m_points.end()){
-                            s=endline;
-                            replace(&s,*pt,(*p)->rot_x);
-                            gc.write(s.toUtf8());
-                        }
-                        if(r == --(*p)->m_runs.end() && pt == --r->m_points.end()){
-                            s=endrun;
-                            replace(&s,*pt,(*p)->rot_x);
-                            gc.write(s.toUtf8());
-                        }
-                        if(p == --paths.end() && r == --(*p)->m_runs.end() && pt == --r->m_points.end()){
-                            s=endpath;
-                            replace(&s,*pt,(*p)->rot_x);
-                            gc.write(s.toUtf8());
-                        }
+                        count++;
                     }//for pt=+-
                 }else{
                     Point pp;
@@ -162,21 +218,28 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
 
                         pp = r->m_points[sz];
                         s = point;
-                        if(p == paths.begin() && r == (*p)->m_runs.begin() && sz == r->m_points.size()-1){
-                            s=beginpath;
-                            replace(&s,pp,(*p)->rot_x);
-                            gc.write(s.toUtf8());
+                        if(dlg.ui->cbbeginpath->isChecked() && p == paths.begin() && r == (*p)->m_runs.begin() && sz == r->m_points.size()-1){
+//                            s=beginpath;
+//                            replace(&s,pp,(*p)->rot_x);
+//                            gc.write(s.toUtf8());
+                            beginpathflag=1;
                         }
-                        if(r == (*p)->m_runs.begin() && sz == r->m_points.size()-1){
-                            s=beginrun;
-                            replace(&s,pp,(*p)->rot_x);
-                            gc.write(s.toUtf8());
+                        if(dlg.ui->cbbeginrun->isChecked() && r == (*p)->m_runs.begin() && sz == r->m_points.size()-1){
+//                            s=beginrun;
+//                            replace(&s,pp,(*p)->rot_x);
+//                            gc.write(s.toUtf8());
+                            beginrunflag=2;
                         }
-                        if(sz == r->m_points.size()-1){
-                            s=beginline;
-                            replace(&s,pp,(*p)->rot_x);
-                            gc.write(s.toUtf8());
+                        if(dlg.ui->cbbeginline->isChecked() && sz == r->m_points.size()-1){
+//                            s=beginline;
+//                            replace(&s,pp,(*p)->rot_x);
+//                            gc.write(s.toUtf8());
+                            beginlineflag=1;
                         }
+                        if(dlg.ui->cbendline->isChecked() && sz == 0)endlineflag=1;
+                        if(dlg.ui->cbendrun->isChecked() && r == --(*p)->m_runs.end() && sz == 0)endrunflag=1;
+                        if(dlg.ui->cbendpath->isChecked() && p == --paths.end() && r == --(*p)->m_runs.end() && sz == 0)endpathflag=1;
+
                         if(pp.m_rad>0 && bEnableArcs)
                         {
                             s=arc;
@@ -187,27 +250,61 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                         }else
                         {
                             s=point;
-                            replace(&s,pp,(*p)->rot_x);
-                            gc.write(s.toUtf8());
+                            if(beginpathflag)
+                            {
+                                s=beginpath;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(beginrunflag)
+                            {
+                                if(beginrunflag==1)
+                                {
+                                    s=slowline;
+                                    slowlineflag=1;
+                                }
+                                if(beginrunflag==2)s=beginrun;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(beginlineflag && !slowlineflag)
+                            {
+                                s=beginline;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            slowlineflag=0;
+                            if(endlineflag){
+                                s=endline;
+                                replace(&s,pp,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(endrunflag){
+                                s=endrun;
+                                replace(&s,pp,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(endpathflag){
+                                s=endpath;
+                                replace(&s,pp,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(!beginpathflag && !beginrunflag && !beginlineflag  && !endlineflag && !endrunflag && !endpathflag)
+                            {
+                                s=point;
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }
+                            if(beginrunflag)beginrunflag--;
+                            if(beginpathflag)beginpathflag=0;
+                            if(beginlineflag)beginlineflag=0;
+                            if(endlineflag)endlineflag=0;
+                            if(endrunflag)endrunflag=0;
+                            if(endpathflag)endpathflag=0;
                         }
-                        if(sz == 0){
-                            s=endline;
-                            replace(&s,pp,(*p)->rot_x);
-                            gc.write(s.toUtf8());
-                        }
-                        if(r == --(*p)->m_runs.end() && sz == 0){
-                            s=endrun;
-                            replace(&s,pp,(*p)->rot_x);
-                            gc.write(s.toUtf8());
-                        }
-                        if(p == paths.end() && r == (*p)->m_runs.end() && sz == 0){
-                            s=endpath;
-                            replace(&s,pp,(*p)->rot_x);
-                            gc.write(s.toUtf8());
-                        }
+                    count++;
                     }//for pt=+-
                 }//else rodd==
-
                 rodd=1-rodd;
         }//for m_runs iterator
     }//for paths iterator
