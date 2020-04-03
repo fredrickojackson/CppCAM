@@ -329,20 +329,15 @@ void MainWindow::on_actionTool_Size_triggered()
     dlgToolSize dlg(this);
     dlg.m_cutterSize=cutter->radius();
     dlg.ui->lineEditSize->setText(QString::number(cutter->radius()));
-
-    double p_cutterSize=0.0;
     dlg.exec();
-    p_cutterSize=dlg.m_cutterSize;
     delete cutter;
     if(dlg.isSph()){
-        cutter = Cutter::CreateSphericalCutter(p_cutterSize, Point(0,0,0));
+        cutter = Cutter::CreateSphericalCutter(dlg.m_cutterSize, Point(0,0,0));
         cutter->m_cutterType="Sph";
     }else{
-        cutter = Cutter::CreateCylindricalCutter(p_cutterSize, Point(0,0,0));
+        cutter = Cutter::CreateCylindricalCutter(dlg.m_cutterSize, Point(0,0,0));
         cutter->m_cutterType="Cyl";
     }
-
-
 }
 
 

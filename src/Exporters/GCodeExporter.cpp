@@ -253,7 +253,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                             if(beginpathflag)
                             {
                                 s=beginpath;
-                                replace(&s,*pt,(*p)->rot_x);
+                                replace(&s,pp,(*p)->rot_x);
                                 gc.write(s.toUtf8());
                             }
                             if(beginrunflag)
@@ -264,13 +264,13 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                                     slowlineflag=1;
                                 }
                                 if(beginrunflag==2)s=beginrun;
-                                replace(&s,*pt,(*p)->rot_x);
+                                replace(&s,pp,(*p)->rot_x);
                                 gc.write(s.toUtf8());
                             }
                             if(beginlineflag && !slowlineflag)
                             {
                                 s=beginline;
-                                replace(&s,*pt,(*p)->rot_x);
+                                replace(&s,pp,(*p)->rot_x);
                                 gc.write(s.toUtf8());
                             }
                             slowlineflag=0;
@@ -292,7 +292,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                             if(!beginpathflag && !beginrunflag && !beginlineflag  && !endlineflag && !endrunflag && !endpathflag)
                             {
                                 s=point;
-                                replace(&s,*pt,(*p)->rot_x);
+                                replace(&s,pp,(*p)->rot_x);
                                 gc.write(s.toUtf8());
                             }
                             if(beginrunflag)beginrunflag--;
