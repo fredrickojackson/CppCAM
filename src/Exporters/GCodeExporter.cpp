@@ -48,7 +48,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
     dlg.exec();
     QString header = settings->value("header").toString();
     QString str;
-    header.replace("$VERSION", "0.1");
+    header.replace("$VERSION", "0.9");
     time_t rawtime;
     struct tm * timeinfo;
     char buffer[80];

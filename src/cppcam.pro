@@ -31,7 +31,7 @@ SOURCES += \
     Gui/dlgtoolsize.cpp \
     cppcam.cpp \
     Gui/rackcutdlg.cpp \
-    dlggcodeprop.cpp
+    Gui/dlggcodeprop.cpp
 
 SOURCES += Gui/MainWindow.cpp Gui/GLWidget.cpp 
 SOURCES += Gui/PreferencesDialog.cpp Gui/StockModelDialog.cpp
@@ -65,7 +65,7 @@ HEADERS += Gui/AboutDialog.h \
     Gui/rectcutdialog.h \
     Gui/dlgtoolsize.h \
     Gui/rackcutdlg.h \
-    dlggcodeprop.h
+    Gui/dlggcodeprop.h
 HEADERS += Gui/MainWindow.h Gui/GLWidget.h
 HEADERS += Gui/PreferencesDialog.h
 HEADERS += Gui/StockModelDialog.h 
@@ -78,7 +78,7 @@ FORMS += Gui/MainWindow.ui Gui/AboutDialog.ui \
     Gui/rectcutdialog.ui \
     Gui/dlgtoolsize.ui \
     Gui/rackcutdlg.ui \
-    dlggcodeprop.ui
+    Gui/dlggcodeprop.ui
 FORMS += Gui/PreferencesDialog.ui Gui/StockModelDialog.ui 
 FORMS += Gui/ResizeModelDialog.ui Gui/AlignModelDialog.ui Gui/RotateModelDialog.ui 
 FORMS += Gui/SimpleCutterDialog.ui
