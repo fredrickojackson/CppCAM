@@ -30,5 +30,5 @@ Exporters:
 	GCodeExporter: basic functionality, configurable output
 
 GUI:
-	The gui is very rudimentary, back like it was in pycam-0.1.x, just for testing the algorithms
+	The gui is rudimentary, but functional. Tool paths for routers (3 axis) and lathes (4 axis) can be created without significant effort.
 
