@@ -124,9 +124,7 @@ private slots:
 
     void on_actionRack_Cut_triggered();
 
-    void on_pbt_clicked();
-
-    void on_pbt_hole_clicked();
+    void hole_cut();
 
     void on_actionHole_Cut_triggered();
 

@@ -1519,23 +1519,12 @@ xtot:
 
 
 
-
-
-
-
-
-
-void MainWindow::on_pbt_clicked()
-{
-    sim();
-}
-
-void MainWindow::on_pbt_hole_clicked()
+void MainWindow::hole_cut()
 {
 
     dlgHoleCut dlg;
     dlg.exec();
-    while(dlg.myresult == 1)
+    if(dlg.myresult == 1)
     {
         bEnableArcs=true;
         double stepdown=dlg.ui->lestepdown->text().toDouble();
@@ -1584,7 +1573,7 @@ void MainWindow::on_pbt_hole_clicked()
 
 void MainWindow::on_actionHole_Cut_triggered()
 {
-    on_pbt_hole_clicked();
+    hole_cut();
 }
 
 void MainWindow::on_actionClear_Path_triggered()
