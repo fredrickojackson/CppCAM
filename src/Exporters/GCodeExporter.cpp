@@ -76,6 +76,24 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
 
     QString preamble = settings->value("preamble").toString();
     if (!preamble.endsWith("\n")) preamble.append("\n");
+    preamble.replace("$XMIN",QString::number(stk->min_x()));
+    preamble.replace("$XMAX",QString::number(stk->max_x()));
+    preamble.replace("$XDIM",QString::number(stk->dim_x()));
+    preamble.replace("$YMIN",QString::number(stk->min_y()));
+    preamble.replace("$YMAX",QString::number(stk->max_y()));
+    preamble.replace("$YDIM",QString::number(stk->dim_y()));
+    preamble.replace("$ZMIN",QString::number(stk->min_z()));
+    preamble.replace("$ZMAX",QString::number(stk->max_z()));
+    preamble.replace("$ZDIM",QString::number(stk->dim_z()));
+    preamble.replace("$MXMIN",QString::number(mdl->min_x()));
+    preamble.replace("$MXMAX",QString::number(mdl->max_x()));
+    preamble.replace("$MXDIM",QString::number(mdl->dim_x()));
+    preamble.replace("$MYMIN",QString::number(mdl->min_y()));
+    preamble.replace("$MYMAX",QString::number(mdl->max_y()));
+    preamble.replace("$MYDIM",QString::number(mdl->dim_y()));
+    preamble.replace("$MZMIN",QString::number(mdl->min_z()));
+    preamble.replace("$MZMAX",QString::number(mdl->max_z()));
+    preamble.replace("$MZDIM",QString::number(mdl->dim_z()));
     QString postamble = settings->value("postamble").toString();
     if (!postamble.endsWith("\n")) postamble.append("\n");
     QString beginpath = settings->value("beginpath").toString();

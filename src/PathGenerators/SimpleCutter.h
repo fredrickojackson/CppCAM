@@ -1,4 +1,4 @@
-/* -*- coding: utf-8 -*-
+/* -  *- coding: utf-8 -*-
 
 Copyright 2014 Lode Leroy
 
@@ -29,6 +29,7 @@ class SimpleCutter {
 public:
     SimpleCutter():m_zigzag(false) { }
     bool GenerateCutPath(const HeightField& heightfield, const Point& start, const Point& direction, const std::vector<double>& zlevels, std::vector<Path*>& paths, double angle);
+    bool GenerateCutPathx(const HeightField& heightfield, const Point& start, const Point& direction, double Zlevel, std::vector<Path*>& paths, double angle);
     bool m_zigzag;
 
     double m_radius;

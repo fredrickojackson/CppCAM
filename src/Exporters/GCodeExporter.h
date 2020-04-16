@@ -23,6 +23,9 @@ along with PyCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <QString>
 #include <string>
 #include "Path.h"
+#include "Stock.h"
+#include "Model.h"
+
 
 class GCodeExporter
 {
@@ -36,6 +39,8 @@ public:
     bool bEnableArcs;
     double cutter_radius;
     QString cutter_type;
+    Stock* stk;
+    Model* mdl;
 
 };
 

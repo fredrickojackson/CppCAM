@@ -23,9 +23,20 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "SimpleCutter.h"
 #include "PathProcessors.h"
 
+bool SimpleCutter::GenerateCutPathx(const HeightField& heightfield, const Point& start, const Point& direction, double Zlevel, std::vector<Path*>& paths, double angle)
+{
+    Path* path = new Path();
+    path->rot_x=angle;
+    if (!GenerateCutPathLayer_y(heightfield, start, direction, Zlevel, *path)) {
+        delete path;
+        return false;
+    }
+    paths.push_back(path);
+    return true;
+}
+
 bool
-SimpleCutter::GenerateCutPath(const HeightField& heightfield, const Point& start, const Point& direction, const std::vector<double>& zlevels, 
-                              std::vector<Path*>& paths, double angle)
+SimpleCutter::GenerateCutPath(const HeightField& heightfield, const Point& start, const Point& direction, const std::vector<double>& zlevels, std::vector<Path*>& paths, double angle)
 {
     if (direction.z() != 0) return false;
     //if (direction.x() != 0 && direction.y() != 0) return false;
@@ -68,8 +79,7 @@ SimpleCutter::GenerateCutPath(const HeightField& heightfield, const Point& start
 }
 
 bool
-SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, 
-                                     Path& path)
+SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path)
 {
     SimplePathProcessors pathProcessors;
 
@@ -147,11 +157,9 @@ SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point
 }
 
 bool
-SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, 
-                                     Path& path)
+SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path)
 {
     SimplePathProcessors pathProcessors;
-
     double xstep=m_stock->dim_x()/heightfield.width();
     double ystep=m_stock->dim_y()/heightfield.height();
     long di = 1+m_radius/xstep;

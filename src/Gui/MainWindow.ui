@@ -49,6 +49,11 @@
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
+    <property name="font">
+     <font>
+      <family>Noto Sans</family>
+     </font>
+    </property>
    </widget>
    <widget class="QLineEdit" name="letime">
     <property name="geometry">
@@ -140,6 +145,7 @@
     <addaction name="actionRack_Cut"/>
     <addaction name="actionRectCut"/>
     <addaction name="actionHole_Cut"/>
+    <addaction name="actionRadial_Cut"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -419,6 +425,11 @@
   <action name="actionClear_Path">
    <property name="text">
     <string>Clear Path</string>
+   </property>
+  </action>
+  <action name="actionRadial_Cut">
+   <property name="text">
+    <string>Radial Cut</string>
    </property>
   </action>
  </widget>
