@@ -1880,7 +1880,15 @@ void MainWindow::on_actionRadial_Cut_triggered()
         }
         for(size_t i=0; i<nz; i++)
         {
-            double Zlevel=z0 + (z1-z0)*(nz-1-i)/(nz-1);
+            double Zlevel=0.0;
+            if(nz>1)
+            {
+                Zlevel=z0 + (z1-z0)*(nz-1-i)/(nz-1);
+            }else
+            {
+                Zlevel=z0;
+            }
+
             for(ang=0.0; ang<angrotatet; ang+=ai)
             {
                 int hfi=ang/ai;

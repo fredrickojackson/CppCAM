@@ -398,10 +398,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>0.5</string>
+    <string/>
    </property>
    <property name="placeholderText">
-    <string>.5</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="label_12">
