@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>667</width>
+    <width>1033</width>
     <height>259</height>
    </rect>
   </property>
@@ -29,8 +29,8 @@
      <property name="title">
       <string>Align X</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
        <widget class="QRadioButton" name="radioButton_xmin">
         <property name="text">
          <string>&amp;Left of stock</string>
@@ -40,7 +40,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item>
        <widget class="QRadioButton" name="radioButton_xcen">
         <property name="text">
          <string>Ce&amp;nter of stock</string>
@@ -50,17 +50,40 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item>
+       <widget class="QRadioButton" name="radioButton_xmax">
+        <property name="text">
+         <string>Right of stock</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QRadioButton" name="radioButton_cx">
         <property name="text">
          <string>center x axis on zero</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QRadioButton" name="radioButton_xmax">
+      <item>
+       <widget class="QRadioButton" name="rbCustomX">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
-         <string>Right of stock</string>
+         <string>custom</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="dsbCustomX">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -72,41 +95,64 @@
      <property name="title">
       <string>Align Y</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="2">
-       <widget class="QRadioButton" name="radioButton_ymax">
-        <property name="text">
-         <string>Rear</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QRadioButton" name="radioButton_ycen">
-        <property name="text">
-         <string>Center</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
        <widget class="QRadioButton" name="radioButton_ymin">
         <property name="text">
-         <string>Front</string>
+         <string>Front of Stock</string>
         </property>
         <property name="checked">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item>
+       <widget class="QRadioButton" name="radioButton_ycen">
+        <property name="text">
+         <string>Center of Stock</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioButton_ymax">
+        <property name="text">
+         <string>Rear of Stock</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QRadioButton" name="radioButton_cy">
         <property name="text">
          <string>center y axis on zero</string>
         </property>
         <property name="checked">
          <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbCustomY">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>custom</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="dsbCustomY">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -118,38 +164,61 @@
      <property name="title">
       <string>Align Z</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="1">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QRadioButton" name="radioButton_zmin">
+        <property name="text">
+         <string>Bottom of Stock</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QRadioButton" name="radioButton_zcen">
         <property name="text">
-         <string>Center</string>
+         <string>Center of Stock</string>
         </property>
         <property name="checked">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QRadioButton" name="radioButton_zmin">
-        <property name="text">
-         <string>Bottom</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
+      <item>
        <widget class="QRadioButton" name="radioButton_zmax">
         <property name="text">
-         <string>Top</string>
+         <string>Top of Stock</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
+      <item>
        <widget class="QRadioButton" name="radioButton_cz">
         <property name="text">
          <string>model top to zero</string>
         </property>
         <property name="checked">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbCustomZ">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>custom</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="dsbCustomZ">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>

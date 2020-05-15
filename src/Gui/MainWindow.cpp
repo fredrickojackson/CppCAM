@@ -161,7 +161,7 @@ void MainWindow::clearModelAndPath()
 
 void MainWindow::on_actionOpen_triggered()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Select Project File", "/home/fred", "Cam files (*.cam)");
+    QString filename = QFileDialog::getOpenFileName(this, "Select Project File", "/home/fred/projects/cppcam/data/", "Cam files (*.cam)");
     QSettings setproj(filename,QSettings::IniFormat);
     p_modelfilename=setproj.value("p_modelfilename","~/tmp.cam").toString();
 
@@ -382,6 +382,9 @@ void MainWindow::on_actionResize_Model_triggered()
     dlg.lineEdit_dimx->setText(QString::number(m_dim_x));
     dlg.lineEdit_dimy->setText(QString::number(m_dim_y));
     dlg.lineEdit_dimz->setText(QString::number(m_dim_z));
+    dlg.leOx->setText(QString::number(model->min_x()));
+    dlg.leOy->setText(QString::number(model->min_y()));
+    dlg.leOz->setText(QString::number(model->min_z()));
     dlg.radioButton_stock_size->setChecked(true);
     dlg.checkBox_scalemax->setChecked(true);
     dlg.exec();
@@ -423,9 +426,9 @@ void MainWindow::on_actionResize_Model_triggered()
                 }
             }
         } else if (dlg.radioButton_custom_size->isChecked()) {
-            n_min_x = 0;
-            n_min_y = 0;
-            n_min_z = 0;
+            n_min_x = dlg.leOx->text().toDouble();
+            n_min_y = dlg.leOy->text().toDouble();
+            n_min_z = dlg.leOz->text().toDouble();
             n_dim_x = dlg.lineEdit_dimx->text().toDouble();
             n_dim_y = dlg.lineEdit_dimy->text().toDouble();
             n_dim_z = dlg.lineEdit_dimz->text().toDouble();
@@ -443,7 +446,9 @@ void MainWindow::on_actionResize_Model_triggered()
             n_min_z = m_min_z;
             scale_x = scale_y = scale_z = 1/25.4;
         }
-        model->resize(n_min_x * scale_x, scale_x, n_min_y * scale_y, scale_y, n_min_z * scale_z, scale_z);
+
+        model->resize(0.0, scale_x, 0.0, scale_y, 0.0, scale_z);
+        model->resize(n_min_x * scale_x, 1.0, n_min_y * scale_y, 1.0, n_min_z * scale_z, 1.0);
     }
 }
 
@@ -1675,7 +1680,7 @@ void MainWindow::on_actionAlign_Model_triggered()
 void MainWindow::on_actionRadial_Cut_triggered()
 {
     QString ss;
-    HeightField* hf[48];
+    HeightField* hf[72];
     p_rectcut=false;
     bEnableArcs=false;
     if (model == NULL) return;
@@ -1761,6 +1766,19 @@ void MainWindow::on_actionRadial_Cut_triggered()
     dlg.textEditStatus->append(ss);
 
     ss=QString("z (%1 : %2) %3").arg(stock->min_z()).arg(stock->max_z()).arg(stock->max_z()-stock->min_z());
+    dlg.textEditStatus->append(ss);
+
+
+    ss="Model:";
+    dlg.textEditStatus->append(ss);
+
+    ss=QString("x (%1 : %2) %3").arg(model->min_x()).arg(model->max_x()).arg(model->max_x()-model->min_x());
+    dlg.textEditStatus->append(ss);
+
+    ss=QString("y (%1 : %2) %3").arg(model->min_y()).arg(model->max_y()).arg(model->max_y()-model->min_y());
+    dlg.textEditStatus->append(ss);
+
+    ss=QString("z (%1 : %2) %3").arg(model->min_z()).arg(model->max_z()).arg(model->max_z()-model->min_z());
     dlg.textEditStatus->append(ss);
 
     dlg.exec();
@@ -1933,4 +1951,17 @@ void MainWindow::on_actionRadial_Cut_triggered()
             }//for ang
         }//for i
     }//if (dlg.result() == QDialog::Accepted)
+}
+
+void MainWindow::on_actionprep_for_radial_cut_triggered()
+{
+    model->resize(0.0,1.0,-(model->m_max_y-model->m_min_y)/2,1.0,20-((model->m_max_z-model->m_min_z)/2.0),1.0);
+
+    stock->m_min_x=model->m_min_x;
+    stock->m_max_x=model->m_max_x;
+    stock->m_min_y=-3;
+    stock->m_max_y=3;
+    stock->m_min_z=model->m_min_z;
+    stock->m_max_z=model->m_max_z;
+
 }

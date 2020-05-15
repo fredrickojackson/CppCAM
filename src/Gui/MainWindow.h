@@ -57,6 +57,9 @@ public:
     bool bEnableArcs;
     QTimer *qtimer;
 
+    void on_actionAlign_Model_to_Stock_triggered();
+    void on_pbTst_clicked();
+
 private slots:
     void mytimeout();
 
@@ -77,8 +80,6 @@ private slots:
     void on_actionTool_Size_triggered();
 
     void on_actionResize_Model_triggered();
-
-    void on_actionAlign_Model_to_Stock_triggered();
 
     void on_actionRotate_Model_triggered();
 
@@ -118,8 +119,6 @@ private slots:
 
     void on_actionRectCut_triggered();
 
-    void on_pbTst_clicked();
-
     void on_MainWindow_iconSizeChanged(const QSize &iconSize);
 
     void on_actionRack_Cut_triggered();
@@ -133,6 +132,8 @@ private slots:
     void on_actionAlign_Model_triggered();
 
     void on_actionRadial_Cut_triggered();
+
+    void on_actionprep_for_radial_cut_triggered();
 
 private:
     void clearPath();

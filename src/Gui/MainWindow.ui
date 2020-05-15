@@ -128,6 +128,7 @@
     <addaction name="separator"/>
     <addaction name="actionheight_field"/>
     <addaction name="actionClear_Path"/>
+    <addaction name="actionprep_for_radial_cut"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -430,6 +431,11 @@
   <action name="actionRadial_Cut">
    <property name="text">
     <string>Radial Cut</string>
+   </property>
+  </action>
+  <action name="actionprep_for_radial_cut">
+   <property name="text">
+    <string>prep for radial cut</string>
    </property>
   </action>
  </widget>
