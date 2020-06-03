@@ -385,7 +385,7 @@ void MainWindow::on_actionResize_Model_triggered()
     dlg.leOx->setText(QString::number(model->min_x()));
     dlg.leOy->setText(QString::number(model->min_y()));
     dlg.leOz->setText(QString::number(model->min_z()));
-    dlg.radioButton_stock_size->setChecked(true);
+    dlg.radioButton_custom_size->setChecked(true);
     dlg.checkBox_scalemax->setChecked(true);
     dlg.exec();
 
@@ -1929,6 +1929,7 @@ void MainWindow::on_actionRadial_Cut_triggered()
                 }
                 SimpleCutter simplecutter;
                 simplecutter.m_radius=cutter->radius();
+                simplecutter.m_noretrace=true;
 
 
 

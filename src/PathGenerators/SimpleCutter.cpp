@@ -174,6 +174,10 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
         path.m_runs.resize(path.m_runs.size()+1);
         Run& run = path.m_runs.back();
 //        double last_z = 0;
+
+
+/* ********************************************************************** */
+        bool b_istraced=true;
         for(size_t jj=0; jj<heightfield.width(); jj++) {
             size_t j = jj;
 //            if (m_zigzag) j = heightfield.width()-jj;
@@ -196,22 +200,6 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
             for(long lj=dj1; lj<=dj2; lj++)
                 for(long li=di1; li<=di2; li++)
                 {
-//                    double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
-//                    double zc = -1000.0;
-//                    if(!((li == j) && (lj == i)))
-//                    {
-//                        if(!m_isSpherical)
-//                        {
-//                            zc=heightfield.point(li,lj);
-//                        }else
-//                        {
-//                            zc=heightfield.point(li,lj)-m_radius*cos((dis*3.1415926/(2.0*m_radius)));
-//                        }
-//                        if((dis<(m_radius+m_compmargin)) && (zc>zcc))
-//                        {
-//                            zcc=zc;
-//                        }
-//                    }
                     if((labs(li-(long)j)<=m_smooth) && (labs(lj-(long)i)<=m_smooth))
                     {
                         zav += heightfield.point(li,lj);
@@ -222,13 +210,16 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
             if(m_smooth && zcnt)
                 z=zav/zcnt;
 
-//            if(zcc>z)z=zcc;
             if (z < z_layer) {
                 z = z_layer;
+                b_istraced=false;
+            }else{
+
             }
             z+=m_compmargin;
             run.m_points.push_back(Point(heightfield.x(j), heightfield.y(i), z));
         }//j or jj
+
         pathProcessors.process(run.m_points);
     }//i
     return true;
