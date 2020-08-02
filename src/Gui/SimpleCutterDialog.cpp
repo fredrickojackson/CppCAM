@@ -25,6 +25,8 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 SimpleCutterDialog::SimpleCutterDialog(QWidget* parent){
     setupUi(this);
+    lineEdit_lines->installEventFilter(this);
+    lineEdit_points->installEventFilter(this);
     flag_f=0.0;
     m_xmin=0.0;
     m_ymin=0.0;
@@ -35,6 +37,35 @@ SimpleCutterDialog::SimpleCutterDialog(QWidget* parent){
     m_comp=0.0;
     m_smooth=0;
 }
+
+bool SimpleCutterDialog::eventFilter(QObject *object, QEvent *event)
+{
+    double res = 0.0;
+    double step = 0.0;
+    if (event->type() == QEvent::FocusOut)
+    {
+        if (object == lineEdit_lines || object == lineEdit_points)
+        {
+            if(radioButton_xdir->isChecked() || rbrect->isChecked())
+            {
+                res=(m_xmax-m_xmin)/(lineEdit_points->text().toInt()-1);
+                step=(m_ymax-m_ymin)/(lineEdit_lines->text().toInt()-1);
+
+            }
+            if(radioButton_ydir->isChecked())
+            {
+                res=(m_ymax-m_ymin)/(lineEdit_points->text().toInt()-1);
+                step=(m_xmax-m_xmin)/(lineEdit_lines->text().toInt()-1);
+            }
+            le_resolution->setText(QString::number(res));
+            le_stepover->setText(QString::number(step));
+        }
+    }
+
+    return false;
+}
+
+
 
 void SimpleCutterDialog::showEvent(QShowEvent *event){
     if(m_comp){
@@ -49,38 +80,6 @@ void SimpleCutterDialog::showEvent(QShowEvent *event){
 
 
 
-void SimpleCutterDialog::on_lineEdit_points_editingFinished()
-{
-    double res = 0.0;
-    QString qs;
-    if(radioButton_xdir->isChecked())
-        res=(m_xmax-m_xmin)/(lineEdit_points->text().toInt()-1);
-    else
-        res=(m_ymax-m_ymin)/(lineEdit_points->text().toInt()-1);
-    qs="resolution=";
-    qs.append(QString::number(res)/*.append("\n")*/);
-    textEditStatus->append(qs);
-    le_resolution->setText(QString::number(res));
-}
-
-
-void SimpleCutterDialog::on_lineEdit_lines_editingFinished()
-{
-    double step = 0.0;
-    QString qs;
-    if (!isNear((m_ymax - m_ymin),0.0))
-    {
-
-        if(radioButton_xdir->isChecked())
-            step=(m_ymax-m_ymin)/(lineEdit_lines->text().toInt()-1);
-        else
-            step=(m_xmax-m_xmin)/(lineEdit_lines->text().toInt()-1);
-        qs="stepover=";
-        qs.append(QString::number(step));
-        textEditStatus->append(qs);
-        le_stepover->setText(QString::number(step));
-    }
-}
 
 void SimpleCutterDialog::on_lineEdit_layers_editingFinished()
 {

@@ -41,11 +41,10 @@ public:
     
 private slots:
 
-    void on_lineEdit_points_editingFinished();
-    void on_lineEdit_lines_editingFinished();
     void on_lineEdit_layers_editingFinished();
     void on_leUseLine_textChanged(const QString &arg1);
     void on_leMargin_editingFinished();
     void on_cbLeaveMargin_stateChanged(int arg1);
     void on_buttonBox_accepted();
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 };

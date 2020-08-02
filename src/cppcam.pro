@@ -5,7 +5,7 @@ CONFIG += console debug
 #QMAKE_CXXFLAGS += -O2
 
 unix:{
-TARGET = cppcam
+TARGET = ../cppcam
 LIBS += -lGLU
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -26,6 +26,7 @@ RCC_DIR = buildwin32
 SOURCES += \
     Gui/SimpleCutterDialog.cpp \
     Gui/dlgholecut.cpp \
+    Gui/dlgradialcutter.cpp \
     Gui/dlgroundcutter.cpp \
     Gui/rectcutdialog.cpp \
     Gui/dlgtoolsize.cpp \
@@ -61,6 +62,7 @@ HEADERS += Gui/AboutDialog.h \
     Geometry/Edge.h \
     Geometry/intersection.h \
     Gui/dlgholecut.h \
+    Gui/dlgradialcutter.h \
     Gui/dlgroundcutter.h \
     Gui/rectcutdialog.h \
     Gui/dlgtoolsize.h \
@@ -74,6 +76,7 @@ HEADERS += Gui/SimpleCutterDialog.h
 
 FORMS += Gui/MainWindow.ui Gui/AboutDialog.ui \
     Gui/dlgholecut.ui \
+    Gui/dlgradialcutter.ui \
     Gui/dlgroundcutter.ui \
     Gui/rectcutdialog.ui \
     Gui/dlgtoolsize.ui \

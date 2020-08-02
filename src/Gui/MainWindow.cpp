@@ -36,6 +36,7 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "AlignModelDialog.h"
 #include "RotateModelDialog.h"
 #include "SimpleCutterDialog.h"
+#include "dlgradialcutter.h"
 
 #include "dlgtoolsize.h"
 #include "ui_dlgtoolsize.h"
@@ -163,6 +164,7 @@ void MainWindow::on_actionOpen_triggered()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Select Project File", "/home/fred/projects/cppcam/data/", "Cam files (*.cam)");
     QSettings setproj(filename,QSettings::IniFormat);
+    p_projectfilename=filename;
     p_modelfilename=setproj.value("p_modelfilename","~/tmp.cam").toString();
 
     model = STLImporter::ImportModel(p_modelfilename.toStdString());
@@ -207,12 +209,15 @@ void MainWindow::on_actionOpen_triggered()
     p_rectcut=setproj.value("p_rectcut",0.0).toBool();
     p_useLine=setproj.value("p_useLine",0.0).toInt();
     p_smooth=setproj.value("p_smooth",0.0).toInt();
+    setWindowTitle(filename);
 }
 
 void MainWindow::on_actionSave_triggered()
 {
-    QString filename = QFileDialog::getSaveFileName(this, "Select Project File", "/home/fred", "Cam files (*.cam)");
+    QString filename = QFileDialog::getSaveFileName(this, "Select Project File", p_projectfilename, "Cam files (*.cam)");
     QSettings setproj(filename,QSettings::IniFormat);
+    p_projectfilename=filename;
+    setWindowTitle(filename);
 
     setproj.setValue("p_modelfilename",p_modelfilename);
     setproj.setValue("p_mminx",model->min_x());
@@ -698,11 +703,6 @@ void MainWindow::on_actionRun_triggered()
         dlg.rbrect->setChecked(true);
     }
 
-    dlg.cbRotate->setChecked(p_runRotate);
-    ss.setNum(p_runRotateDegrees);
-    dlg.leRotateDegrees->setText(ss);
-    ss.setNum(p_runRotateStep);
-    dlg.leRotateStep->setText(ss);
 
     ss="Stock:";
     dlg.textEditStatus->append(ss);
@@ -740,9 +740,6 @@ void MainWindow::on_actionRun_triggered()
             p_comp=0.0;
         }
         p_safez = dlg.le_SafeZ->text().toDouble();
-        p_runRotate=dlg.cbRotate->isChecked();
-        p_runRotateDegrees=dlg.leRotateDegrees->text().toDouble();
-        p_runRotateStep=dlg.leRotateStep->text().toDouble();
         clearPath();
         nz = dlg.lineEdit_layers->text().toInt();
 
@@ -763,6 +760,9 @@ void MainWindow::on_actionRun_triggered()
                     nx = (x1-x0)/resolution;
                 }
             }
+            p_runLines=ny;
+            p_runPoints=nx;
+            p_runLayers=nz;
         }// if(xdir is checked
 
         if (dlg.radioButton_ydir->isChecked()) {
@@ -782,6 +782,9 @@ void MainWindow::on_actionRun_triggered()
                     ny = (y1-y0)/resolution;
                 }
             }
+            p_runLines=nx;
+            p_runPoints=ny;
+            p_runLayers=nz;
         }// if ydir s checked
 
         if (dlg.rbrect->isChecked()) {
@@ -801,6 +804,10 @@ void MainWindow::on_actionRun_triggered()
                     nx = (x1-x0)/resolution;
                 }
             }
+            p_runLines=ny;
+            p_runPoints=nx;
+            p_runLayers=nz;
+
         }// if rectangular is checked
 
         std::vector<double> zlevels;
@@ -811,9 +818,6 @@ void MainWindow::on_actionRun_triggered()
                 zlevels.push_back(z1 - (z1-z0)*(nz-1-i)/(nz-1));
             }
         }
-        p_runLines=ny;
-        p_runPoints=nx;
-        p_runLayers=nz;
         p_runStepover=(stock->max_y()-stock->min_y())/ny;
         p_runResolution=(stock->max_x()-stock->min_x())/nx;
         p_runStepdown=(stock->max_z()-stock->min_z())/nz;
@@ -826,10 +830,6 @@ void MainWindow::on_actionRun_triggered()
         double angrotatet=375.0;
         double oz = (model->m_min_z+model->m_max_z)/2.0;
         double ozc = 0.0;
-        if(dlg.cbRotate->isChecked()){
-             ai = dlg.leRotateStep->text().toDouble();
-             angrotatet = dlg.leRotateDegrees->text().toDouble();
-        }
 
         for(ang=0.0; ang<angrotatet; ang+=ai){
             if (heightfield) {
@@ -1173,7 +1173,16 @@ void MainWindow::on_actionRectCut_triggered()
         path->m_runs.resize(1);
 
         Point p = Point(rcdlg.dminX(),rcdlg.dminY(),rcdlg.dmaxZ());
-        p.m_x-=(cutter->radius()+rcdlg.m_droundcorner);
+        if(rcdlg.ui->cbroundcorner->isChecked())
+            if(rcdlg.ui->rbInside->isChecked())
+            p.m_y+=(cutter->radius()+rcdlg.m_droundcorner);
+
+
+
+
+
+
+
         path->m_runs[0].m_points.push_back(p);
         bool bdone=false;
         while(bdone==false){
@@ -1707,7 +1716,7 @@ void MainWindow::on_actionRadial_Cut_triggered()
         z1 = stock->max_z();
     }
 
-    SimpleCutterDialog dlg;
+    dlgRadialCutter dlg;
 
     dlg.m_smooth=p_smooth;
     dlg.m_xmin=stock->min_x();

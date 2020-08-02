@@ -44,7 +44,6 @@ private:
 protected:
     void showEvent(QShowEvent *event) override;
 private slots:
-    void on_pbUsestock_clicked();
     void on_dblminX_valueChanged(const QString &arg1);
     void on_dblminY_valueChanged(const QString &arg1);
     void on_dblminZ_valueChanged(const QString &arg1);
@@ -53,6 +52,7 @@ private slots:
     void on_dblmaxZ_valueChanged(const QString &arg1);
     void on_buttonBox_accepted();
     void on_dsbroundcorner_valueChanged(const QString &arg1);
+    void on_cbroundcorner_stateChanged(int arg1);
 };
 
 #endif // RECTCUTDIALOG_H

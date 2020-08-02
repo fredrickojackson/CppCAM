@@ -47,6 +47,13 @@ void RectCutDialog::showEvent(QShowEvent *event)
         qsr.append(",");
         qsr.append(qsr.number(m_model->max_z()));
         ui->lblModel->setText(qsr);
+        ui->dblminX->setValue(m_stock->min_x());
+        ui->dblminY->setValue(m_stock->min_y());
+        ui->dblminZ->setValue(m_stock->min_z());
+        ui->dblmaxX->setValue(m_stock->max_x());
+        ui->dblmaxY->setValue(m_stock->max_y());
+        ui->dblmaxZ->setValue(m_stock->max_z());
+
 }
 
 
@@ -104,15 +111,6 @@ double RectCutDialog::dStepDown()
     return ui->dblStepDown->value();
 }
 
-void RectCutDialog::on_pbUsestock_clicked()
-{
-    ui->dblminX->setValue(m_stock->min_x());
-    ui->dblminY->setValue(m_stock->min_y());
-    ui->dblminZ->setValue(m_stock->min_z());
-    ui->dblmaxX->setValue(m_stock->max_x());
-    ui->dblmaxY->setValue(m_stock->max_y());
-    ui->dblmaxZ->setValue(m_stock->max_z());
-}
 
 void RectCutDialog::on_dblminX_valueChanged(const QString &arg1)
 {
@@ -166,4 +164,11 @@ void RectCutDialog::on_dsbroundcorner_valueChanged(const QString &arg1)
     //double x = dsbroundcorner->value();
     m_droundcorner=arg1.toDouble();
     //m_droundcorner=dsbroundcorner->value();
+}
+
+
+
+void RectCutDialog::on_cbroundcorner_stateChanged(int istate)
+{
+
 }

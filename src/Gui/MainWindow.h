@@ -35,6 +35,7 @@ public:
     void mouseMoveEvent(QMouseEvent *ev);
     GLWidget* theGLWidget;
     QString p_modelfilename;
+    QString p_projectfilename;
     long p_runLines;
     double p_runStepover;
     long p_runPoints;
