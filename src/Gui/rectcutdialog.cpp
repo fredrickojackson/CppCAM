@@ -47,12 +47,12 @@ void RectCutDialog::showEvent(QShowEvent *event)
         qsr.append(",");
         qsr.append(qsr.number(m_model->max_z()));
         ui->lblModel->setText(qsr);
-        ui->dblminX->setValue(m_stock->min_x());
-        ui->dblminY->setValue(m_stock->min_y());
-        ui->dblminZ->setValue(m_stock->min_z());
-        ui->dblmaxX->setValue(m_stock->max_x());
-        ui->dblmaxY->setValue(m_stock->max_y());
-        ui->dblmaxZ->setValue(m_stock->max_z());
+        ui->dsbminX->setValue(m_stock->min_x());
+        ui->dsbminY->setValue(m_stock->min_y());
+        ui->dsbminZ->setValue(m_stock->min_z());
+        ui->dsbmaxX->setValue(m_stock->max_x());
+        ui->dsbmaxY->setValue(m_stock->max_y());
+        ui->dsbmaxZ->setValue(m_stock->max_z());
 
 }
 
@@ -62,92 +62,14 @@ RectCutDialog::~RectCutDialog()
     delete ui;
 }
 
-double RectCutDialog::dminX()
-{
-    return ui->dblminX->value();
-}
-
-double RectCutDialog::dminY()
-{
-    return ui->dblminY->value();
-}
-
-double RectCutDialog::dminZ()
-{
-    return ui->dblminZ->value();
-}
-double RectCutDialog::dmaxX()
-{
-    return ui->dblmaxX->value();
-}
-
-double RectCutDialog::dmaxY()
-{
-    return ui->dblmaxY->value();
-}
-
-double RectCutDialog::dmaxZ()
-{
-    return ui->dblmaxZ->value();
-}
-
-double RectCutDialog::dSzX()
-{
-    return ui->dblSizeX->value();
-}
-
-double RectCutDialog::dSzY()
-{
-    return ui->dblSizeY->value();
-}
-
-double RectCutDialog::dSzZ()
-{
-    return ui->dblSizeZ->value();
-}
-
-double RectCutDialog::dStepDown()
-{
-    return ui->dblStepDown->value();
-}
 
 
-void RectCutDialog::on_dblminX_valueChanged(const QString &arg1)
-{
-    updSize();
-}
-
-
-void RectCutDialog::on_dblminY_valueChanged(const QString &arg1)
-{
-    updSize();
-}
-
-void RectCutDialog::on_dblminZ_valueChanged(const QString &arg1)
-{
-    updSize();
-}
-
-void RectCutDialog::on_dblmaxX_valueChanged(const QString &arg1)
-{
-    updSize();
-}
-
-void RectCutDialog::on_dblmaxY_valueChanged(const QString &arg1)
-{
-    updSize();
-}
-
-void RectCutDialog::on_dblmaxZ_valueChanged(const QString &arg1)
-{
-    updSize();
-}
 
 void RectCutDialog::updSize()
 {
-    ui->dblSizeX->setValue(ui->dblmaxX->value()-ui->dblminX->value());
-    ui->dblSizeY->setValue(ui->dblmaxY->value()-ui->dblminY->value());
-    ui->dblSizeZ->setValue(ui->dblmaxZ->value()-ui->dblminZ->value());
+    ui->dsbsizeX->setValue(ui->dsbmaxX->value()-ui->dsbminX->value());
+    ui->dsbsizeY->setValue(ui->dsbmaxY->value()-ui->dsbminY->value());
+    ui->dsbsizeZ->setValue(ui->dsbmaxZ->value()-ui->dsbminZ->value());
 }
 
 
@@ -158,17 +80,59 @@ void RectCutDialog::on_buttonBox_accepted()
 
 }
 
-void RectCutDialog::on_dsbroundcorner_valueChanged(const QString &arg1)
-{
-    //if(dsbroundcorner->value() > 0.0)cbroundcorner->setChecked(true);
-    //double x = dsbroundcorner->value();
-    m_droundcorner=arg1.toDouble();
-    //m_droundcorner=dsbroundcorner->value();
-}
 
 
 
 void RectCutDialog::on_cbroundcorner_stateChanged(int istate)
 {
+    if(ui->cbroundcorner->isChecked())
+        ui->dsbRoundCorner->setValue(m_cutter->radius());
+    else
+        ui->dsbRoundCorner->setValue(0.0);
+}
 
+void RectCutDialog::on_cbInside_stateChanged(int arg1)
+{
+    if(arg1 == 2)ui->cbOutside->setCheckState(Qt::Unchecked);
+}
+
+void RectCutDialog::on_cbOutside_stateChanged(int arg1)
+{
+    if(arg1 == 2)ui->cbInside->setCheckState(Qt::Unchecked);
+}
+
+
+void RectCutDialog::on_dsbRoundCorner_valueChanged(double arg1)
+{
+    m_droundcorner=arg1;
+}
+
+void RectCutDialog::on_dsbminX_valueChanged(double arg1)
+{
+    updSize();
+}
+
+void RectCutDialog::on_dsbminY_valueChanged(double arg1)
+{
+    updSize();
+}
+
+void RectCutDialog::on_dsbminZ_valueChanged(double arg1)
+{
+    updSize();
+}
+
+void RectCutDialog::on_dsbmaxX_valueChanged(double arg1)
+{
+    updSize();
+}
+
+void RectCutDialog::on_dsbmaxY_valueChanged(double arg1)
+{
+    updSize();
+}
+
+void RectCutDialog::on_dsbmaxZ_valueChanged(double arg1)
+{
+    updSize();
 }

@@ -5,6 +5,7 @@
 
 #include "Stock.h"
 #include "Model.h"
+#include "Cutter.h"
 
 #include "ui_rectcutdialog.h"
 
@@ -21,21 +22,12 @@ public:
     explicit RectCutDialog(QWidget *parent = 0);
     ~RectCutDialog();
     Ui::RectCutDialog *ui;
-    double dminX();
-    double dminY();
-    double dminZ();
-    double dmaxX();
-    double dmaxY();
-    double dmaxZ();
-    double dSzX();
-    double dSzY();
-    double dSzZ();
-    double dStepDown();
     void updSize();
     double m_droundcorner;
 
     Stock* m_stock;
     Model* m_model;
+    Cutter* m_cutter;
 
 
 
@@ -44,15 +36,17 @@ private:
 protected:
     void showEvent(QShowEvent *event) override;
 private slots:
-    void on_dblminX_valueChanged(const QString &arg1);
-    void on_dblminY_valueChanged(const QString &arg1);
-    void on_dblminZ_valueChanged(const QString &arg1);
-    void on_dblmaxX_valueChanged(const QString &arg1);
-    void on_dblmaxY_valueChanged(const QString &arg1);
-    void on_dblmaxZ_valueChanged(const QString &arg1);
     void on_buttonBox_accepted();
-    void on_dsbroundcorner_valueChanged(const QString &arg1);
     void on_cbroundcorner_stateChanged(int arg1);
+    void on_cbInside_stateChanged(int arg1);
+    void on_cbOutside_stateChanged(int arg1);
+    void on_dsbRoundCorner_valueChanged(double arg1);
+    void on_dsbminX_valueChanged(double arg1);
+    void on_dsbminY_valueChanged(double arg1);
+    void on_dsbminZ_valueChanged(double arg1);
+    void on_dsbmaxX_valueChanged(double arg1);
+    void on_dsbmaxY_valueChanged(double arg1);
+    void on_dsbmaxZ_valueChanged(double arg1);
 };
 
 #endif // RECTCUTDIALOG_H

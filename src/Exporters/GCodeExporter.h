@@ -41,6 +41,7 @@ public:
     QString cutter_type;
     Stock* stk;
     Model* mdl;
+    bool m_radial=false;
 
 };
 

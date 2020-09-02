@@ -61,6 +61,7 @@ public:
     void on_actionAlign_Model_to_Stock_triggered();
     void on_pbTst_clicked();
 
+
 private slots:
     void mytimeout();
 
@@ -134,7 +135,6 @@ private slots:
 
     void on_actionRadial_Cut_triggered();
 
-    void on_actionprep_for_radial_cut_triggered();
 
 private:
     void clearPath();

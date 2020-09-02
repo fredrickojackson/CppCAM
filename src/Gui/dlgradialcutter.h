@@ -28,17 +28,24 @@ public:
     int m_smooth=0;
     double m_comp=0;
     void showEvent(QShowEvent *event);
+    void upddisp();
 
 private slots:
 
     void on_lineEdit_points_editingFinished();
     void on_lineEdit_lines_editingFinished();
     void on_lineEdit_layers_editingFinished();
-    void on_leUseLine_textChanged(const QString &arg1);
+    void on_leUseLine_textChanged(const QString);
     void on_leMargin_editingFinished();
     void on_cbLeaveMargin_stateChanged(int arg1);
     void on_buttonBox_accepted();
 
+
+    void on_le_stepover_editingFinished();
+
+    void on_le_resolution_editingFinished();
+
+    void on_le_stepdown_editingFinished();
 
 public:
     Ui::dlgRadialCutter *ui;

@@ -23,11 +23,35 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "SimpleCutter.h"
 #include "PathProcessors.h"
 
+bool SimpleCutter::GenerateCutPath_radial(const HeightField& heightfield, const Point& start, const Point& direction, double Zlevel, std::vector<Path*>& paths, double angle)
+{
+    Path* path = new Path();
+    path->rot_x=angle;
+    if (direction.x() != 0 && direction.y() == 0)
+    {
+        if (!GenerateCutPathLayer_y(heightfield, start, direction, Zlevel, *path))
+        {
+            delete path;
+            return false;
+        }
+    }
+    if (direction.x() == 0 && direction.y() != 0)
+    {
+        if (!GenerateCutPathLayer_x(heightfield, start, direction, Zlevel, *path))
+        {
+            delete path;
+            return false;
+        }
+    }
+    paths.push_back(path);
+    return true;
+}
+
 bool SimpleCutter::GenerateCutPathx(const HeightField& heightfield, const Point& start, const Point& direction, double Zlevel, std::vector<Path*>& paths, double angle)
 {
     Path* path = new Path();
     path->rot_x=angle;
-    if (!GenerateCutPathLayer_y(heightfield, start, direction, Zlevel, *path)) {
+    if (!GenerateCutPathLayer_x(heightfield, start, direction, Zlevel, *path)) {
         delete path;
         return false;
     }
@@ -172,6 +196,7 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
 
     for(size_t i=0; i<heightfield.height(); i+=(m_useLine)) {
         path.m_runs.resize(path.m_runs.size()+1);
+
         Run& run = path.m_runs.back();
 //        double last_z = 0;
 

@@ -50,7 +50,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblSizeX">
+     <widget class="QDoubleSpinBox" name="dsbsizeX">
       <property name="wrapping">
        <bool>false</bool>
       </property>
@@ -66,7 +66,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblSizeY">
+     <widget class="QDoubleSpinBox" name="dsbsizeY">
       <property name="readOnly">
        <bool>true</bool>
       </property>
@@ -79,7 +79,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblSizeZ">
+     <widget class="QDoubleSpinBox" name="dsbsizeZ">
       <property name="readOnly">
        <bool>true</bool>
       </property>
@@ -111,7 +111,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblminX">
+     <widget class="QDoubleSpinBox" name="dsbminX">
       <property name="minimum">
        <double>-10000.000000000000000</double>
       </property>
@@ -121,7 +121,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblminY">
+     <widget class="QDoubleSpinBox" name="dsbminY">
       <property name="minimum">
        <double>-10000.000000000000000</double>
       </property>
@@ -131,7 +131,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblminZ">
+     <widget class="QDoubleSpinBox" name="dsbminZ">
       <property name="minimum">
        <double>-10000.000000000000000</double>
       </property>
@@ -163,7 +163,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblStepDown">
+     <widget class="QDoubleSpinBox" name="dsbStepDown">
       <property name="maximum">
        <double>25.000000000000000</double>
       </property>
@@ -171,7 +171,7 @@
        <double>0.100000000000000</double>
       </property>
       <property name="value">
-       <double>1.500000000000000</double>
+       <double>0.250000000000000</double>
       </property>
      </widget>
     </item>
@@ -195,7 +195,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblmaxX">
+     <widget class="QDoubleSpinBox" name="dsbmaxX">
       <property name="maximum">
        <double>10000.000000000000000</double>
       </property>
@@ -205,7 +205,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblmaxY">
+     <widget class="QDoubleSpinBox" name="dsbmaxY">
       <property name="maximum">
        <double>10000.000000000000000</double>
       </property>
@@ -215,7 +215,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QDoubleSpinBox" name="dblmaxZ">
+     <widget class="QDoubleSpinBox" name="dsbmaxZ">
       <property name="maximum">
        <double>10000.000000000000000</double>
       </property>
@@ -271,7 +271,7 @@
     <string>Round Corners</string>
    </property>
   </widget>
-  <widget class="QDoubleSpinBox" name="dblRoundCorner">
+  <widget class="QDoubleSpinBox" name="dsbRoundCorner">
    <property name="geometry">
     <rect>
      <x>430</x>
@@ -280,35 +280,6 @@
      <height>32</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>80</x>
-     <y>200</y>
-     <width>151</width>
-     <height>31</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QRadioButton" name="rbInside">
-      <property name="text">
-       <string>Inside</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QRadioButton" name="rbOutside">
-      <property name="text">
-       <string>Outside</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
   </widget>
   <widget class="QLabel" name="lblCutterInf">
    <property name="geometry">
@@ -327,13 +298,42 @@
    <property name="geometry">
     <rect>
      <x>80</x>
-     <y>150</y>
+     <y>180</y>
      <width>88</width>
      <height>22</height>
     </rect>
    </property>
    <property name="text">
     <string>Clockwise</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cbInside">
+   <property name="geometry">
+    <rect>
+     <x>80</x>
+     <y>220</y>
+     <width>88</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Inside</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cbOutside">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>220</y>
+     <width>88</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Outside</string>
    </property>
   </widget>
  </widget>

@@ -22,12 +22,13 @@ dlgRadialCutter::dlgRadialCutter(QWidget *parent) :
 
 void dlgRadialCutter::showEvent(QShowEvent *event){
     if(m_comp){
-        cbLeaveMargin->setChecked(true);
-        leMargin->setText(QString::number(m_comp));
+        ui->cbLeaveMargin->setChecked(true);
+        ui->leMargin->setText(QString::number(m_comp));
     }
     if(m_smooth){
-        leSmooth->setText(QString::number(m_smooth));
+        ui->leSmooth->setText(QString::number(m_smooth));
     }
+    upddisp();
 }
 
 
@@ -36,66 +37,108 @@ dlgRadialCutter::~dlgRadialCutter()
     delete ui;
 }
 
+void dlgRadialCutter::upddisp()
+{
+    double dres = 0.0;
+    double dlin = 0.0;
+    QString qs;
+    if(ui->radioButton_xdir->isChecked())
+    {
+        dres=(m_xmax-m_xmin)/(ui->lineEdit_points->text().toInt()-1);
+        dlin=(m_ymax-m_ymin)/(ui->lineEdit_lines->text().toInt()-1);
+    }
+    else
+    {
+        dres=(m_ymax-m_ymin)/(ui->lineEdit_points->text().toInt()-1);
+        dlin=(m_xmax-m_xmin)/(ui->lineEdit_lines->text().toInt()-1);
+    }
+    qs.setNum(dres);
+    ui->le_resolution->setText(qs);
+    qs.setNum(dlin);
+    ui->le_stepover->setText(qs);
+
+    dres=(m_zmax-m_zmin)/(ui->lineEdit_layers->text().toInt()-1);
+    qs.setNum(dres);
+    ui->le_stepdown->setText(qs);
+}
+
+void dlgRadialCutter::on_le_stepover_editingFinished()
+{
+    QString s;
+    if(ui->radioButton_xdir->isChecked())
+        s.setNum((int)(1+(m_ymax-m_ymin)/(ui->le_stepover->text().toDouble())));
+    if(ui->radioButton_ydir->isChecked())
+        s.setNum((int)(1+(m_xmax-m_xmin)/(ui->le_stepover->text().toDouble())));
+    ui->lineEdit_lines->setText(s);
+    upddisp();
+}
+
+void dlgRadialCutter::on_le_resolution_editingFinished()
+{
+    QString s;
+    if(ui->radioButton_xdir->isChecked())
+        s.setNum((int)(1+(m_xmax-m_xmin)/(ui->le_resolution->text().toDouble())));
+    if(ui->radioButton_ydir->isChecked())
+        s.setNum((int)(1+(m_ymax-m_ymin)/(ui->le_resolution->text().toDouble())));
+    ui->lineEdit_points->setText(s);
+    upddisp();
+
+
+}
+
+void dlgRadialCutter::on_le_stepdown_editingFinished()
+{
+    QString s;
+    s.setNum((int)(1+(m_zmax-m_zmin)/(ui->le_stepdown->text().toDouble())));
+    ui->lineEdit_layers->setText(s);
+
+}
+
 void dlgRadialCutter::on_lineEdit_points_editingFinished()
 {
     double res = 0.0;
-    QString qs;
-    if(radioButton_xdir->isChecked())
-        res=(m_xmax-m_xmin)/(lineEdit_points->text().toInt()-1);
+    if(ui->radioButton_xdir->isChecked())
+        res=(m_xmax-m_xmin)/(ui->lineEdit_points->text().toInt()-1);
     else
-        res=(m_ymax-m_ymin)/(lineEdit_points->text().toInt()-1);
-    qs="resolution=";
-    qs.append(QString::number(res)/*.append("\n")*/);
-    textEditStatus->append(qs);
-    le_resolution->setText(QString::number(res));
+        res=(m_ymax-m_ymin)/(ui->lineEdit_points->text().toInt()-1);
+
+    ui->le_resolution->setText(QString::number(res));
+    upddisp();
 }
 
 void dlgRadialCutter::on_lineEdit_lines_editingFinished()
 {
-    double step = 0.0;
-    QString qs;
-    if (!isNear((m_ymax - m_ymin),0.0))
-    {
+    double so = 0.0;
+    if(ui->radioButton_xdir->isChecked())
+        so=(m_ymax-m_ymin)/(ui->lineEdit_lines->text().toInt()-1);
+    else
+        so=(m_xmax-m_xmin)/(ui->lineEdit_lines->text().toInt()-1);
 
-        if(radioButton_xdir->isChecked())
-            step=(m_ymax-m_ymin)/(lineEdit_lines->text().toInt()-1);
-        else
-            step=(m_xmax-m_xmin)/(lineEdit_lines->text().toInt()-1);
-        qs="stepover=";
-        qs.append(QString::number(step));
-        textEditStatus->append(qs);
-        le_stepover->setText(QString::number(step));
-    }
+    ui->le_stepover->setText(QString::number(so));
+
+    upddisp();
 }
 
 void dlgRadialCutter::on_lineEdit_layers_editingFinished()
 {
-    double step = 0.0;
-    QString qs;
-    if(lineEdit_layers->text().toInt()==1){
-        step=(m_zmax-m_zmin);
-    }else{
-        step=(m_zmax-m_zmin)/(lineEdit_layers->text().toInt()-1);
-    }
-    qs="stepdown=";
-    qs.append(QString::number(step));
-    textEditStatus->append(qs);
-    le_stepdown->setText(QString::number(step));
+    double stepdown = 0.0;
+    stepdown=(m_zmax-m_zmin)/(ui->lineEdit_layers->text().toInt()-1);
+    upddisp();
 }
 
-void dlgRadialCutter::on_leUseLine_textChanged(const QString &arg1)
+void dlgRadialCutter::on_leUseLine_textChanged(const QString/* &arg1*/)
 {
-    if(leUseLine->text().toInt() == 1)lblUseline->setText("Line");
-    if(leUseLine->text().toInt() == 2)lblUseline->setText("nd Line");
-    if(leUseLine->text().toInt() == 3)lblUseline->setText("rd Line");
-    if(leUseLine->text().toInt() >= 4)lblUseline->setText("th Line");
+    if(ui->leUseLine->text().toInt() == 1)ui->lblUseline->setText("Line");
+    if(ui->leUseLine->text().toInt() == 2)ui->lblUseline->setText("nd Line");
+    if(ui->leUseLine->text().toInt() == 3)ui->lblUseline->setText("rd Line");
+    if(ui->leUseLine->text().toInt() >= 4)ui->lblUseline->setText("th Line");
 }
 
 
 void dlgRadialCutter::on_leMargin_editingFinished()
 {
-    if(cbLeaveMargin->isChecked())
-        m_comp=leMargin->text().toDouble();
+    if(ui->cbLeaveMargin->isChecked())
+        m_comp=ui->leMargin->text().toDouble();
     else
         m_comp=0.0;
 }
@@ -103,7 +146,7 @@ void dlgRadialCutter::on_leMargin_editingFinished()
 void dlgRadialCutter::on_cbLeaveMargin_stateChanged(int arg1)
 {
     if(arg1)
-        m_comp=leMargin->text().toDouble();
+        m_comp=ui->leMargin->text().toDouble();
     else
         m_comp=0.0;
 }

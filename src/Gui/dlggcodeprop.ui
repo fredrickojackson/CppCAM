@@ -89,6 +89,9 @@
    <property name="text">
     <string>beginline</string>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QCheckBox" name="cbendline">
    <property name="geometry">
@@ -101,6 +104,9 @@
    </property>
    <property name="text">
     <string>endline</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
   </widget>
   <widget class="QCheckBox" name="cbendrun">

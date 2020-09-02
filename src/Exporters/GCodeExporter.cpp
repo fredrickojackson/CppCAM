@@ -46,290 +46,299 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
     dlgGcodeProp dlg;
 
     dlg.exec();
-    QString header = settings->value("header").toString();
-    QString str;
-    header.replace("$VERSION", "0.9");
-    time_t rawtime;
-    struct tm * timeinfo;
-    char buffer[80];
+    if (dlg.result() == QDialog::Accepted)
+    {
+        QString header = settings->value("header").toString();
+        QString str;
+        header.replace("$VERSION", "0.9");
+        time_t rawtime;
+        struct tm * timeinfo;
+        char buffer[80];
 
-    time (&rawtime);
-    timeinfo = localtime(&rawtime);
+        time (&rawtime);
+        timeinfo = localtime(&rawtime);
 
-    strftime(buffer,sizeof(buffer),"%m/%d/%Y %H:%M:%S",timeinfo);
-    str=buffer;
+        strftime(buffer,sizeof(buffer),"%m/%d/%Y %H:%M:%S",timeinfo);
+        str=buffer;
 
-    header.replace("$TIME", str);
-    str.setNum(safez);
+        header.replace("$TIME", str);
+        str.setNum(safez);
 
-    header.replace("$SAFEZ", str);
-    header.replace("$F", QString::number(feedspeed));
-    header.replace("$P", QString::number(plungespeed));
-    header.replace("$TS", QString::number(cutter_radius));
-    header.replace("$TT", cutter_type);
+        header.replace("$SAFEZ", str);
+        header.replace("$F", QString::number(feedspeed));
+        header.replace("$P", QString::number(plungespeed));
+        header.replace("$TS", QString::number(cutter_radius));
+        header.replace("$TT", cutter_type);
+        m_radial=0;
+        header.replace("$ZOFF",QString::number(-(mdl->max_z()+mdl->min_z())/2.0 ));
 
-    if (!header.endsWith("\n")) header.append("\n");
-    QString metric = settings->value("metric").toString();
-    if (!metric.endsWith("\n")) metric.append("\n");
-    QString imperial = settings->value("imperial").toString();
-    if (!imperial.endsWith("\n")) imperial.append("\n");
+        if (!header.endsWith("\n")) header.append("\n");
+        QString metric = settings->value("metric").toString();
+        if (!metric.endsWith("\n")) metric.append("\n");
+        QString imperial = settings->value("imperial").toString();
+        if (!imperial.endsWith("\n")) imperial.append("\n");
 
-    QString preamble = settings->value("preamble").toString();
-    if (!preamble.endsWith("\n")) preamble.append("\n");
-    preamble.replace("$XMIN",QString::number(stk->min_x()));
-    preamble.replace("$XMAX",QString::number(stk->max_x()));
-    preamble.replace("$XDIM",QString::number(stk->dim_x()));
-    preamble.replace("$YMIN",QString::number(stk->min_y()));
-    preamble.replace("$YMAX",QString::number(stk->max_y()));
-    preamble.replace("$YDIM",QString::number(stk->dim_y()));
-    preamble.replace("$ZMIN",QString::number(stk->min_z()));
-    preamble.replace("$ZMAX",QString::number(stk->max_z()));
-    preamble.replace("$ZDIM",QString::number(stk->dim_z()));
-    preamble.replace("$MXMIN",QString::number(mdl->min_x()));
-    preamble.replace("$MXMAX",QString::number(mdl->max_x()));
-    preamble.replace("$MXDIM",QString::number(mdl->dim_x()));
-    preamble.replace("$MYMIN",QString::number(mdl->min_y()));
-    preamble.replace("$MYMAX",QString::number(mdl->max_y()));
-    preamble.replace("$MYDIM",QString::number(mdl->dim_y()));
-    preamble.replace("$MZMIN",QString::number(mdl->min_z()));
-    preamble.replace("$MZMAX",QString::number(mdl->max_z()));
-    preamble.replace("$MZDIM",QString::number(mdl->dim_z()));
-    QString postamble = settings->value("postamble").toString();
-    if (!postamble.endsWith("\n")) postamble.append("\n");
-    QString beginpath = settings->value("beginpath").toString();
-    if (!beginpath.endsWith("\n")) beginpath.append("\n");
-    QString endpath = settings->value("endpath").toString();
-    if (!endpath.endsWith("\n")) endpath.append("\n");
-    QString beginrun = settings->value("beginrun").toString();
-    if (!beginrun.endsWith("\n")) beginrun.append("\n");
-    QString endrun = settings->value("endrun").toString();
-    if (!endrun.endsWith("\n")) endrun.append("\n");
-    QString point = settings->value("point").toString();
-    QString slowline = settings->value("slowline").toString();
-    QString firstlinepoint = settings->value("firstlinepoint").toString();
-    QString arc = settings->value("arc").toString();
-    QString start_spindle = settings->value("start_spindle").toString();
-    QString stop_spindle = settings->value("stop_spindle").toString();
-    QString beginline = settings->value("beginline").toString();
-    QString endline = settings->value("endline").toString();
-    gc.write(header.toUtf8());
-    gc.write(preamble.toUtf8());
-    gc.write(metric.toUtf8());
-    gc.write(start_spindle.toUtf8());
+        QString preamble = settings->value("preamble").toString();
+        if (!preamble.endsWith("\n")) preamble.append("\n");
+        preamble.replace("$MXMIN",QString::number(mdl->min_x()));
+        preamble.replace("$MXMAX",QString::number(mdl->max_x()));
+        preamble.replace("$MXDIM",QString::number(mdl->dim_x()));
+        preamble.replace("$MYMIN",QString::number(mdl->min_y()));
+        preamble.replace("$MYMAX",QString::number(mdl->max_y()));
+        preamble.replace("$MYDIM",QString::number(mdl->dim_y()));
+        preamble.replace("$MZMIN",QString::number(mdl->min_z()));
+        preamble.replace("$MZMAX",QString::number(mdl->max_z()));
+        preamble.replace("$MZDIM",QString::number(mdl->dim_z()));
+        preamble.replace("$XMIN",QString::number(stk->min_x()));
+        preamble.replace("$XMAX",QString::number(stk->max_x()));
+        preamble.replace("$XDIM",QString::number(stk->dim_x()));
+        preamble.replace("$YMIN",QString::number(stk->min_y()));
+        preamble.replace("$YMAX",QString::number(stk->max_y()));
+        preamble.replace("$YDIM",QString::number(stk->dim_y()));
+        preamble.replace("$ZMIN",QString::number(stk->min_z()));
+        preamble.replace("$ZMAX",QString::number(stk->max_z()));
+        preamble.replace("$ZDIM",QString::number(stk->dim_z()));
 
-    int slowlineflag=0;
-    int beginpathflag=0;
-    int beginrunflag=0;
-    int beginlineflag=0;
-    int endpathflag=0;
-    int endrunflag=0;
-    int endlineflag=0;
-    unsigned long count=0;
+        QString postamble = settings->value("postamble").toString();
+        if (!postamble.endsWith("\n")) postamble.append("\n");
+        QString beginpath = settings->value("beginpath").toString();
+        if (!beginpath.endsWith("\n")) beginpath.append("\n");
+        QString endpath = settings->value("endpath").toString();
+        if (!endpath.endsWith("\n")) endpath.append("\n");
+        QString beginrun = settings->value("beginrun").toString();
+        if (!beginrun.endsWith("\n")) beginrun.append("\n");
+        QString endrun = settings->value("endrun").toString();
+        if (!endrun.endsWith("\n")) endrun.append("\n");
+        QString point = settings->value("point").toString();
+        QString slowline = settings->value("slowline").toString();
+        QString firstlinepoint = settings->value("firstlinepoint").toString();
+        QString arc = settings->value("arc").toString();
+        QString start_spindle = settings->value("start_spindle").toString();
+        QString stop_spindle = settings->value("stop_spindle").toString();
+        QString beginline = settings->value("beginline").toString();
+        QString endline = settings->value("endline").toString();
+        gc.write(header.toUtf8());
+        gc.write(preamble.toUtf8());
+        gc.write(metric.toUtf8());
+        gc.write(start_spindle.toUtf8());
 
-    for(std::vector<Path*>::const_iterator p = paths.begin(); p!=paths.end(); ++p) {
-        QString s;
+        int slowlineflag=0;
+        int beginpathflag=0;
+        int beginrunflag=0;
+        int beginlineflag=0;
+        int endpathflag=0;
+        int endrunflag=0;
+        int endlineflag=0;
+        unsigned long count=0;
 
-        int rodd=0;
-        for(std::vector<Run>::const_iterator r = (*p)->m_runs.begin(); r!=(*p)->m_runs.end(); ++r) {
+        for(std::vector<Path*>::const_iterator p = paths.begin(); p!=paths.end(); ++p) {
+            QString s;
 
-                std::vector<Point>::const_iterator pt;
+            int rodd=0;
+            for(std::vector<Run>::const_iterator r = (*p)->m_runs.begin(); r!=(*p)->m_runs.end(); ++r) {
+
+                    std::vector<Point>::const_iterator pt;
 
 
-                if(rodd==0){
-                    pt = r->m_points.begin();
-                    int sz = r->m_points.size();
-                    sz=0;
-                    for(; pt!=r->m_points.end(); ++pt){
-                        s=point;
-                        if(dlg.ui->cbbeginpath->isChecked() && p == paths.begin() && r == (*p)->m_runs.begin() && pt == r->m_points.begin()){
-//                            s=beginpath;
-//                            replace(&s,*pt,(*p)->rot_x);
-//                            gc.write(s.toUtf8());
-                            beginpathflag=1;
-                        }
-                        if(dlg.ui->cbbeginrun->isChecked() && r == (*p)->m_runs.begin() && pt == r->m_points.begin()){
-//                            s=beginrun;
-//                            replace(&s,*pt,(*p)->rot_x);
-//                            gc.write(s.toUtf8());
-                            beginrunflag=2;
-                        }
-                        if(dlg.ui->cbbeginline->isChecked() && pt == r->m_points.begin()){
-//                            s=beginline;
-//                            replace(&s,*pt,(*p)->rot_x);
-//                            gc.write(s.toUtf8());
-                            beginlineflag=1;
-                        }
-                        if(dlg.ui->cbendline->isChecked() && pt == --r->m_points.end())endlineflag=1;
-                        if(dlg.ui->cbendrun->isChecked() && r == --(*p)->m_runs.end() && pt == --r->m_points.end())endrunflag=1;
-                        if(dlg.ui->cbendpath->isChecked() && p == --paths.end() &&  r == --(*p)->m_runs.end() && pt == --r->m_points.end())endpathflag=1;
-
-                        if(pt->m_rad>0.0 && bEnableArcs)
-                        {
-                            s=arc;
-                            if(pt->isCC)s.replace("G2", "G3");
-                            s.replace("$R", QString::number(pt->m_rad,'f',3));
-                            replace(&s,*pt,(*p)->rot_x);
-                            gc.write(s.toUtf8());
-                        }else
-                        {
-                            if(beginpathflag)
-                            {
-                                s=beginpath;
-                                replace(&s,*pt,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            if(beginrunflag)
-                            {
-                                if(beginrunflag==1)
-                                {
-                                    s=slowline;
-                                    slowlineflag=1;
-                                }
-                                if(beginrunflag==2)s=beginrun;
-                                replace(&s,*pt,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            if(beginlineflag)
-                            {
-                                s=beginline;
-                                replace(&s,*pt,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            if(endlineflag && !slowlineflag){
-                                s=endline;
-                                replace(&s,*pt,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            slowlineflag=0;
-                            if(endrunflag){
-                                s=endrun;
-                                replace(&s,*pt,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            if(endpathflag){
-                                s=endpath;
-                                replace(&s,*pt,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            if(!beginpathflag && !beginrunflag && !beginlineflag && !endlineflag && !endrunflag && !endpathflag)
-                            {
-                                s=point;
-                                replace(&s,*pt,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            if(beginrunflag)beginrunflag--;
-                            if(beginpathflag)beginpathflag=0;
-                            if(beginlineflag)beginlineflag=0;
-                            if(endlineflag)endlineflag=0;
-                            if(endrunflag)endrunflag=0;
-                            if(endpathflag)endpathflag=0;
-                        }
-                        count++;
-                    }//for pt=+-
-                }else{
-                    Point pp;
-
-                    pt = r->m_points.end();
-                    long sz = r->m_points.size();
-                    for(sz=r->m_points.size()-1; sz>=0; sz--)
-                    {
-
-                        pp = r->m_points[sz];
-                        s = point;
-                        if(dlg.ui->cbbeginpath->isChecked() && p == paths.begin() && r == (*p)->m_runs.begin() && sz == r->m_points.size()-1){
-//                            s=beginpath;
-//                            replace(&s,pp,(*p)->rot_x);
-//                            gc.write(s.toUtf8());
-                            beginpathflag=1;
-                        }
-                        if(dlg.ui->cbbeginrun->isChecked() && r == (*p)->m_runs.begin() && sz == r->m_points.size()-1){
-//                            s=beginrun;
-//                            replace(&s,pp,(*p)->rot_x);
-//                            gc.write(s.toUtf8());
-                            beginrunflag=2;
-                        }
-                        if(dlg.ui->cbbeginline->isChecked() && sz == r->m_points.size()-1){
-//                            s=beginline;
-//                            replace(&s,pp,(*p)->rot_x);
-//                            gc.write(s.toUtf8());
-                            beginlineflag=1;
-                        }
-                        if(dlg.ui->cbendline->isChecked() && sz == 0)endlineflag=1;
-                        if(dlg.ui->cbendrun->isChecked() && r == --(*p)->m_runs.end() && sz == 0)endrunflag=1;
-                        if(dlg.ui->cbendpath->isChecked() && p == --paths.end() && r == --(*p)->m_runs.end() && sz == 0)endpathflag=1;
-
-                        if(pp.m_rad>0 && bEnableArcs)
-                        {
-                            s=arc;
-                            if(pp.isCC)s.replace("G2", "G3");
-                            s.replace("$R", QString::number(pp.m_rad,'f',3));
-                            replace(&s,pp,(*p)->rot_x);
-                            gc.write(s.toUtf8());
-                        }else
-                        {
+                    if(rodd==0){
+                        pt = r->m_points.begin();
+                        int sz = r->m_points.size();
+                        sz=0;
+                        for(; pt!=r->m_points.end(); ++pt){
                             s=point;
-                            if(beginpathflag)
-                            {
-                                s=beginpath;
-                                replace(&s,pp,(*p)->rot_x);
-                                gc.write(s.toUtf8());
+                            if(dlg.ui->cbbeginpath->isChecked() && p == paths.begin() && r == (*p)->m_runs.begin() && pt == r->m_points.begin()){
+    //                            s=beginpath;
+    //                            replace(&s,*pt,(*p)->rot_x);
+    //                            gc.write(s.toUtf8());
+                                beginpathflag=1;
                             }
-                            if(beginrunflag)
+                            if(dlg.ui->cbbeginrun->isChecked() && r == (*p)->m_runs.begin() && pt == r->m_points.begin()){
+    //                            s=beginrun;
+    //                            replace(&s,*pt,(*p)->rot_x);
+    //                            gc.write(s.toUtf8());
+                                beginrunflag=2;
+                            }
+                            if(dlg.ui->cbbeginline->isChecked() && pt == r->m_points.begin()){
+    //                            s=beginline;
+    //                            replace(&s,*pt,(*p)->rot_x);
+    //                            gc.write(s.toUtf8());
+                                beginlineflag=1;
+                            }
+                            if(dlg.ui->cbendline->isChecked() && pt == --r->m_points.end())endlineflag=1;
+                            if(dlg.ui->cbendrun->isChecked() && r == --(*p)->m_runs.end() && pt == --r->m_points.end())endrunflag=1;
+                            if(dlg.ui->cbendpath->isChecked() && p == --paths.end() &&  r == --(*p)->m_runs.end() && pt == --r->m_points.end())endpathflag=1;
+
+                            if(pt->m_rad>0.0 && bEnableArcs)
                             {
-                                if(beginrunflag==1)
+                                s=arc;
+                                if(pt->isCC)s.replace("G2", "G3");
+                                s.replace("$R", QString::number(pt->m_rad,'f',3));
+                                replace(&s,*pt,(*p)->rot_x);
+                                gc.write(s.toUtf8());
+                            }else
+                            {
+                                if(beginpathflag)
                                 {
-                                    s=slowline;
-                                    slowlineflag=1;
+                                    s=beginpath;
+                                    replace(&s,*pt,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
                                 }
-                                if(beginrunflag==2)s=beginrun;
-                                replace(&s,pp,(*p)->rot_x);
-                                gc.write(s.toUtf8());
+                                if(beginrunflag)
+                                {
+                                    if(beginrunflag==1)
+                                    {
+                                        s=slowline;
+                                        slowlineflag=1;
+                                    }
+                                    if(beginrunflag==2)s=beginrun;
+                                    replace(&s,*pt,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(beginlineflag)
+                                {
+                                    s=beginline;
+                                    replace(&s,*pt,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(endlineflag && !slowlineflag){
+                                    s=endline;
+                                    replace(&s,*pt,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                slowlineflag=0;
+                                if(endrunflag){
+                                    s=endrun;
+                                    replace(&s,*pt,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(endpathflag){
+                                    s=endpath;
+                                    replace(&s,*pt,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(!beginpathflag && !beginrunflag && !beginlineflag && !endlineflag && !endrunflag && !endpathflag)
+                                {
+                                    s=point;
+                                    replace(&s,*pt,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(beginrunflag)beginrunflag--;
+                                if(beginpathflag)beginpathflag=0;
+                                if(beginlineflag)beginlineflag=0;
+                                if(endlineflag)endlineflag=0;
+                                if(endrunflag)endrunflag=0;
+                                if(endpathflag)endpathflag=0;
                             }
-                            if(beginlineflag && !slowlineflag)
+                            count++;
+                        }//for pt=+-
+                    }else{
+                        Point pp;
+
+                        pt = r->m_points.end();
+                        long sz = r->m_points.size();
+                        for(sz=r->m_points.size()-1; sz>=0; sz--)
+                        {
+
+                            pp = r->m_points[sz];
+                            s = point;
+                            if(dlg.ui->cbbeginpath->isChecked() && p == paths.begin() && r == (*p)->m_runs.begin() && sz == r->m_points.size()-1){
+    //                            s=beginpath;
+    //                            replace(&s,pp,(*p)->rot_x);
+    //                            gc.write(s.toUtf8());
+                                beginpathflag=1;
+                            }
+                            if(dlg.ui->cbbeginrun->isChecked() && r == (*p)->m_runs.begin() && sz == r->m_points.size()-1){
+    //                            s=beginrun;
+    //                            replace(&s,pp,(*p)->rot_x);
+    //                            gc.write(s.toUtf8());
+                                beginrunflag=2;
+                            }
+                            if(dlg.ui->cbbeginline->isChecked() && sz == r->m_points.size()-1){
+    //                            s=beginline;
+    //                            replace(&s,pp,(*p)->rot_x);
+    //                            gc.write(s.toUtf8());
+                                beginlineflag=1;
+                            }
+                            if(dlg.ui->cbendline->isChecked() && sz == 0)endlineflag=1;
+                            if(dlg.ui->cbendrun->isChecked() && r == --(*p)->m_runs.end() && sz == 0)endrunflag=1;
+                            if(dlg.ui->cbendpath->isChecked() && p == --paths.end() && r == --(*p)->m_runs.end() && sz == 0)endpathflag=1;
+
+                            if(pp.m_rad>0 && bEnableArcs)
                             {
-                                s=beginline;
+                                s=arc;
+                                if(pp.isCC)s.replace("G2", "G3");
+                                s.replace("$R", QString::number(pp.m_rad,'f',3));
                                 replace(&s,pp,(*p)->rot_x);
                                 gc.write(s.toUtf8());
-                            }
-                            slowlineflag=0;
-                            if(endlineflag){
-                                s=endline;
-                                replace(&s,pp,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            if(endrunflag){
-                                s=endrun;
-                                replace(&s,pp,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            if(endpathflag){
-                                s=endpath;
-                                replace(&s,pp,(*p)->rot_x);
-                                gc.write(s.toUtf8());
-                            }
-                            if(!beginpathflag && !beginrunflag && !beginlineflag  && !endlineflag && !endrunflag && !endpathflag)
+                            }else
                             {
                                 s=point;
-                                replace(&s,pp,(*p)->rot_x);
-                                gc.write(s.toUtf8());
+                                if(beginpathflag)
+                                {
+                                    s=beginpath;
+                                    replace(&s,pp,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(beginrunflag)
+                                {
+                                    if(beginrunflag==1)
+                                    {
+                                        s=slowline;
+                                        slowlineflag=1;
+                                    }
+                                    if(beginrunflag==2)s=beginrun;
+                                    replace(&s,pp,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(beginlineflag && !slowlineflag)
+                                {
+                                    s=beginline;
+                                    replace(&s,pp,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                slowlineflag=0;
+                                if(endlineflag){
+                                    s=endline;
+                                    replace(&s,pp,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(endrunflag){
+                                    s=endrun;
+                                    replace(&s,pp,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(endpathflag){
+                                    s=endpath;
+                                    replace(&s,pp,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(!beginpathflag && !beginrunflag && !beginlineflag  && !endlineflag && !endrunflag && !endpathflag)
+                                {
+                                    s=point;
+                                    replace(&s,pp,(*p)->rot_x);
+                                    gc.write(s.toUtf8());
+                                }
+                                if(beginrunflag)beginrunflag--;
+                                if(beginpathflag)beginpathflag=0;
+                                if(beginlineflag)beginlineflag=0;
+                                if(endlineflag)endlineflag=0;
+                                if(endrunflag)endrunflag=0;
+                                if(endpathflag)endpathflag=0;
                             }
-                            if(beginrunflag)beginrunflag--;
-                            if(beginpathflag)beginpathflag=0;
-                            if(beginlineflag)beginlineflag=0;
-                            if(endlineflag)endlineflag=0;
-                            if(endrunflag)endrunflag=0;
-                            if(endpathflag)endpathflag=0;
-                        }
-                    count++;
-                    }//for pt=+-
-                }//else rodd==
-                rodd=1-rodd;
-        }//for m_runs iterator
-    }//for paths iterator
-    gc.write(stop_spindle.toUtf8());
-    gc.write(postamble.toUtf8());
-    gc.close();
-    return true;
+                        count++;
+                        }//for pt=+-
+                    }//else rodd==
+                    rodd=1-rodd;
+            }//for m_runs iterator
+        }//for paths iterator
+        gc.write(stop_spindle.toUtf8());
+        gc.write(postamble.toUtf8());
+        gc.close();
+        return true;
+    }else
+    {
+        return false;
+    }
 }
 
 void GCodeExporter::replace(QString *s, Point pt, double ang)

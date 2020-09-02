@@ -30,14 +30,18 @@ public:
     SimpleCutter():m_zigzag(false) { }
     bool GenerateCutPath(const HeightField& heightfield, const Point& start, const Point& direction, const std::vector<double>& zlevels, std::vector<Path*>& paths, double angle);
     bool GenerateCutPathx(const HeightField& heightfield, const Point& start, const Point& direction, double Zlevel, std::vector<Path*>& paths, double angle);
-    bool m_zigzag;
+    bool GenerateCutPath_radial(const HeightField& heightfield, const Point& start, const Point& direction, double Zlevel, std::vector<Path*>& paths, double angle);
+    bool m_zigzag=false;
 
     double m_radius;
     double m_compmargin;
     Stock* m_stock;
     int m_useLine;
     int m_smooth;
-    bool m_noretrace;
+    bool m_noretrace=false;
+    double m_radialcut=0.0;
+    double m_radialcutdepth=0.0;
+
 private:
     bool GenerateCutPathLayer_x(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path);
     bool GenerateCutPathLayer_y(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path);

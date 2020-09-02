@@ -73,17 +73,17 @@ MainWindow::MainWindow()
     QObject::connect(actionFrontView, SIGNAL(triggered()), theGLWidget, SLOT(setFrontView()));
     QObject::connect(actionRightView, SIGNAL(triggered()), theGLWidget, SLOT(setRightView()));
 
-    cutter = Cutter::CreateSphericalCutter(1.0, Point(0,0,0));
+    cutter = Cutter::CreateSphericalCutter(0.5, Point(0,0,0));
     p_runStepover=cutter->radius();
     cutter->m_cutterType="Sph";
     stock = new Stock();
-    stock->m_min_x=0.0;
-    stock->m_min_y=-5.0;
-    stock->m_min_z=9;
+    stock->m_min_x=10.0;
+    stock->m_min_y=10.0;
+    stock->m_min_z=1.0;
 
-    stock->m_max_x=12.0;
-    stock->m_max_y=5.0;
-    stock->m_max_z=15.0;
+    stock->m_max_x=20.0;
+    stock->m_max_y=20.0;
+    stock->m_max_z=2.0;
 
      p_runLines=100;
      p_runStepover=0.333;
@@ -106,9 +106,9 @@ MainWindow::MainWindow()
      connect(qtimer, SIGNAL(timeout()), this, SLOT(mytimeout()));
      qtimer->setInterval(100);
      qtimer->start();
-     p_modelfilename="/home/fred/projects/cppcam/data/gear_m2_12t.stl";
+     p_modelfilename="/home/fred/projects/cppcam/data/box.stl";
      model = STLImporter::ImportModel(p_modelfilename.toStdString());
-     model->rotate(0,90,0);
+     //model->rotate(0,90,0);
      p_comp=0.0;
 
 
@@ -165,9 +165,11 @@ void MainWindow::on_actionOpen_triggered()
     QString filename = QFileDialog::getOpenFileName(this, "Select Project File", "/home/fred/projects/cppcam/data/", "Cam files (*.cam)");
     QSettings setproj(filename,QSettings::IniFormat);
     p_projectfilename=filename;
+    filename=p_modelfilename;
     p_modelfilename=setproj.value("p_modelfilename","~/tmp.cam").toString();
 
-    model = STLImporter::ImportModel(p_modelfilename.toStdString());
+    if(filename.compare(p_modelfilename)!=0)    model = STLImporter::ImportModel(p_modelfilename.toStdString());
+
     if(setproj.value("p_CutterType","Sph").toString().compare("Sph") == 0)
     {
         cutter = Cutter::CreateSphericalCutter(setproj.value("p_CutterSize",0.0).toDouble(), Point(0,0,0));
@@ -209,7 +211,7 @@ void MainWindow::on_actionOpen_triggered()
     p_rectcut=setproj.value("p_rectcut",0.0).toBool();
     p_useLine=setproj.value("p_useLine",0.0).toInt();
     p_smooth=setproj.value("p_smooth",0.0).toInt();
-    setWindowTitle(filename);
+    setWindowTitle(p_projectfilename);
 }
 
 void MainWindow::on_actionSave_triggered()
@@ -257,7 +259,7 @@ void MainWindow::on_actionImport_Model_triggered()
 {
 
 
-    static QString lastFile = QString::null;
+    static QString lastFile = QString("");
     QString filename = QFileDialog::getOpenFileName(this, "Import STL File", lastFile.isNull()?"data/TestModel.stl":lastFile, "STL files (*.stl)");
     if (!filename.isEmpty())
     {
@@ -334,6 +336,12 @@ void MainWindow::on_actionTool_Size_triggered()
     dlgToolSize dlg(this);
     dlg.m_cutterSize=cutter->radius();
     dlg.ui->lineEditSize->setText(QString::number(cutter->radius()));
+    dlg.m_cuttertype=cutter->m_cutterType;
+//    if(cutter->m_cutterType.compare("Sph")==0)
+//        dlg.ui->radioButtonSph->setChecked(true);
+//    else
+//        dlg.ui->radioButtonSph->setChecked(false);
+
     dlg.exec();
     delete cutter;
     if(dlg.isSph()){
@@ -1153,6 +1161,12 @@ void MainWindow::on_actionpush_triggered()
 
 void MainWindow::on_actionRectCut_triggered()
 {
+    Point p;// = Point(rcdlg.dsbminX->value(),rcdlg.dsbminX->value(),rcdlg.dsbminX->value());//
+    double f_boxw=0.0;
+    double f_boxcr=0.0;
+    double f_boxh=0.0;
+
+
     RectCutDialog rcdlg(this);
 
     p_rectcut=true;
@@ -1163,77 +1177,97 @@ void MainWindow::on_actionRectCut_triggered()
 
     if(rcdlg.exec() == QDialog::Accepted)
     {
+
+        f_boxw=rcdlg.ui->dsbsizeX->value();
+        f_boxh=rcdlg.ui->dsbsizeY->value();
+        if(rcdlg.ui->cbInside->isChecked())
+        {
+            f_boxw-=2.0*cutter->radius();
+            f_boxh-=2.0*cutter->radius();
+            f_boxcr=0.0;
+        }
+
+
+
+        p.m_x=rcdlg.ui->dsbminX->value();
+        p.m_y=rcdlg.ui->dsbminY->value();
+
+
+
+
         bEnableArcs=true;
         clearPath();
         Path* path = new Path();
         QMessageBox qmsg;
         QString ss;
 
+        // always start at x=minx,y=miny,z=maxz + specified bit width comp + radius of roundcorner. (inside,outside or none.)
+//
 
         path->m_runs.resize(1);
+        p.m_z=rcdlg.ui->dsbmaxZ->value();
+        while(p.m_z>=rcdlg.ui->dsbminZ->value())
+        {
 
-        Point p = Point(rcdlg.dminX(),rcdlg.dminY(),rcdlg.dmaxZ());
-        if(rcdlg.ui->cbroundcorner->isChecked())
-            if(rcdlg.ui->rbInside->isChecked())
-            p.m_y+=(cutter->radius()+rcdlg.m_droundcorner);
+            p.m_x=rcdlg.ui->dsbminX->value();
+            p.m_y=rcdlg.ui->dsbminY->value();
 
-
-
-
-
-
-
-        path->m_runs[0].m_points.push_back(p);
-        bool bdone=false;
-        while(bdone==false){
-            p.m_z-=rcdlg.dStepDown();
-            if(p.m_z<(rcdlg.dmaxZ()-rcdlg.dSzZ()))
+            if(rcdlg.ui->cbInside->isChecked())
             {
-                p.m_z=rcdlg.dmaxZ()-rcdlg.dSzZ();
-                bdone=true;
+                p.m_x+=cutter->radius();
+                p.m_y+=cutter->radius();
+
             }
 
-            p.m_rad=-1.0;
+            if(p.m_z==rcdlg.ui->dsbmaxZ->value())
+                p.m_rad=-1.0;
+            else
+                p.m_rad=f_boxcr;
             path->m_runs[0].m_points.push_back(p);
-            p.m_y+=rcdlg.dSzY();
-            p.m_rad=-1.0;
-            path->m_runs[0].m_points.push_back(p);
-
-            p.m_x+=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
-            p.m_y+=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
-            p.m_rad=cutter->radius()+rcdlg.m_droundcorner;
-            path->m_runs[0].m_points.push_back(p);
+//first point
 
 
-            p.m_rad=-1.0;
-            p.m_x+=rcdlg.dSzX();
-            path->m_runs[0].m_points.push_back(p);
 
-
-            p.m_x+=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
-            p.m_y-=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
-            p.m_rad=cutter->radius()+rcdlg.m_droundcorner;
-            path->m_runs[0].m_points.push_back(p);
-
-            p.m_rad=-1.0;
-            p.m_y-=rcdlg.dSzY();
-            path->m_runs[0].m_points.push_back(p);
-
-            p.m_x-=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
-            p.m_y-=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
-            p.m_rad=cutter->radius()+rcdlg.m_droundcorner;
-            path->m_runs[0].m_points.push_back(p);
-
-            p.m_rad=-1.0;
-            p.m_x-=rcdlg.dSzX();
+            if(!rcdlg.ui->cbClockwise->isChecked())
+            {
+                p.m_x+=f_boxw;
+                p.m_rad=-1.0;
+            }
             path->m_runs[0].m_points.push_back(p);
 
 
-            p.m_x-=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
-            p.m_y+=(cutter->radius()+(1.0*rcdlg.m_droundcorner));
-            p.m_rad=cutter->radius()+rcdlg.m_droundcorner;
+
+
+            if(!rcdlg.ui->cbClockwise->isChecked())
+            {
+                 p.m_y+=f_boxh;
+                 p.m_rad=-1.0;
+            }
             path->m_runs[0].m_points.push_back(p);
-        }
+
+
+            if(!rcdlg.ui->cbClockwise->isChecked())
+            {
+                p.m_x-=f_boxw;
+                p.m_rad=-1.0;
+            }
+            path->m_runs[0].m_points.push_back(p);
+
+
+            if(!rcdlg.ui->cbClockwise->isChecked())
+            {
+                p.m_y-=f_boxh;
+                p.m_rad=-1.0;
+            }
+            path->m_runs[0].m_points.push_back(p);
+
+
+
+
+
+
+            p.m_z-=rcdlg.ui->dsbStepDown->value();
+        }//while
 
         paths.push_back(path);
     }
@@ -1726,152 +1760,152 @@ void MainWindow::on_actionRadial_Cut_triggered()
     dlg.m_ymax=stock->max_y();
     dlg.m_zmax=stock->max_z();
     ss.setNum(p_safez);
-    dlg.le_SafeZ->setText(ss);
+    dlg.ui->le_SafeZ->setText(ss);
     ss.setNum(p_FeedSpeed);
-    dlg.leFeedSpeed->setText(ss);
+    dlg.ui->leFeedSpeed->setText(ss);
     ss.setNum(p_PlungeSpeed);
-    dlg.lePlungeSpeed->setText(ss);
+    dlg.ui->lePlungeSpeed->setText(ss);
 
     //ss.setNum(1);
-    dlg.leSmooth->setText("0");
-    dlg.leUseLine->setText(QString::number(p_useLine));
+    dlg.ui->leSmooth->setText("0");
+    dlg.ui->leUseLine->setText(QString::number(p_useLine));
     if(p_comp>0.0)
     {
-        dlg.cbLeaveMargin->setChecked(true);
-        dlg.leMargin->setText(QString::number(p_comp));
+        dlg.ui->cbLeaveMargin->setChecked(true);
+        dlg.ui->leMargin->setText(QString::number(p_comp));
     }else
     {
-        dlg.cbLeaveMargin->setChecked(false);
+        dlg.ui->cbLeaveMargin->setChecked(false);
     }
     ss.setNum(p_comp);
-    dlg.leMargin->setText(ss);
+    dlg.ui->leMargin->setText(ss);
 
 
-    dlg.lineEdit_lines->setText(QString::number(p_runLines));
-    dlg.lineEdit_points->setText(QString::number(p_runPoints));
-    dlg.lineEdit_layers->setText(QString::number(p_runLayers));
-    dlg.le_SafeZ->setText(QString::number(p_safez));
+    dlg.ui->lineEdit_lines->setText(QString::number(p_runLines));
+    dlg.ui->lineEdit_points->setText(QString::number(p_runPoints));
+    dlg.ui->lineEdit_layers->setText(QString::number(p_runLayers));
+    dlg.ui->le_SafeZ->setText(QString::number(p_safez));
     if(p_runDirection==1){
-        dlg.radioButton_xdir->setChecked(true);
+        dlg.ui->radioButton_xdir->setChecked(true);
     }else if(p_runDirection==2){
-        dlg.radioButton_ydir->setChecked(true);
+        dlg.ui->radioButton_ydir->setChecked(true);
     }else if(p_runDirection==3){
-        dlg.rbrect->setChecked(true);
+        dlg.ui->rbrect->setChecked(true);
     }
 
-    dlg.cbRotate->setChecked(p_runRotate);
+    dlg.ui->cbRotate->setChecked(p_runRotate);
     ss.setNum(p_runRotateDegrees);
-    dlg.leRotateDegrees->setText(ss);
+    dlg.ui->leRotateDegrees->setText(ss);
     ss.setNum(p_runRotateStep);
-    dlg.leRotateStep->setText(ss);
+    dlg.ui->leRotateStep->setText(ss);
 
     ss="Stock:";
-    dlg.textEditStatus->append(ss);
+    dlg.ui->textEditStatus->append(ss);
 
     ss=QString("x (%1 : %2) %3").arg(stock->min_x()).arg(stock->max_x()).arg(stock->max_x()-stock->min_x());
-    dlg.textEditStatus->append(ss);
+    dlg.ui->textEditStatus->append(ss);
 
     ss=QString("y (%1 : %2) %3").arg(stock->min_y()).arg(stock->max_y()).arg(stock->max_y()-stock->min_y());
-    dlg.textEditStatus->append(ss);
+    dlg.ui->textEditStatus->append(ss);
 
     ss=QString("z (%1 : %2) %3").arg(stock->min_z()).arg(stock->max_z()).arg(stock->max_z()-stock->min_z());
-    dlg.textEditStatus->append(ss);
+    dlg.ui->textEditStatus->append(ss);
 
 
     ss="Model:";
-    dlg.textEditStatus->append(ss);
+    dlg.ui->textEditStatus->append(ss);
 
     ss=QString("x (%1 : %2) %3").arg(model->min_x()).arg(model->max_x()).arg(model->max_x()-model->min_x());
-    dlg.textEditStatus->append(ss);
+    dlg.ui->textEditStatus->append(ss);
 
     ss=QString("y (%1 : %2) %3").arg(model->min_y()).arg(model->max_y()).arg(model->max_y()-model->min_y());
-    dlg.textEditStatus->append(ss);
+    dlg.ui->textEditStatus->append(ss);
 
     ss=QString("z (%1 : %2) %3").arg(model->min_z()).arg(model->max_z()).arg(model->max_z()-model->min_z());
-    dlg.textEditStatus->append(ss);
+    dlg.ui->textEditStatus->append(ss);
 
     dlg.exec();
 
 
     if (dlg.result() == QDialog::Accepted)
     {
-        if(dlg.radioButton_xdir->isChecked()){
+        if(dlg.ui->radioButton_xdir->isChecked()){
             p_runDirection=1;
-        }else if(dlg.radioButton_ydir->isChecked()){
+        }else if(dlg.ui->radioButton_ydir->isChecked()){
             p_runDirection=2;
-        }else if(dlg.rbrect->isChecked()){
+        }else if(dlg.ui->rbrect->isChecked()){
             p_runDirection=3;
         }
-        p_runLayers=dlg.lineEdit_layers->text().toInt();
-        p_smooth=dlg.leSmooth->text().toInt();
-        p_useLine=dlg.leUseLine->text().toUInt();
-        p_FeedSpeed=dlg.leFeedSpeed->text().toDouble();
-        p_PlungeSpeed=dlg.lePlungeSpeed->text().toDouble();
-        if(dlg.cbLeaveMargin->isChecked())
+        p_runLayers=dlg.ui->lineEdit_layers->text().toInt();
+        p_smooth=dlg.ui->leSmooth->text().toInt();
+        p_useLine=dlg.ui->leUseLine->text().toUInt();
+        p_FeedSpeed=dlg.ui->leFeedSpeed->text().toDouble();
+        p_PlungeSpeed=dlg.ui->lePlungeSpeed->text().toDouble();
+        if(dlg.ui->cbLeaveMargin->isChecked())
         {
-            p_comp=dlg.leMargin->text().toDouble();
+            p_comp=dlg.ui->leMargin->text().toDouble();
         }else
         {
             p_comp=0.0;
         }
-        p_safez = dlg.le_SafeZ->text().toDouble();
-        p_runRotate=dlg.cbRotate->isChecked();
-        p_runRotateDegrees=dlg.leRotateDegrees->text().toDouble();
-        p_runRotateStep=dlg.leRotateStep->text().toDouble();
+        p_safez = dlg.ui->le_SafeZ->text().toDouble();
+        p_runRotate=dlg.ui->cbRotate->isChecked();
+        p_runRotateDegrees=dlg.ui->leRotateDegrees->text().toDouble();
+        p_runRotateStep=dlg.ui->leRotateStep->text().toDouble();
         clearPath();
-        nz = dlg.lineEdit_layers->text().toInt();
+        nz = dlg.ui->lineEdit_layers->text().toInt();
 
-        if (dlg.radioButton_xdir->isChecked()) {
+        if (dlg.ui->radioButton_xdir->isChecked()) {
             dir = Point(1,0,0);
-            if (!dlg.lineEdit_lines->text().isEmpty()) {
-                ny = dlg.lineEdit_lines->text().toInt();
-            } else if (!dlg.le_stepover->text().isEmpty()) {
-                double overlap = dlg.le_stepover->text().toDouble();
+            if (!dlg.ui->lineEdit_lines->text().isEmpty()) {
+                ny = dlg.ui->lineEdit_lines->text().toInt();
+            } else if (!dlg.ui->le_stepover->text().isEmpty()) {
+                double overlap = dlg.ui->le_stepover->text().toDouble();
                 if (overlap > 1) overlap /= 100;
                 ny = (y1-y0)/(cutter->radius()*(1-overlap)*2);
             }
-            if (!dlg.lineEdit_points->text().isEmpty()) {
-                nx = dlg.lineEdit_points->text().toInt();
-            } else if (!dlg.le_resolution->text().isEmpty()) {
-                double resolution = dlg.le_resolution->text().toDouble();
+            if (!dlg.ui->lineEdit_points->text().isEmpty()) {
+                nx = dlg.ui->lineEdit_points->text().toInt();
+            } else if (!dlg.ui->le_resolution->text().isEmpty()) {
+                double resolution = dlg.ui->le_resolution->text().toDouble();
                 if (resolution>0) {
                     nx = (x1-x0)/resolution;
                 }
             }
         }// if(xdir is checked
 
-        if (dlg.radioButton_ydir->isChecked()) {
+        if (dlg.ui->radioButton_ydir->isChecked()) {
             dir = Point(0,1,0);
-            if (!dlg.lineEdit_lines->text().isEmpty()) {
-                nx = dlg.lineEdit_lines->text().toInt();
-            } else if (!dlg.le_stepover->text().isEmpty()) {
-                double overlap = dlg.le_stepover->text().toDouble();
+            if (!dlg.ui->lineEdit_lines->text().isEmpty()) {
+                nx = dlg.ui->lineEdit_lines->text().toInt();
+            } else if (!dlg.ui->le_stepover->text().isEmpty()) {
+                double overlap = dlg.ui->le_stepover->text().toDouble();
                 if (overlap > 1) overlap /= 100;
                 nx = (x1-x0)/(cutter->radius()*(1-overlap)*2);
             }
-            if (!dlg.lineEdit_points->text().isEmpty()) {
-                ny = dlg.lineEdit_points->text().toInt();
-            } else if (!dlg.le_resolution->text().isEmpty()) {
-                double resolution = dlg.le_resolution->text().toDouble();
+            if (!dlg.ui->lineEdit_points->text().isEmpty()) {
+                ny = dlg.ui->lineEdit_points->text().toInt();
+            } else if (!dlg.ui->le_resolution->text().isEmpty()) {
+                double resolution = dlg.ui->le_resolution->text().toDouble();
                 if (resolution>0) {
                     ny = (y1-y0)/resolution;
                 }
             }
         }// if ydir s checked
 
-        if (dlg.rbrect->isChecked()) {
+        if (dlg.ui->rbrect->isChecked()) {
             dir = Point(1,1,0);
-            if (!dlg.lineEdit_lines->text().isEmpty()) {
-                ny = dlg.lineEdit_lines->text().toInt();
-            } else if (!dlg.le_stepover->text().isEmpty()) {
-                double overlap = dlg.le_stepover->text().toDouble();
+            if (!dlg.ui->lineEdit_lines->text().isEmpty()) {
+                ny = dlg.ui->lineEdit_lines->text().toInt();
+            } else if (!dlg.ui->le_stepover->text().isEmpty()) {
+                double overlap = dlg.ui->le_stepover->text().toDouble();
                 if (overlap > 1) overlap /= 100;
                 ny = (y1-y0)/(cutter->radius()*(1-overlap)*2);
             }
-            if (!dlg.lineEdit_points->text().isEmpty()) {
-                nx = dlg.lineEdit_points->text().toInt();
-            } else if (!dlg.le_resolution->text().isEmpty()) {
-                double resolution = dlg.le_resolution->text().toDouble();
+            if (!dlg.ui->lineEdit_points->text().isEmpty()) {
+                nx = dlg.ui->lineEdit_points->text().toInt();
+            } else if (!dlg.ui->le_resolution->text().isEmpty()) {
+                double resolution = dlg.ui->le_resolution->text().toDouble();
                 if (resolution>0) {
                     nx = (x1-x0)/resolution;
                 }
@@ -1886,11 +1920,11 @@ void MainWindow::on_actionRadial_Cut_triggered()
                 zlevels.push_back(z1 - (z1-z0)*(nz-1-i)/(nz-1));
             }
         }
-        p_runLines=ny;
-        p_runPoints=nx;
+        p_runLines=dlg.ui->lineEdit_lines->text().toInt();
+        p_runPoints=dlg.ui->lineEdit_points->text().toInt();
         p_runLayers=nz;
-        p_runStepover=(stock->max_y()-stock->min_y())/ny;
-        p_runResolution=(stock->max_x()-stock->min_x())/nx;
+        p_runStepover=dlg.ui->le_stepover->text().toDouble();
+        p_runResolution=dlg.ui->le_resolution->text().toDouble();
         p_runStepdown=(stock->max_z()-stock->min_z())/nz;
 
 
@@ -1901,9 +1935,9 @@ void MainWindow::on_actionRadial_Cut_triggered()
         double angrotatet=375.0;
         double oz = (model->m_min_z+model->m_max_z)/2.0;
         double ozc = 0.0;
-        if(dlg.cbRotate->isChecked()){
-             ai = dlg.leRotateStep->text().toDouble();
-             angrotatet = dlg.leRotateDegrees->text().toDouble();
+        if(dlg.ui->cbRotate->isChecked()){
+             ai = dlg.ui->leRotateStep->text().toDouble();
+             angrotatet = dlg.ui->leRotateDegrees->text().toDouble();
         }
         for(size_t i=0; i<nz; i++)
         {
@@ -1942,14 +1976,16 @@ void MainWindow::on_actionRadial_Cut_triggered()
 
 
 
-                if(dlg.cbLeaveMargin->isChecked())
-                    simplecutter.m_compmargin=dlg.leMargin->text().toDouble();
+                if(dlg.ui->cbLeaveMargin->isChecked())
+                    simplecutter.m_compmargin=dlg.ui->leMargin->text().toDouble();
                 else
                     simplecutter.m_compmargin=0.0;
                 simplecutter.m_stock=stock;
                 simplecutter.m_useLine=p_useLine;
-                simplecutter.m_smooth=dlg.leSmooth->text().toDouble();
-                simplecutter.GenerateCutPathx(*hf[hfi], Point(stock->min_x(), stock->min_y(), stock->max_z()), dir, Zlevel, paths, ang);
+                simplecutter.m_smooth=dlg.ui->leSmooth->text().toDouble();
+                simplecutter.m_radialcut=ai;
+                simplecutter.m_radialcutdepth=oz;
+                simplecutter.GenerateCutPath_radial(*hf[hfi], Point(stock->min_x(), stock->min_y(), stock->max_z()), dir, Zlevel, paths, ang);
 
                 if(p_runRotate)
                 {
@@ -1960,18 +1996,6 @@ void MainWindow::on_actionRadial_Cut_triggered()
                 theGLWidget->updateGL();
             }//for ang
         }//for i
-    }//if (dlg.result() == QDialog::Accepted)
+    }//if (dlg.ui->result() == QDialog::Accepted)
 }
 
-void MainWindow::on_actionprep_for_radial_cut_triggered()
-{
-    model->resize(0.0,1.0,-(model->m_max_y-model->m_min_y)/2,1.0,20-((model->m_max_z-model->m_min_z)/2.0),1.0);
-
-    stock->m_min_x=model->m_min_x;
-    stock->m_max_x=model->m_max_x;
-    stock->m_min_y=-3;
-    stock->m_max_y=3;
-    stock->m_min_z=model->m_min_z;
-    stock->m_max_z=model->m_max_z;
-
-}
