@@ -26,7 +26,7 @@ class AboutDialog :
 {
     Q_OBJECT
 public:
-    AboutDialog(QWidget* parent=0) {
+    AboutDialog(/*QWidget* parent=0*/) {
         setupUi(this);
     }
 };

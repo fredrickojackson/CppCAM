@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidgeta">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -38,7 +38,7 @@
      <height>34</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="hlx">
+   <layout class="QHBoxLayout" name="hlposSz">
     <item>
      <widget class="QLabel" name="label_3">
       <property name="enabled">
@@ -93,7 +93,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidgetb">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -102,7 +102,7 @@
      <height>34</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="hl2">
+   <layout class="QHBoxLayout" name="hlposx">
     <item>
      <widget class="QLabel" name="label_2">
       <property name="text">
@@ -145,7 +145,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidgetc">
    <property name="geometry">
     <rect>
      <x>360</x>
@@ -177,7 +177,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_2">
+  <widget class="QWidget" name="layoutWidgete">
    <property name="geometry">
     <rect>
      <x>80</x>
@@ -186,7 +186,7 @@
      <height>34</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="hl4">
+   <layout class="QHBoxLayout" name="hlposX">
     <item>
      <widget class="QLabel" name="label_6">
       <property name="text">

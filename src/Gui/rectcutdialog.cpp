@@ -85,7 +85,7 @@ void RectCutDialog::on_buttonBox_accepted()
 
 void RectCutDialog::on_cbroundcorner_stateChanged(int istate)
 {
-    if(ui->cbroundcorner->isChecked())
+    if(istate)
         ui->dsbRoundCorner->setValue(m_cutter->radius());
     else
         ui->dsbRoundCorner->setValue(0.0);
@@ -107,32 +107,32 @@ void RectCutDialog::on_dsbRoundCorner_valueChanged(double arg1)
     m_droundcorner=arg1;
 }
 
-void RectCutDialog::on_dsbminX_valueChanged(double arg1)
+void RectCutDialog::on_dsbminX_valueChanged(double /*arg1*/)
 {
     updSize();
 }
 
-void RectCutDialog::on_dsbminY_valueChanged(double arg1)
+void RectCutDialog::on_dsbminY_valueChanged(double /*arg1*/)
 {
     updSize();
 }
 
-void RectCutDialog::on_dsbminZ_valueChanged(double arg1)
+void RectCutDialog::on_dsbminZ_valueChanged(double /*arg1*/)
 {
     updSize();
 }
 
-void RectCutDialog::on_dsbmaxX_valueChanged(double arg1)
+void RectCutDialog::on_dsbmaxX_valueChanged(double /*arg1*/)
 {
     updSize();
 }
 
-void RectCutDialog::on_dsbmaxY_valueChanged(double arg1)
+void RectCutDialog::on_dsbmaxY_valueChanged(double /*arg1*/)
 {
     updSize();
 }
 
-void RectCutDialog::on_dsbmaxZ_valueChanged(double arg1)
+void RectCutDialog::on_dsbmaxZ_valueChanged(double /*arg1*/)
 {
     updSize();
 }

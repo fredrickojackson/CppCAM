@@ -21,6 +21,16 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtOpenGL>
 
+void Stock::copy(Stock* stk)
+{
+    m_min_x=stk->min_x();
+    m_max_x=stk->max_x();
+    m_min_y=stk->min_y();
+    m_max_y=stk->max_y();
+    m_min_z=stk->min_z();
+    m_max_z=stk->max_z();
+}
+
 void 
 Stock::bb_OpenGL()
 {

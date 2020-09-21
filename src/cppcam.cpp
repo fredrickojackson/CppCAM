@@ -17,17 +17,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include "Stock.h"
+#include "Model.h"
+#include "Path.h"
+#include "Cutter.h"
+#include "HeightField.h"
 #include "MainWindow.h"
 
 #include <stdio.h>
 
 extern int run_tests();
 
-#include "Stock.h"
-#include "Model.h"
-#include "Path.h"
-#include "Cutter.h"
-#include "HeightField.h"
 
 Stock* stock = NULL;
 Model* model = NULL;

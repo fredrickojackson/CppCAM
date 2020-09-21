@@ -28,6 +28,7 @@ namespace {
     const double INFINITE = 1e+5;
 #endif
 
+
     bool isNear(double a, double b) {
         return fabs(a - b) < epsilon;
     }
@@ -37,8 +38,10 @@ namespace {
     }
 
     double sqr(double x) {
+//        bool r=fakeit();
         return x * x;
     }
+
 }
 
 #include "Point.h"

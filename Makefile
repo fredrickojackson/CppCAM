@@ -13,8 +13,8 @@ MAKEFILE      = Makefile
 CC            = gcc
 CXX           = g++
 DEFINES       = -DQT_QML_DEBUG -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
-CFLAGS        = -m64 -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -m64 -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
+CFLAGS        = -m64 -pipe -g -D_REENTRANT -fPIC $(DEFINES)
+CXXFLAGS      = -m64 -pipe -g -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -Isrc -I. -Isrc -Isrc/Gui -Isrc/Geometry -Isrc/Importers -Isrc/Cutters -Isrc/PathGenerators -Isrc/PathProcessors -Isrc/Exporters -isystem /usr/include/x86_64-linux-gnu/qt5 -isystem /usr/include/x86_64-linux-gnu/qt5/QtOpenGL -isystem /usr/include/x86_64-linux-gnu/qt5/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt5/QtGui -isystem /usr/include/x86_64-linux-gnu/qt5/QtCore -Ibuild -isystem /usr/include/libdrm -Ibuild -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-64
 QMAKE         = /usr/lib/qt5/bin/qmake
 DEL_FILE      = rm -f
@@ -575,7 +575,7 @@ compiler_moc_predefs_make_all: build/moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) build/moc_predefs.h
 build/moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
-	g++ -m64 -pipe -g -Wall -W -dM -E -o build/moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
+    g++ -m64 -pipe -g -W -dM -E -o build/moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
 compiler_moc_header_make_all: build/moc_AboutDialog.cpp build/moc_dlgcuttersize.cpp build/moc_MainWindow.cpp build/moc_GLWidget.cpp build/moc_PreferencesDialog.cpp build/moc_StockModelDialog.cpp build/moc_ResizeModelDialog.cpp build/moc_AlignModelDialog.cpp build/moc_RotateModelDialog.cpp build/moc_SimpleCutterDialog.cpp
 compiler_moc_header_clean:

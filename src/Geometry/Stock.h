@@ -27,6 +27,7 @@ class Stock : public Boxed
 public:
     Stock() {}
     void bb_OpenGL();
+    void copy(Stock* stk);
 };
 
 #endif

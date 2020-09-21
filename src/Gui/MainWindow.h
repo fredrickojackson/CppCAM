@@ -21,6 +21,10 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "GLWidget.h"
 
 #include "ui_MainWindow.h"
+#include "Cutter.h"
+#include "Stock.h"
+#include "Model.h"
+#include "runs.h"
 
 class PreferencesDialog;
 
@@ -29,8 +33,13 @@ class MainWindow :
 {
     Q_OBJECT
 public:
+
     MainWindow();
     ~MainWindow();
+
+//    Stock* stock;
+//    Model* model;
+//    Cutter* cutter;
     void resizeEvent(QResizeEvent* event);
     void mouseMoveEvent(QMouseEvent *ev);
     GLWidget* theGLWidget;
@@ -47,7 +56,7 @@ public:
     double p_runRotateDegrees;
     double p_runRotateStep;
 
-    int p_runDirection;
+    unsigned int p_runDirection;
     double p_safez;
     double p_FeedSpeed;
     double p_PlungeSpeed;
@@ -58,8 +67,9 @@ public:
     bool bEnableArcs;
     QTimer *qtimer;
 
-    void on_actionAlign_Model_to_Stock_triggered();
-    void on_pbTst_clicked();
+    unsigned int p_runs;
+    r_run r_runs[10];
+    bool radialcut(r_run myrun);
 
 
 private slots:
@@ -86,8 +96,6 @@ private slots:
     void on_actionRotate_Model_triggered();
 
     void on_actionExport_Model_triggered();
-
-    void on_actionRun_triggered();
 
     void on_actionExport_GCode_triggered();
 
@@ -121,8 +129,6 @@ private slots:
 
     void on_actionRectCut_triggered();
 
-    void on_MainWindow_iconSizeChanged(const QSize &iconSize);
-
     void on_actionRack_Cut_triggered();
 
     void hole_cut();
@@ -135,6 +141,12 @@ private slots:
 
     void on_actionRadial_Cut_triggered();
 
+
+    void on_pbAdd_clicked();
+
+    void on_pbRemove_clicked();
+
+    void on_pbRun_clicked();
 
 private:
     void clearPath();

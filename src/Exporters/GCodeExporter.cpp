@@ -69,8 +69,11 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
         header.replace("$P", QString::number(plungespeed));
         header.replace("$TS", QString::number(cutter_radius));
         header.replace("$TT", cutter_type);
-        m_radial=0;
-        header.replace("$ZOFF",QString::number(-(mdl->max_z()+mdl->min_z())/2.0 ));
+        if(m_radial)
+            header.replace("$ZOFF",QString::number(-(mdl->max_z()+mdl->min_z())/2.0 ));
+        else
+            header.replace("$ZOFF",QString::number(0.00));
+
 
         if (!header.endsWith("\n")) header.append("\n");
         QString metric = settings->value("metric").toString();
@@ -142,8 +145,6 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
 
                     if(rodd==0){
                         pt = r->m_points.begin();
-                        int sz = r->m_points.size();
-                        sz=0;
                         for(; pt!=r->m_points.end(); ++pt){
                             s=point;
                             if(dlg.ui->cbbeginpath->isChecked() && p == paths.begin() && r == (*p)->m_runs.begin() && pt == r->m_points.begin()){
@@ -235,8 +236,8 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                         Point pp;
 
                         pt = r->m_points.end();
-                        long sz = r->m_points.size();
-                        for(sz=r->m_points.size()-1; sz>=0; sz--)
+                        unsigned long sz = r->m_points.size();
+                        for(sz=r->m_points.size()-1; sz!=0; sz--)
                         {
 
                             pp = r->m_points[sz];

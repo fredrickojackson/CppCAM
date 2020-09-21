@@ -87,7 +87,9 @@ Model* STLImportHelper::ImportModel()
     }
     return NULL;
     */
-    }
+
+  }
+    return NULL;
 }
 
 // only works on big-endian machines, like intel... are there any others left?
@@ -271,7 +273,7 @@ Model* STLImportHelper::nImportBinaryModel()
     model = new Model();
     bool normal_conflict_warning_seen = false;
 
-    for(int i=0; i<numfacets; i++) {
+    for(unsigned int i=0; i<numfacets; i++) {
         long fpos=f.pos();
         double a1 = unpackFloat(f.read(4));
         double a2 = unpackFloat(f.read(4));
@@ -298,7 +300,7 @@ Model* STLImportHelper::nImportBinaryModel()
         Point p3(v31, v32, v33);
 
         // not used
-        unsigned short attribs = unpackShort(f.read(2));
+        unpackShort(f.read(2));
         // hmm... probably need to skip some bytes here...
 
         double dotcross = n.dot(p2.sub(p1).cross(p3.sub(p1)));

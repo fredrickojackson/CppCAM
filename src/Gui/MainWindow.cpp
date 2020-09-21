@@ -28,6 +28,8 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <QMessageBox>
 #include <QTimer>
 
+#include "Stock.h"
+#include "Model.h"
 #include "MainWindow.h"
 #include "AboutDialog.h"
 #include "PreferencesDialog.h"
@@ -35,16 +37,12 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "ResizeModelDialog.h"
 #include "AlignModelDialog.h"
 #include "RotateModelDialog.h"
-#include "SimpleCutterDialog.h"
 #include "dlgradialcutter.h"
 
 #include "dlgtoolsize.h"
 #include "ui_dlgtoolsize.h"
 
-#include "Stock.h"
-#include "Model.h"
 #include "Path.h"
-#include "Cutter.h"
 #include "DropCutter.h"
 #include "SimpleCutter.h"
 #include "TestModel.h"
@@ -97,7 +95,6 @@ MainWindow::MainWindow()
      p_runDirection=0;
      p_useLine=1;
      p_smooth=0;
-//     menuTest->setVisible(false);
      bEnableArcs=false;
      p_FeedSpeed=5000.0;
      p_PlungeSpeed=500.0;
@@ -108,12 +105,11 @@ MainWindow::MainWindow()
      qtimer->start();
      p_modelfilename="/home/fred/projects/cppcam/data/box.stl";
      model = STLImporter::ImportModel(p_modelfilename.toStdString());
-     //model->rotate(0,90,0);
      p_comp=0.0;
-
-
+     p_runs=0;
 
 }
+
 void MainWindow::mytimeout()
 {
     QTime thetime;
@@ -312,7 +308,6 @@ void MainWindow::on_actionEdit_Stock_Dimensions_triggered()
             stock->m_max_z = model->max_z();
             if(dlg.cbAddBorder->isChecked())
             {
-                double ds=0.0;
                 stock->m_min_x-=dlg.leMargin->text().toDouble();
                 stock->m_min_y-=dlg.leMargin->text().toDouble();
                 stock->m_max_x+=dlg.leMargin->text().toDouble();
@@ -465,9 +460,6 @@ void MainWindow::on_actionResize_Model_triggered()
     }
 }
 
-void MainWindow::on_actionAlign_Model_to_Stock_triggered()
-{
-}
 
 
 void MainWindow::on_actionRotate_Model_triggered()
@@ -527,7 +519,7 @@ void MainWindow::sim()
 //    double xstep=sw/hw;
 //    double ystep=sh/hh;
 //    Point *plast=NULL;
-    QTime mytim;
+    QElapsedTimer mytim;
     mytim.start();
 
     for(std::vector<Path*>::const_iterator p = paths.begin(); p!=paths.end(); ++p)
@@ -627,7 +619,7 @@ void MainWindow::sim()
 
 void MainWindow::on_actionExport_Model_triggered()
 {
-    static QString lastFile = QString::null;
+    static QString lastFile = QString();
     QString selectedFilter;
     QString filename = QFileDialog::getSaveFileName(this, "Export STL File", lastFile, "STL files (*.stl);;Binary STL files (*.stl)", &selectedFilter);
     std::cout << "Selected Filter: " << qPrintable(selectedFilter) << std::endl;
@@ -638,262 +630,19 @@ void MainWindow::on_actionExport_Model_triggered()
     }
 }
 
-void MainWindow::on_actionRun_triggered()
-{
-    QString ss;
-    p_rectcut=false;
-    bEnableArcs=false;
-    if (model == NULL) return;
-
-    double x0 = -6.5;
-    double x1 = 6.5;
-    double y0 = -5;
-    double y1 = +5;
-    size_t nx = 100;
-    size_t ny = 20;
-    double z0 = -1.0;
-    double z1 = 4.0;
-    size_t nz = 10;
-    Point dir = Point(1,0,0);
-
-    if (stock == NULL){
-        stock=new Stock();
-    }else{
-        x0 = stock->min_x();
-        x1 = stock->max_x();
-        y0 = stock->min_y();
-        y1 = stock->max_y();
-        z0 = stock->min_z();
-        z1 = stock->max_z();
-    }
-
-    SimpleCutterDialog dlg;
-
-    dlg.m_smooth=p_smooth;
-    dlg.m_xmin=stock->min_x();
-    dlg.m_ymin=stock->min_y();
-    dlg.m_zmin=stock->min_z();
-    dlg.m_xmax=stock->max_x();
-    dlg.m_ymax=stock->max_y();
-    dlg.m_zmax=stock->max_z();
-    ss.setNum(p_safez);
-    dlg.le_SafeZ->setText(ss);
-    ss.setNum(p_FeedSpeed);
-    dlg.leFeedSpeed->setText(ss);
-    ss.setNum(p_PlungeSpeed);
-    dlg.lePlungeSpeed->setText(ss);
-    dlg.leMargin->setText(QString::number(p_comp));
-
-    //ss.setNum(1);
-    dlg.leSmooth->setText("0");
-    dlg.leUseLine->setText(QString::number(p_useLine));
-    if(p_comp>0.0)
-    {
-        dlg.cbLeaveMargin->setChecked(true);
-        dlg.leMargin->setText(QString::number(p_comp));
-    }else
-    {
-        dlg.cbLeaveMargin->setChecked(false);
-    }
-    ss.setNum(p_comp);
-    dlg.leMargin->setText(ss);
-
-
-    dlg.lineEdit_lines->setText(QString::number(p_runLines));
-    dlg.lineEdit_points->setText(QString::number(p_runPoints));
-    dlg.lineEdit_layers->setText(QString::number(p_runLayers));
-    dlg.le_SafeZ->setText(QString::number(p_safez));
-    if(p_runDirection==1){
-        dlg.radioButton_xdir->setChecked(true);
-    }else if(p_runDirection==2){
-        dlg.radioButton_ydir->setChecked(true);
-    }else if(p_runDirection==3){
-        dlg.rbrect->setChecked(true);
-    }
-
-
-    ss="Stock:";
-    dlg.textEditStatus->append(ss);
-
-    ss=QString("x (%1 : %2) %3").arg(stock->min_x()).arg(stock->max_x()).arg(stock->max_x()-stock->min_x());
-    dlg.textEditStatus->append(ss);
-
-    ss=QString("y (%1 : %2) %3").arg(stock->min_y()).arg(stock->max_y()).arg(stock->max_y()-stock->min_y());
-    dlg.textEditStatus->append(ss);
-
-    ss=QString("z (%1 : %2) %3").arg(stock->min_z()).arg(stock->max_z()).arg(stock->max_z()-stock->min_z());
-    dlg.textEditStatus->append(ss);
-
-    dlg.exec();
-
-
-    if (dlg.result() == QDialog::Accepted) {
-        if(dlg.radioButton_xdir->isChecked()){
-            p_runDirection=1;
-        }else if(dlg.radioButton_ydir->isChecked()){
-            p_runDirection=2;
-        }else if(dlg.rbrect->isChecked()){
-            p_runDirection=3;
-        }
-        p_runLayers=dlg.lineEdit_layers->text().toInt();
-        p_smooth=dlg.leSmooth->text().toInt();
-        p_useLine=dlg.leUseLine->text().toUInt();
-        p_FeedSpeed=dlg.leFeedSpeed->text().toDouble();
-        p_PlungeSpeed=dlg.lePlungeSpeed->text().toDouble();
-        if(dlg.cbLeaveMargin->isChecked())
-        {
-            p_comp=dlg.leMargin->text().toDouble();
-        }else
-        {
-            p_comp=0.0;
-        }
-        p_safez = dlg.le_SafeZ->text().toDouble();
-        clearPath();
-        nz = dlg.lineEdit_layers->text().toInt();
-
-        if (dlg.radioButton_xdir->isChecked()) {
-            dir = Point(1,0,0);
-            if (!dlg.lineEdit_lines->text().isEmpty()) {
-                ny = dlg.lineEdit_lines->text().toInt();
-            } else if (!dlg.le_stepover->text().isEmpty()) {
-                double overlap = dlg.le_stepover->text().toDouble();
-                if (overlap > 1) overlap /= 100;
-                ny = (y1-y0)/(cutter->radius()*(1-overlap)*2);
-            }
-            if (!dlg.lineEdit_points->text().isEmpty()) {
-                nx = dlg.lineEdit_points->text().toInt();
-            } else if (!dlg.le_resolution->text().isEmpty()) {
-                double resolution = dlg.le_resolution->text().toDouble();
-                if (resolution>0) {
-                    nx = (x1-x0)/resolution;
-                }
-            }
-            p_runLines=ny;
-            p_runPoints=nx;
-            p_runLayers=nz;
-        }// if(xdir is checked
-
-        if (dlg.radioButton_ydir->isChecked()) {
-            dir = Point(0,1,0);
-            if (!dlg.lineEdit_lines->text().isEmpty()) {
-                nx = dlg.lineEdit_lines->text().toInt();
-            } else if (!dlg.le_stepover->text().isEmpty()) {
-                double overlap = dlg.le_stepover->text().toDouble();
-                if (overlap > 1) overlap /= 100;
-                nx = (x1-x0)/(cutter->radius()*(1-overlap)*2);
-            }
-            if (!dlg.lineEdit_points->text().isEmpty()) {
-                ny = dlg.lineEdit_points->text().toInt();
-            } else if (!dlg.le_resolution->text().isEmpty()) {
-                double resolution = dlg.le_resolution->text().toDouble();
-                if (resolution>0) {
-                    ny = (y1-y0)/resolution;
-                }
-            }
-            p_runLines=nx;
-            p_runPoints=ny;
-            p_runLayers=nz;
-        }// if ydir s checked
-
-        if (dlg.rbrect->isChecked()) {
-            dir = Point(1,1,0);
-            if (!dlg.lineEdit_lines->text().isEmpty()) {
-                ny = dlg.lineEdit_lines->text().toInt();
-            } else if (!dlg.le_stepover->text().isEmpty()) {
-                double overlap = dlg.le_stepover->text().toDouble();
-                if (overlap > 1) overlap /= 100;
-                ny = (y1-y0)/(cutter->radius()*(1-overlap)*2);
-            }
-            if (!dlg.lineEdit_points->text().isEmpty()) {
-                nx = dlg.lineEdit_points->text().toInt();
-            } else if (!dlg.le_resolution->text().isEmpty()) {
-                double resolution = dlg.le_resolution->text().toDouble();
-                if (resolution>0) {
-                    nx = (x1-x0)/resolution;
-                }
-            }
-            p_runLines=ny;
-            p_runPoints=nx;
-            p_runLayers=nz;
-
-        }// if rectangular is checked
-
-        std::vector<double> zlevels;
-        if (nz == 1) {
-            zlevels.push_back(z0);
-        } else {
-            for(size_t i=0; i<nz; i++) {
-                zlevels.push_back(z1 - (z1-z0)*(nz-1-i)/(nz-1));
-            }
-        }
-        p_runStepover=(stock->max_y()-stock->min_y())/ny;
-        p_runResolution=(stock->max_x()-stock->min_x())/nx;
-        p_runStepdown=(stock->max_z()-stock->min_z())/nz;
-
-
-//        if (!heightfield || (heightfield->width() != nx || heightfield->height() != ny))
-
-        double ai=375.0;   // !!precondition
-        double ang=0.0;
-        double angrotatet=375.0;
-        double oz = (model->m_min_z+model->m_max_z)/2.0;
-        double ozc = 0.0;
-
-        for(ang=0.0; ang<angrotatet; ang+=ai){
-            if (heightfield) {
-                delete heightfield;
-            }
-            heightfield = new HeightField(x0, x1, y0, y1, z0, z1, nx, ny);
-            QProgressBar progress(this);
-            progress.setMaximum(100);
-            progress.show();
-            DropCutter dropcutter;
-            double workdone = 0;
-            dropcutter.setAsync(false);
-            dropcutter.GeneratePath(*cutter, *model, *heightfield);
-            while (!dropcutter.finished(&workdone)) {
-                update();
-                progress.setValue(workdone);
-                QCoreApplication::processEvents();
-            }
-            progress.hide();
-            SimpleCutter simplecutter;
-            simplecutter.m_radius=cutter->radius();
-
-
-
-            if(dlg.cbLeaveMargin->isChecked())
-                simplecutter.m_compmargin=dlg.leMargin->text().toDouble();
-            else
-                simplecutter.m_compmargin=0.0;
-            simplecutter.m_stock=stock;
-            simplecutter.m_useLine=p_useLine;
-            simplecutter.m_smooth=dlg.leSmooth->text().toDouble();
-            simplecutter.GenerateCutPath(*heightfield, Point(stock->min_x(), stock->min_y(), stock->max_z()), dir, zlevels, paths, ang);
-
-            if(p_runRotate)
-            {
-                model->resize(model->m_min_x,1.0,model->m_min_y,1.0,model->m_min_z-oz,1.0);
-                model->rotate(ai,0,0);
-                model->resize(model->m_min_x,1.0,model->m_min_y,1.0,model->m_min_z+oz,1.0);
-            }
-            theGLWidget->updateGL();
-        }//for ang
-    }//if (dlg.result() == QDialog::Accepted)
-}
 
 void MainWindow::on_actionExport_GCode_triggered()
 {
     if (paths.size()==0) return;
 
-    static QString lastFile = QString::null;
+    static QString lastFile = QString();
     QString filename = QFileDialog::getSaveFileName(this, "Select GCode file", lastFile.isNull()?"data/TestModel.ngc":lastFile, "GCode files (*.ngc)");
     if (!filename.isEmpty()) {
         lastFile = filename;
         GCodeExporter exp;
         exp.stk=stock;
         exp.mdl=model;
-
+        exp.m_radial=p_runRotate;
         exp.bEnableArcs=bEnableArcs;
         exp.safez=p_safez;
         exp.feedspeed=p_FeedSpeed;
@@ -972,7 +721,6 @@ void MainWindow::on_actionheight_field_triggered()
     double z1 = 4.0;
     int nx = 10;
     int ny = 5;
-    Point dir = Point(0,1,0);
 
     if (stock) {
         x0 = stock->min_x();
@@ -1275,19 +1023,14 @@ void MainWindow::on_actionRectCut_triggered()
 
 }
 
-void MainWindow::on_pbTst_clicked()
-{
-    if(actionShowModel->isChecked())actionShowModel->setChecked(false);
-    theGLWidget->setShowModel(false);
-//    if(actionShowCutter->isChecked())actionShowCutter->setChecked(false);
-//    theGLWidget->setShowCutter(actionShowCutter->isChecked());
-    on_actionRack_Cut_triggered();
-}
-
-void MainWindow::on_MainWindow_iconSizeChanged(const QSize &iconSize)
-{
-
-}
+//void MainWindow::on_pbTst_clicked()
+//{
+//    if(actionShowModel->isChecked())actionShowModel->setChecked(false);
+//    theGLWidget->setShowModel(false);
+////    if(actionShowCutter->isChecked())actionShowCutter->setChecked(false);
+////    theGLWidget->setShowCutter(actionShowCutter->isChecked());
+//    on_actionRack_Cut_triggered();
+//}
 
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
@@ -1352,21 +1095,14 @@ void MainWindow::on_actionRack_Cut_triggered()
         double stepover = dlg.ui->dsbStepOver->value();
         double pitch = M_PI * rmod;
         double prang = dlg.ui->dsbPrAngle->value();
-        double ha = rmod;
-        double hf = 1.25 * rmod;
-        double hw = 2.0 * rmod;
         double c = 0.15 * rmod;
         double pf = 0.38 * rmod;
 
-        double ttip = pf-pf*sin(prang*M_PI/180.0);
-        double d0 = 0.0;
         double d1 = pf*cos(prang*M_PI/180.0);
         double d2 = (M_PI * rmod / 2.0) - d1;
         double ylin=((d2-d1)/tan(prang*M_PI/180.0))/2.0;
         //ylin=(d2-d2)*
-        double hlin2 = ylin-pf*sin(prang*M_PI/180.0)+pf;
         double hd1= ylin;
-        double htot = hlin2*2;
         double hd2 = -ylin;
         double hd0=ylin-pf*sin(prang*M_PI/180.0)+pf;
 
@@ -1384,27 +1120,17 @@ void MainWindow::on_actionRack_Cut_triggered()
 
 
         double d5 = M_PI * rmod;
-        double hd5= hd0;
 
         double dis=0.0;
-        double hh=0.0;
         double hpf=0.0;
         double zl=0.0;
 
-        double cd0=-0.475;
-        double cd1=0.0;
-        double cd2=0.0;
-        double cd3=0.0;
-        double cd4=0.0;
-        double cd5=0.0;
-        double ang=0.0;
 //        QFile logfil("/home/fred/cppcam.log");
 //        QTextStream out(&logfil);
 //        logfil.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
         double xbit=0.0;
         double ybit=0.0;
         double sl = 0.0;
-        double timer = 0.0;
         double yd=0.0;
         double fudge=-999.0;
         double tdist=0.0;
@@ -1554,7 +1280,7 @@ void MainWindow::on_actionRack_Cut_triggered()
                 p.m_rad=-1.0;
             }
 
-xtot:
+
        tdist+=0.0;
         }//dis
 
@@ -1656,7 +1382,7 @@ void MainWindow::on_actionAlign_Model_triggered()
 
     double s_dim_x,s_dim_y,s_dim_z;
     double s_min_x,s_min_y,s_min_z;
-    double s_max_x,s_max_y,s_max_z;
+//    double s_max_x,s_max_y,s_max_z;
 
     s_min_x = stock->min_x();
     s_min_y = stock->min_y();
@@ -1664,9 +1390,9 @@ void MainWindow::on_actionAlign_Model_triggered()
     s_dim_x = stock->dim_x();
     s_dim_y = stock->dim_y();
     s_dim_z = stock->dim_z();
-    s_max_x = s_min_x + stock->dim_x();
-    s_max_y = s_min_y + stock->dim_y();
-    s_max_z = s_min_z + stock->dim_z();
+//    s_max_x = s_min_x + stock->dim_x();
+//    s_max_y = s_min_y + stock->dim_y();
+//    s_max_z = s_min_z + stock->dim_z();
 
     dlg.radioButton_xcen->setChecked(true);
     dlg.radioButton_ycen->setChecked(true);
@@ -1850,7 +1576,11 @@ void MainWindow::on_actionRadial_Cut_triggered()
         }
         p_safez = dlg.ui->le_SafeZ->text().toDouble();
         p_runRotate=dlg.ui->cbRotate->isChecked();
-        p_runRotateDegrees=dlg.ui->leRotateDegrees->text().toDouble();
+        if(p_runRotate==false)
+            p_runRotateDegrees=0.0;
+        else
+            p_runRotateDegrees=dlg.ui->leRotateDegrees->text().toDouble();
+
         p_runRotateStep=dlg.ui->leRotateStep->text().toDouble();
         clearPath();
         nz = dlg.ui->lineEdit_layers->text().toInt();
@@ -1934,7 +1664,6 @@ void MainWindow::on_actionRadial_Cut_triggered()
         double ang=0.0;
         double angrotatet=375.0;
         double oz = (model->m_min_z+model->m_max_z)/2.0;
-        double ozc = 0.0;
         if(dlg.ui->cbRotate->isChecked()){
              ai = dlg.ui->leRotateStep->text().toDouble();
              angrotatet = dlg.ui->leRotateDegrees->text().toDouble();
@@ -1999,3 +1728,158 @@ void MainWindow::on_actionRadial_Cut_triggered()
     }//if (dlg.ui->result() == QDialog::Accepted)
 }
 
+
+void MainWindow::on_pbAdd_clicked()
+{
+    if(p_runDirection==1 && p_runRotate==false){ r_runs[p_runs].type=1; r_runs[p_runs].dir=Point(1,0,0);}
+    if(p_runDirection==2 && p_runRotate==false){r_runs[p_runs].type=2; r_runs[p_runs].dir=Point(0,1,0);}
+    if(p_runDirection==3 && p_runRotate==false){r_runs[p_runs].type=3; r_runs[p_runs].dir=Point(1,1,0);}
+    if(p_runDirection==1 && p_runRotate==true){r_runs[p_runs].type=4; r_runs[p_runs].dir=Point(1,0,0);}
+    if(p_runDirection==2 && p_runRotate==true){r_runs[p_runs].type=5; r_runs[p_runs].dir=Point(0,1,0);}
+    if(p_runDirection==3 && p_runRotate==true){r_runs[p_runs].type=6; r_runs[p_runs].dir=Point(1,1,0);}
+
+    r_runs[p_runs].stock=new Stock;
+    r_runs[p_runs].stock->copy(stock);
+
+    if(cutter->m_cutterType.compare("Sph"))
+        r_runs[p_runs].cutter=Cutter::CreateSphericalCutter(cutter->radius(), Point(0,0,0));
+    else
+        r_runs[p_runs].cutter=Cutter::CreateCylindricalCutter(cutter->radius(), Point(0,0,0));
+    r_runs[p_runs].dir=p_runDirection;
+    r_runs[p_runs].model=model;
+
+    r_runs[p_runs].lines=p_runLines;
+    r_runs[p_runs].points=p_runPoints;
+    r_runs[p_runs].layers=p_runLayers;
+    r_runs[p_runs].safez=p_safez;
+    r_runs[p_runs].fspd=p_FeedSpeed;
+    r_runs[p_runs].pspd=p_PlungeSpeed;
+    r_runs[p_runs].margin=p_comp;
+    if(p_runRotate)
+    {
+        r_runs[p_runs].rotatetotal=p_runRotateDegrees;
+        r_runs[p_runs].rotatestep=p_runRotateStep;
+    }else
+    {
+        r_runs[p_runs].rotatetotal=0.0;
+        r_runs[p_runs].rotatestep=0.0;
+    }
+    p_runs++;
+}
+
+void MainWindow::on_pbRemove_clicked()
+{
+    p_runs--;
+    delete r_runs[p_runs].stock;
+    delete r_runs[p_runs].cutter;
+}
+
+void MainWindow::on_pbRun_clicked()
+{
+    unsigned int ct=0;
+    bool bx;
+    for(ct=0;ct<p_runs;ct++)
+    {
+        bx=radialcut(r_runs[ct]);
+    }
+}
+
+bool MainWindow::radialcut(r_run myrun)
+{
+
+    unsigned int nz=myrun.layers;
+
+    double x0=myrun.stock->m_min_x;
+    double x1=myrun.stock->m_max_x;
+    double y0=myrun.stock->m_min_y;
+    double y1=myrun.stock->m_max_y;
+    double z0=myrun.stock->m_min_z;
+    double z1=myrun.stock->m_max_z;
+    double ang=0.0;
+    double angrotatet=myrun.rotatetotal;
+    double ai=myrun.rotatestep;
+    HeightField* hf[72];
+    int nx=0;
+    int ny=0;
+    if(myrun.type==1 || myrun.type==3 || myrun.type==4 || myrun.type==6)
+    {
+        nx=myrun.points;
+        ny=myrun.lines;
+    }else
+    {
+        nx=myrun.lines;
+        ny=myrun.points;
+    }
+    double oz = (myrun.model->m_min_z+myrun.model->m_max_z)/2.0;
+
+
+
+
+
+
+    ai=375.0;   // !!precondition
+    ang=0.0;
+    angrotatet=375.0;
+    oz = (myrun.model->m_min_z+myrun.model->m_max_z)/2.0;
+    if(myrun.rotatetotal){
+         ai = myrun.rotatestep;
+         angrotatet=myrun.rotatetotal;
+    }
+
+
+    for(size_t i=0; i<nz; i++)
+    {
+        double Zlevel=0.0;
+        if(nz>1)
+        {
+            Zlevel=z0 + (z1-z0)*(nz-1-i)/(nz-1);
+        }else
+        {
+            Zlevel=z0;
+        }
+
+        for(ang=0.0; ang<angrotatet; ang+=ai)
+        {
+            int hfi=ang/ai;
+            if(i==0)
+            {
+                hf[hfi] = new HeightField(x0, x1, y0, y1, z0, z1, nx, ny);
+                QProgressBar progress(this);
+                progress.setMaximum(100);
+                progress.show();
+
+                DropCutter dropcutter;
+                double workdone = 0;
+                dropcutter.setAsync(false);
+                dropcutter.GeneratePath(*myrun.cutter, *myrun.model, *hf[hfi]);
+                while (!dropcutter.finished(&workdone)) {
+                    update();
+                    QCoreApplication::processEvents();
+                }
+                progress.hide();
+            }
+            SimpleCutter simplecutter;
+            simplecutter.m_radius=myrun.cutter->radius();
+            simplecutter.m_noretrace=true;
+
+
+
+            simplecutter.m_compmargin=myrun.margin;
+            simplecutter.m_stock=myrun.stock;
+            simplecutter.m_useLine=myrun.useline;
+            simplecutter.m_smooth=myrun.smooth;
+            simplecutter.m_radialcut=ai;
+            simplecutter.m_radialcutdepth=oz;
+            simplecutter.GenerateCutPath_radial(*hf[hfi], Point(myrun.stock->min_x(), myrun.stock->min_y(), myrun.stock->max_z()), myrun.dir, Zlevel, paths, ang);
+
+            if(myrun.rotatetotal)
+            {
+                myrun.model->resize(myrun.model->m_min_x,1.0,myrun.model->m_min_y,1.0,myrun.model->m_min_z-oz,1.0);
+                myrun.model->rotate(ai,0,0);
+                myrun.model->resize(myrun.model->m_min_x,1.0,myrun.model->m_min_y,1.0,myrun.model->m_min_z+oz,1.0);
+            }
+            theGLWidget->updateGL();
+        }//for ang
+    }//for i
+    return true;
+}

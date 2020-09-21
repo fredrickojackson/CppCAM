@@ -1,4 +1,3 @@
-
 #include "dlgradialcutter.h"
 
 #include <cstdio>
@@ -57,7 +56,12 @@ void dlgRadialCutter::upddisp()
     qs.setNum(dlin);
     ui->le_stepover->setText(qs);
 
-    dres=(m_zmax-m_zmin)/(ui->lineEdit_layers->text().toInt()-1);
+    if(ui->lineEdit_layers->text().toInt()>1)
+        dres=(m_zmax-m_zmin)/(ui->lineEdit_layers->text().toInt()-1);
+
+    if(ui->lineEdit_layers->text().toInt()==1)
+        dres=(m_zmax-m_zmin)/(ui->lineEdit_layers->text().toInt());
+
     qs.setNum(dres);
     ui->le_stepdown->setText(qs);
 }
@@ -89,8 +93,12 @@ void dlgRadialCutter::on_le_resolution_editingFinished()
 void dlgRadialCutter::on_le_stepdown_editingFinished()
 {
     QString s;
-    s.setNum((int)(1+(m_zmax-m_zmin)/(ui->le_stepdown->text().toDouble())));
+    if((int)(1+(m_zmax-m_zmin)/(ui->le_stepdown->text().toDouble()))==2)
+        s.setNum(1);
+    else
+        s.setNum((int)(1+(m_zmax-m_zmin)/(ui->le_stepdown->text().toDouble())));
     ui->lineEdit_layers->setText(s);
+
 
 }
 
@@ -121,8 +129,6 @@ void dlgRadialCutter::on_lineEdit_lines_editingFinished()
 
 void dlgRadialCutter::on_lineEdit_layers_editingFinished()
 {
-    double stepdown = 0.0;
-    stepdown=(m_zmax-m_zmin)/(ui->lineEdit_layers->text().toInt()-1);
     upddisp();
 }
 

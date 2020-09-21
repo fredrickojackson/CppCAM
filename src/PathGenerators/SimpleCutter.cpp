@@ -63,7 +63,6 @@ bool
 SimpleCutter::GenerateCutPath(const HeightField& heightfield, const Point& start, const Point& direction, const std::vector<double>& zlevels, std::vector<Path*>& paths, double angle)
 {
     if (direction.z() != 0) return false;
-    //if (direction.x() != 0 && direction.y() != 0) return false;
     if (direction.x() != 0 && direction.y() == 0) {
         for(size_t i=0; i<zlevels.size(); i++) {
             Path* path = new Path();
@@ -100,6 +99,7 @@ SimpleCutter::GenerateCutPath(const HeightField& heightfield, const Point& start
         }
         return true;
     }
+    return true;
 }
 
 bool
@@ -131,11 +131,11 @@ SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point
             di1=j-di;
             if(di1<0) di1=0;
             di2=j+di;
-            if(di2>(heightfield.width()-1))di2=heightfield.width()-1;
+            if(di2>(long)(heightfield.width()-1))di2=heightfield.width()-1;
             dj1=i-dj;
             if(dj1<0) dj1=0;
             dj2=i+dj;
-            if(dj2>(heightfield.height()-1))dj2=heightfield.height()-1;
+            if(dj2>(long)(heightfield.height()-1))dj2=heightfield.height()-1;
             double zav = 0.0;
             int zcnt = 0;
 //            double zcc = -1000.0;
@@ -202,7 +202,7 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
 
 
 /* ********************************************************************** */
-        bool b_istraced=true;
+        //bool b_istraced=true;
         for(size_t jj=0; jj<heightfield.width(); jj++) {
             size_t j = jj;
 //            if (m_zigzag) j = heightfield.width()-jj;
@@ -213,11 +213,11 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
             di1=j-di;
             if(di1<0) di1=0;
             di2=j+di;
-            if(di2>(heightfield.width()-1))di2=heightfield.width()-1;
+            if(di2>(long)(heightfield.width()-1))di2=heightfield.width()-1;
             dj1=i-dj;
             if(dj1<0) dj1=0;
             dj2=i+dj;
-            if(dj2>(heightfield.height()-1))dj2=heightfield.height()-1;
+            if(dj2>(long)(heightfield.height()-1))dj2=heightfield.height()-1;
             double zav = 0.0;
             int zcnt = 0;
 //            double zcc = -1000.0;
@@ -237,7 +237,6 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
 
             if (z < z_layer) {
                 z = z_layer;
-                b_istraced=false;
             }else{
 
             }
@@ -255,14 +254,14 @@ SimpleCutter::GenerateCutPathLayer_rect(const HeightField& heightfield, const Po
 {
     SimplePathProcessors pathProcessors;
 
-    double xstep=m_stock->dim_x()/heightfield.width();
-    double ystep=m_stock->dim_y()/heightfield.height();
-    size_t di = 1+m_radius/xstep;
-    size_t dj = 1+m_radius/ystep;
-    long di1=0;
-    long di2=0;
-    long dj1=0;
-    long dj2=0;
+//    double xstep=m_stock->dim_x()/heightfield.width();
+//    double ystep=m_stock->dim_y()/heightfield.height();
+//    size_t di = 1+m_radius/xstep;
+//    size_t dj = 1+m_radius/ystep;
+    //long di1=0;
+    //long di2=0;
+//    long dj1=0;
+//    long dj2=0;
     int firstflag=1;
     Point p1=Point(0,0,0);
     Point p2=Point(0,0,0);

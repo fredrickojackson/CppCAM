@@ -2,7 +2,7 @@ TEMPLATE = app
 INCLUDEPATH += . Gui Geometry Importers Cutters PathGenerators PathProcessors Exporters
 QT += gui opengl
 CONFIG += console debug
-#QMAKE_CXXFLAGS += -O2
+QMAKE_CXXFLAGS += -Wno-unused-parameter -Wno-unused-function
 
 unix:{
 TARGET = ../cppcam
@@ -24,7 +24,6 @@ RCC_DIR = buildwin32
 
 # Input
 SOURCES += \
-    Gui/SimpleCutterDialog.cpp \
     Gui/dlgholecut.cpp \
     Gui/dlgradialcutter.cpp \
     Gui/dlgroundcutter.cpp \
@@ -67,12 +66,13 @@ HEADERS += Gui/AboutDialog.h \
     Gui/rectcutdialog.h \
     Gui/dlgtoolsize.h \
     Gui/rackcutdlg.h \
-    Gui/dlggcodeprop.h
+    Gui/dlggcodeprop.h \
+    runs.h
 HEADERS += Gui/MainWindow.h Gui/GLWidget.h
 HEADERS += Gui/PreferencesDialog.h
 HEADERS += Gui/StockModelDialog.h 
 HEADERS += Gui/ResizeModelDialog.h Gui/AlignModelDialog.h Gui/RotateModelDialog.h
-HEADERS += Gui/SimpleCutterDialog.h
+HEADERS +=
 
 FORMS += Gui/MainWindow.ui Gui/AboutDialog.ui \
     Gui/dlgholecut.ui \
@@ -84,6 +84,6 @@ FORMS += Gui/MainWindow.ui Gui/AboutDialog.ui \
     Gui/dlggcodeprop.ui
 FORMS += Gui/PreferencesDialog.ui Gui/StockModelDialog.ui 
 FORMS += Gui/ResizeModelDialog.ui Gui/AlignModelDialog.ui Gui/RotateModelDialog.ui 
-FORMS += Gui/SimpleCutterDialog.ui
+FORMS +=
 
 RESOURCES += Gui/pycam.qrc
