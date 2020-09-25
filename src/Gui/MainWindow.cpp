@@ -1758,6 +1758,7 @@ void MainWindow::on_pbAdd_clicked()
     if(p_runDirection==2 && p_runRotate==true){r_runs[p_runs].type=5; r_runs[p_runs].dir=Point(0,1,0);}
     if(p_runDirection==3 && p_runRotate==true){r_runs[p_runs].type=6; r_runs[p_runs].dir=Point(1,1,0);}
     r_runs[p_runs].dir=p_dir;//
+
     r_runs[p_runs].r_useLine=p_useLine;//
     r_runs[p_runs].smooth=p_smooth;
 
