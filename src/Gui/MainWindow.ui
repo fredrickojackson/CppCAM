@@ -118,6 +118,29 @@
      </item>
     </layout>
    </widget>
+   <widget class="QSpinBox" name="sbRuncnt">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>0</y>
+      <width>52</width>
+      <height>32</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pbClr">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>40</y>
+      <width>31</width>
+      <height>34</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Clr</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

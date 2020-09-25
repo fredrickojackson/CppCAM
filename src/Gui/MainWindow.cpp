@@ -26,7 +26,10 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFileDialog>
 #include <QProgressBar>
 #include <QMessageBox>
+#include <QStringList>
+#include <QString>
 #include <QTimer>
+#include <QFile>
 
 #include "Stock.h"
 #include "Model.h"
@@ -62,6 +65,8 @@ extern HeightField* heightfield;
 
 MainWindow::MainWindow() 
 {
+    //Retail_Merchandising_Signs
+
     setupUi(this);
     theGLWidget = new GLWidget(frmogl);
     m_PreferencesDialog = new PreferencesDialog();
@@ -83,11 +88,11 @@ MainWindow::MainWindow()
     stock->m_max_y=20.0;
     stock->m_max_z=2.0;
 
-     p_runLines=100;
+     p_runLines=10;
      p_runStepover=0.333;
-     p_runPoints=125;
+     p_runPoints=25;
      p_runResolution=0.375;
-     p_runLayers=5;
+     p_runLayers=3;
      p_runStepdown=2.0;
      p_runRotate=false;
      p_runRotateStep=15.0;
@@ -107,6 +112,8 @@ MainWindow::MainWindow()
      model = STLImporter::ImportModel(p_modelfilename.toStdString());
      p_comp=0.0;
      p_runs=0;
+
+
 
 }
 
@@ -190,6 +197,10 @@ void MainWindow::on_actionOpen_triggered()
     double p_smaxz=setproj.value("p_smaxz",0.0).toDouble();
     stock->m_max_z=p_smaxz;
 
+
+
+
+
     p_runLines=setproj.value("p_runLines",0.0).toInt();
     p_runPoints=setproj.value("p_runPoints",0.0).toInt();
     p_runLayers=setproj.value("p_runLayers",0.0).toInt();
@@ -217,10 +228,16 @@ void MainWindow::on_actionSave_triggered()
     p_projectfilename=filename;
     setWindowTitle(filename);
 
+
+
     setproj.setValue("p_modelfilename",p_modelfilename);
     setproj.setValue("p_mminx",model->min_x());
     setproj.setValue("p_mminy",model->min_y());
     setproj.setValue("p_mminz",model->min_z());
+    setproj.setValue("p_mmaxx",model->max_x());
+    setproj.setValue("p_mmaxy",model->max_y());
+    setproj.setValue("p_mmaxz",model->max_z());
+
     filename.setNum(cutter->radius());
     setproj.setValue("p_CutterSize",cutter->radius());
     setproj.setValue("p_CutterType",cutter->m_cutterType);
@@ -639,6 +656,7 @@ void MainWindow::on_actionExport_GCode_triggered()
     QString filename = QFileDialog::getSaveFileName(this, "Select GCode file", lastFile.isNull()?"data/TestModel.ngc":lastFile, "GCode files (*.ngc)");
     if (!filename.isEmpty()) {
         lastFile = filename;
+
         GCodeExporter exp;
         exp.stk=stock;
         exp.mdl=model;
@@ -650,6 +668,7 @@ void MainWindow::on_actionExport_GCode_triggered()
         exp.cutter_radius=cutter->radius();
         exp.cutter_type=cutter->m_cutterType;
         exp.ExportPath(paths, filename.toStdString());
+
     }
 }
 
@@ -1656,7 +1675,7 @@ void MainWindow::on_actionRadial_Cut_triggered()
         p_runStepover=dlg.ui->le_stepover->text().toDouble();
         p_runResolution=dlg.ui->le_resolution->text().toDouble();
         p_runStepdown=(stock->max_z()-stock->min_z())/nz;
-
+        p_dir=dir;
 
 //        if (!heightfield || (heightfield->width() != nx || heightfield->height() != ny))
 
@@ -1731,12 +1750,16 @@ void MainWindow::on_actionRadial_Cut_triggered()
 
 void MainWindow::on_pbAdd_clicked()
 {
+
     if(p_runDirection==1 && p_runRotate==false){ r_runs[p_runs].type=1; r_runs[p_runs].dir=Point(1,0,0);}
     if(p_runDirection==2 && p_runRotate==false){r_runs[p_runs].type=2; r_runs[p_runs].dir=Point(0,1,0);}
     if(p_runDirection==3 && p_runRotate==false){r_runs[p_runs].type=3; r_runs[p_runs].dir=Point(1,1,0);}
     if(p_runDirection==1 && p_runRotate==true){r_runs[p_runs].type=4; r_runs[p_runs].dir=Point(1,0,0);}
     if(p_runDirection==2 && p_runRotate==true){r_runs[p_runs].type=5; r_runs[p_runs].dir=Point(0,1,0);}
     if(p_runDirection==3 && p_runRotate==true){r_runs[p_runs].type=6; r_runs[p_runs].dir=Point(1,1,0);}
+    r_runs[p_runs].dir=p_dir;//
+    r_runs[p_runs].r_useLine=p_useLine;//
+    r_runs[p_runs].smooth=p_smooth;
 
     r_runs[p_runs].stock=new Stock;
     r_runs[p_runs].stock->copy(stock);
@@ -1745,8 +1768,8 @@ void MainWindow::on_pbAdd_clicked()
         r_runs[p_runs].cutter=Cutter::CreateSphericalCutter(cutter->radius(), Point(0,0,0));
     else
         r_runs[p_runs].cutter=Cutter::CreateCylindricalCutter(cutter->radius(), Point(0,0,0));
-    r_runs[p_runs].dir=p_runDirection;
-    r_runs[p_runs].model=model;
+
+    //r_runs[p_runs].model=model;
 
     r_runs[p_runs].lines=p_runLines;
     r_runs[p_runs].points=p_runPoints;
@@ -1765,13 +1788,15 @@ void MainWindow::on_pbAdd_clicked()
         r_runs[p_runs].rotatestep=0.0;
     }
     p_runs++;
+    sbRuncnt->setValue(p_runs);
 }
 
 void MainWindow::on_pbRemove_clicked()
 {
-    p_runs--;
+    if(p_runs>=0)p_runs--;
     delete r_runs[p_runs].stock;
     delete r_runs[p_runs].cutter;
+    sbRuncnt->setValue(p_runs);
 }
 
 void MainWindow::on_pbRun_clicked()
@@ -1810,17 +1835,17 @@ bool MainWindow::radialcut(r_run myrun)
         nx=myrun.lines;
         ny=myrun.points;
     }
-    double oz = (myrun.model->m_min_z+myrun.model->m_max_z)/2.0;
+    double oz = (model->m_min_z+model->m_max_z)/2.0;
 
 
 
 
 
 
-    ai=375.0;   // !!precondition
+    ai=1375.0;   // !!precondition
     ang=0.0;
     angrotatet=375.0;
-    oz = (myrun.model->m_min_z+myrun.model->m_max_z)/2.0;
+    oz = (model->m_min_z+model->m_max_z)/2.0;
     if(myrun.rotatetotal){
          ai = myrun.rotatestep;
          angrotatet=myrun.rotatetotal;
@@ -1851,7 +1876,7 @@ bool MainWindow::radialcut(r_run myrun)
                 DropCutter dropcutter;
                 double workdone = 0;
                 dropcutter.setAsync(false);
-                dropcutter.GeneratePath(*myrun.cutter, *myrun.model, *hf[hfi]);
+                dropcutter.GeneratePath(*myrun.cutter, *model, *hf[hfi]);
                 while (!dropcutter.finished(&workdone)) {
                     update();
                     QCoreApplication::processEvents();
@@ -1866,7 +1891,7 @@ bool MainWindow::radialcut(r_run myrun)
 
             simplecutter.m_compmargin=myrun.margin;
             simplecutter.m_stock=myrun.stock;
-            simplecutter.m_useLine=myrun.useline;
+            simplecutter.m_useLine=myrun.r_useLine;
             simplecutter.m_smooth=myrun.smooth;
             simplecutter.m_radialcut=ai;
             simplecutter.m_radialcutdepth=oz;
@@ -1874,12 +1899,36 @@ bool MainWindow::radialcut(r_run myrun)
 
             if(myrun.rotatetotal)
             {
-                myrun.model->resize(myrun.model->m_min_x,1.0,myrun.model->m_min_y,1.0,myrun.model->m_min_z-oz,1.0);
-                myrun.model->rotate(ai,0,0);
-                myrun.model->resize(myrun.model->m_min_x,1.0,myrun.model->m_min_y,1.0,myrun.model->m_min_z+oz,1.0);
+                model->resize(model->m_min_x,1.0,model->m_min_y,1.0,model->m_min_z-oz,1.0);
+                model->rotate(ai,0,0);
+                model->resize(model->m_min_x,1.0,model->m_min_y,1.0,model->m_min_z+oz,1.0);
             }
             theGLWidget->updateGL();
         }//for ang
     }//for i
     return true;
+}
+
+void MainWindow::on_pbClr_clicked()
+{
+    clearPath();
+}
+
+void MainWindow::logit(QString qstr)
+{
+    QFile logfile("logfile.txt");
+    logfile.open(QIODevice::Append |  QIODevice::Text);
+    logfile.write((char *)qstr.data());
+    logfile.write(" \n");
+    logfile.write(" ");
+}
+
+void MainWindow::on_pbUp_clicked()
+{
+    sbRuncnt->setValue(sbRuncnt->value()+1);
+}
+
+void MainWindow::on_pbDown_clicked()
+{
+    sbRuncnt->setValue(sbRuncnt->value()-1);
 }

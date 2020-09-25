@@ -139,26 +139,10 @@ SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point
             double zav = 0.0;
             int zcnt = 0;
 //            double zcc = -1000.0;
-
+            if(m_smooth)
             for(long lj=dj1; lj<=dj2; lj++)
                 for(long li=di1; li<=di2; li++)
                 {
-//                    double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
-//                    double zc = 0.0;
-//                    if(!((li == j) && (lj == i)))
-//                    {
-//                        if(!m_isSpherical)
-//                        {
-//                            zc=heightfield.point(li,lj);
-//                        }else
-//                        {
-//                            zc=heightfield.point(li,lj)-m_radius*cos((dis*3.1415926/(2.0*m_radius)));
-//                        }
-//                        if((dis<(m_radius+m_compmargin)) && (zc>zcc))
-//                        {
-//                            zcc=zc;
-//                        }
-//                    }
                     if((labs(li-(long)j)<=m_smooth) && (labs(lj-(long)i)<=m_smooth))
                     {
                         zav += heightfield.point(li,lj);
@@ -221,7 +205,7 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
             double zav = 0.0;
             int zcnt = 0;
 //            double zcc = -1000.0;
-
+            if(m_smooth)
             for(long lj=dj1; lj<=dj2; lj++)
                 for(long li=di1; li<=di2; li++)
                 {

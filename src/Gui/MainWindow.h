@@ -21,6 +21,7 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "GLWidget.h"
 
 #include "ui_MainWindow.h"
+
 #include "Cutter.h"
 #include "Stock.h"
 #include "Model.h"
@@ -40,6 +41,8 @@ public:
 //    Stock* stock;
 //    Model* model;
 //    Cutter* cutter;
+
+    void logit(QString qstr);
     void resizeEvent(QResizeEvent* event);
     void mouseMoveEvent(QMouseEvent *ev);
     GLWidget* theGLWidget;
@@ -67,10 +70,11 @@ public:
     bool bEnableArcs;
     QTimer *qtimer;
 
+
     unsigned int p_runs;
     r_run r_runs[10];
     bool radialcut(r_run myrun);
-
+    Point p_dir;
 
 private slots:
     void mytimeout();
@@ -147,6 +151,12 @@ private slots:
     void on_pbRemove_clicked();
 
     void on_pbRun_clicked();
+
+    void on_pbClr_clicked();
+
+    void on_pbUp_clicked();
+
+    void on_pbDown_clicked();
 
 private:
     void clearPath();
