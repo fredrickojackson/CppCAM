@@ -60,6 +60,7 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 extern Stock* stock;
 extern Model* model;
 extern Cutter* cutter;
+extern Cutter* cutter2;
 extern std::vector<Path*> paths;
 extern HeightField* heightfield;
 
@@ -77,8 +78,8 @@ MainWindow::MainWindow()
     QObject::connect(actionRightView, SIGNAL(triggered()), theGLWidget, SLOT(setRightView()));
 
     cutter = Cutter::CreateSphericalCutter(0.5, Point(0,0,0));
+    cutter2 = Cutter::CreateSphericalCutter(0.5, Point(0,0,0));
     p_runStepover=cutter->radius();
-    cutter->m_cutterType="Sph";
     stock = new Stock();
     stock->m_min_x=10.0;
     stock->m_min_y=10.0;
@@ -87,6 +88,8 @@ MainWindow::MainWindow()
     stock->m_max_x=20.0;
     stock->m_max_y=20.0;
     stock->m_max_z=2.0;
+
+    iRunInd=0;
 
      p_runLines=10;
      p_runStepover=0.333;
@@ -112,6 +115,7 @@ MainWindow::MainWindow()
      model = STLImporter::ImportModel(p_modelfilename.toStdString());
      p_comp=0.0;
      p_runs=0;
+     pbStat->hide();
 
 
 
@@ -170,32 +174,22 @@ void MainWindow::on_actionOpen_triggered()
     p_projectfilename=filename;
     filename=p_modelfilename;
     p_modelfilename=setproj.value("p_modelfilename","~/tmp.cam").toString();
-
-    if(filename.compare(p_modelfilename)!=0)    model = STLImporter::ImportModel(p_modelfilename.toStdString());
-
+    delete cutter;
     if(setproj.value("p_CutterType","Sph").toString().compare("Sph") == 0)
     {
         cutter = Cutter::CreateSphericalCutter(setproj.value("p_CutterSize",0.0).toDouble(), Point(0,0,0));
-        cutter->m_cutterType="Sph";
     }else
     {
         cutter = Cutter::CreateCylindricalCutter(setproj.value("p_CutterSize",0.0).toDouble(), Point(0,0,0));
-        cutter->m_cutterType="Sph";
     }
 
 
-    double p_sminx=setproj.value("p_sminx",0.0).toDouble();
-    stock->m_min_x=p_sminx;
-    double p_sminy=setproj.value("p_sminy",0.0).toDouble();
-    stock->m_min_y=p_sminy;
-    double p_sminz=setproj.value("p_sminz",0.0).toDouble();
-    stock->m_min_z=p_sminz;
-    double p_smaxx=setproj.value("p_smaxx",0.0).toDouble();
-    stock->m_max_x=p_smaxx;
-    double p_smaxy=setproj.value("p_smaxy",0.0).toDouble();
-    stock->m_max_y=p_smaxy;
-    double p_smaxz=setproj.value("p_smaxz",0.0).toDouble();
-    stock->m_max_z=p_smaxz;
+    stock->m_min_x=setproj.value("p_sminx",0.0).toDouble();
+    stock->m_min_y=setproj.value("p_sminy",0.0).toDouble();
+    stock->m_min_z=setproj.value("p_sminz",0.0).toDouble();
+    stock->m_max_x=setproj.value("p_smaxx",0.0).toDouble();
+    stock->m_max_y=setproj.value("p_smaxy",0.0).toDouble();
+    stock->m_max_z=setproj.value("p_smaxz",0.0).toDouble();
 
 
 
@@ -218,6 +212,42 @@ void MainWindow::on_actionOpen_triggered()
     p_rectcut=setproj.value("p_rectcut",0.0).toBool();
     p_useLine=setproj.value("p_useLine",0.0).toInt();
     p_smooth=setproj.value("p_smooth",0.0).toInt();
+    int sz = setproj.beginReadArray("p_qlruns");
+    int il=0;
+    r_run trun;
+    p_qlruns.clear();
+    for(il=0;il<sz;il++)
+    {
+        setproj.setArrayIndex(il);
+        trun.type=setproj.value("type").toInt();
+        trun.cutterType=setproj.value("cutter.type").toString();
+        trun.cutterRadius=setproj.value("cutter.radius").toDouble();
+        trun.sminx=setproj.value("stock.xmin").toDouble();
+        trun.sminy=setproj.value("stock.ymin").toDouble();
+        trun.sminz=setproj.value("stock.zmin").toDouble();
+        trun.smaxx=setproj.value("stock.xmax").toDouble();
+        trun.smaxy=setproj.value("stock.ymax").toDouble();
+        trun.smaxz=setproj.value("stock.zmax").toDouble();
+        trun.lines=setproj.value("lines").toInt();
+        trun.points=setproj.value("points").toInt();
+        trun.layers=setproj.value("layers").toInt();
+        trun.safez=setproj.value("safez").toDouble();
+        trun.fspd=setproj.value("fspd").toDouble();
+        trun.pspd=setproj.value("pspd").toDouble();
+        trun.margin=setproj.value("margin").toDouble();
+        trun.rotatetotal=setproj.value("rotatetotal").toDouble();
+        trun.rotatestep=setproj.value("rotatestep").toDouble();
+        trun.smooth=setproj.value("smooth").toInt();
+        trun.dir.m_x=setproj.value("dir.x").toDouble();
+        trun.dir.m_y=setproj.value("dir.y").toDouble();
+        trun.dir.m_z=setproj.value("dir.z").toDouble();
+        trun.useLine=setproj.value("useLine").toInt();
+        p_qlruns.append(trun);
+        p_runs++;
+    }
+    iRunInd=0;
+    selectRun(iRunInd);
+    if(filename.compare(p_modelfilename)!=0)    model = STLImporter::ImportModel(p_modelfilename.toStdString());
     setWindowTitle(p_projectfilename);
 }
 
@@ -265,6 +295,34 @@ void MainWindow::on_actionSave_triggered()
     setproj.setValue("p_rectcut",p_rectcut);
     setproj.setValue("p_smooth",p_smooth);
     setproj.setValue("p_comp",p_comp);
+    setproj.beginWriteArray("p_qlruns");
+    for (int i = 0; i < p_qlruns.size(); ++i) {
+          setproj.setArrayIndex(i);
+          setproj.setValue("type", p_qlruns.at(i).type);
+          setproj.setValue("cutter.type", p_qlruns.at(i).cutterType);
+          setproj.setValue("cutter.radius", p_qlruns.at(i).cutterRadius);
+          setproj.setValue("stock.xmin", p_qlruns.at(i).sminx);
+          setproj.setValue("stock.xmax", p_qlruns.at(i).smaxx);
+          setproj.setValue("stock.ymin", p_qlruns.at(i).sminy);
+          setproj.setValue("stock.ymax", p_qlruns.at(i).smaxy);
+          setproj.setValue("stock.zmin", p_qlruns.at(i).sminz);
+          setproj.setValue("stock.zmax", p_qlruns.at(i).smaxz);
+          setproj.setValue("lines", p_qlruns.at(i).lines);
+          setproj.setValue("points", p_qlruns.at(i).points);
+          setproj.setValue("layers", p_qlruns.at(i).layers);
+          setproj.setValue("safez", p_qlruns.at(i).safez);
+          setproj.setValue("fspd", p_qlruns.at(i).fspd);
+          setproj.setValue("pspd", p_qlruns.at(i).pspd);
+          setproj.setValue("margin", p_qlruns.at(i).margin);
+          setproj.setValue("rotatetotal", p_qlruns.at(i).rotatetotal);
+          setproj.setValue("rotatestep", p_qlruns.at(i).rotatestep);
+          setproj.setValue("smooth", p_qlruns.at(i).smooth);
+          setproj.setValue("dir.x", p_qlruns.at(i).dir.x());
+          setproj.setValue("dir.y", p_qlruns.at(i).dir.y());
+          setproj.setValue("dir.z", p_qlruns.at(i).dir.z());
+          setproj.setValue("useLine", p_qlruns.at(i).useLine);
+      }
+      setproj.endArray();
     setproj.sync();
 }
 
@@ -358,10 +416,8 @@ void MainWindow::on_actionTool_Size_triggered()
     delete cutter;
     if(dlg.isSph()){
         cutter = Cutter::CreateSphericalCutter(dlg.m_cutterSize, Point(0,0,0));
-        cutter->m_cutterType="Sph";
     }else{
         cutter = Cutter::CreateCylindricalCutter(dlg.m_cutterSize, Point(0,0,0));
-        cutter->m_cutterType="Cyl";
     }
 }
 
@@ -551,37 +607,6 @@ void MainWindow::sim()
                     theGLWidget->updateGL();
                     mytim.restart();
                 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1728,7 +1753,13 @@ void MainWindow::on_actionRadial_Cut_triggered()
                     simplecutter.m_compmargin=dlg.ui->leMargin->text().toDouble();
                 else
                     simplecutter.m_compmargin=0.0;
-                simplecutter.m_stock=stock;
+//                simplecutter.m_stock=stock;
+                simplecutter.sminx=stock->min_x();
+                simplecutter.smaxx=stock->max_x();
+                simplecutter.sminy=stock->min_y();
+                simplecutter.smaxy=stock->max_y();
+                simplecutter.sminz=stock->min_z();
+                simplecutter.smaxz=stock->max_z();
                 simplecutter.m_useLine=p_useLine;
                 simplecutter.m_smooth=dlg.ui->leSmooth->text().toDouble();
                 simplecutter.m_radialcut=ai;
@@ -1751,63 +1782,89 @@ void MainWindow::on_actionRadial_Cut_triggered()
 void MainWindow::on_pbAdd_clicked()
 {
 
-    if(p_runDirection==1 && p_runRotate==false){ r_runs[p_runs].type=1; r_runs[p_runs].dir=Point(1,0,0);}
-    if(p_runDirection==2 && p_runRotate==false){r_runs[p_runs].type=2; r_runs[p_runs].dir=Point(0,1,0);}
-    if(p_runDirection==3 && p_runRotate==false){r_runs[p_runs].type=3; r_runs[p_runs].dir=Point(1,1,0);}
-    if(p_runDirection==1 && p_runRotate==true){r_runs[p_runs].type=4; r_runs[p_runs].dir=Point(1,0,0);}
-    if(p_runDirection==2 && p_runRotate==true){r_runs[p_runs].type=5; r_runs[p_runs].dir=Point(0,1,0);}
-    if(p_runDirection==3 && p_runRotate==true){r_runs[p_runs].type=6; r_runs[p_runs].dir=Point(1,1,0);}
-    r_runs[p_runs].dir=p_dir;//
+
+    if(p_runDirection==1 && p_runRotate==false){
+        ttrun.type=1;
+        ttrun.dir=Point(1,0,0);
+    }
+    if(p_runDirection==2 && p_runRotate==false){
+        ttrun.type=2;
+        ttrun.dir=Point(0,1,0);
+    }
+    if(p_runDirection==3 && p_runRotate==false){
+        ttrun.type=3;
+        ttrun.dir=Point(1,1,0);
+    }
+    if(p_runDirection==1 && p_runRotate==true){
+        ttrun.type=4;
+        ttrun.dir=Point(1,0,0);
+    }
+    if(p_runDirection==2 && p_runRotate==true){
+        ttrun.type=5;
+        ttrun.dir=Point(0,1,0);
+    }
+    if(p_runDirection==3 && p_runRotate==true){
+        ttrun.type=6;
+        ttrun.dir=Point(1,1,0);
+    }
+    ttrun.dir=p_dir;//
+    ttrun.useLine=p_useLine;//
+    ttrun.smooth=p_smooth;
+
+    ttrun.sminx=stock->min_x();
+    ttrun.sminy=stock->min_y();
+    ttrun.sminz=stock->min_z();
+    ttrun.smaxx=stock->max_x();
+    ttrun.smaxy=stock->max_y();
+    ttrun.smaxz=stock->max_z();
 
 
-    r_runs[p_runs].r_useLine=p_useLine;//
-    r_runs[p_runs].smooth=p_smooth;
+    ttrun.cutterType=cutter->m_cutterType;
+    ttrun.cutterRadius=cutter->radius();
 
-    r_runs[p_runs].stock=new Stock;
-    r_runs[p_runs].stock->copy(stock);
-
-    if(cutter->m_cutterType.compare("Sph"))
-        r_runs[p_runs].cutter=Cutter::CreateSphericalCutter(cutter->radius(), Point(0,0,0));
-    else
-        r_runs[p_runs].cutter=Cutter::CreateCylindricalCutter(cutter->radius(), Point(0,0,0));
-
-    //r_runs[p_runs].model=model;
-
-    r_runs[p_runs].lines=p_runLines;
-    r_runs[p_runs].points=p_runPoints;
-    r_runs[p_runs].layers=p_runLayers;
-    r_runs[p_runs].safez=p_safez;
-    r_runs[p_runs].fspd=p_FeedSpeed;
-    r_runs[p_runs].pspd=p_PlungeSpeed;
-    r_runs[p_runs].margin=p_comp;
+    ttrun.lines=p_runLines;
+    ttrun.points=p_runPoints;
+    ttrun.layers=p_runLayers;
+    ttrun.safez=p_safez;
+    ttrun.fspd=p_FeedSpeed;
+    ttrun.pspd=p_PlungeSpeed;
+    ttrun.margin=p_comp;
     if(p_runRotate)
     {
-        r_runs[p_runs].rotatetotal=p_runRotateDegrees;
-        r_runs[p_runs].rotatestep=p_runRotateStep;
+        ttrun.rotatetotal=p_runRotateDegrees;
+        ttrun.rotatestep=p_runRotateStep;
     }else
     {
-        r_runs[p_runs].rotatetotal=0.0;
-        r_runs[p_runs].rotatestep=0.0;
+        ttrun.rotatetotal=0.0;
+        ttrun.rotatestep=0.0;
     }
+
+    p_qlruns.append(ttrun);
     p_runs++;
-    sbRuncnt->setValue(p_runs);
 }
 
 void MainWindow::on_pbRemove_clicked()
 {
-    if(p_runs>=0)p_runs--;
-    delete r_runs[p_runs].stock;
-    delete r_runs[p_runs].cutter;
-    sbRuncnt->setValue(p_runs);
+    if(p_runs>0)p_runs--;
+    p_qlruns.removeAt(iRunInd);
+    if(iRunInd>=p_runs)iRunInd=p_runs-1;
 }
 
 void MainWindow::on_pbRun_clicked()
 {
-    unsigned int ct=0;
+    int ct=0;
+    clearPath();
     bool bx;
     for(ct=0;ct<p_runs;ct++)
     {
-        bx=radialcut(r_runs[ct]);
+        selectRun(ct);
+        delete cutter2;
+        if(p_qlruns.at(ct).cutterType.compare("Sph")==0){
+                cutter2 = Cutter::CreateSphericalCutter(p_qlruns.at(ct).cutterRadius, Point(0,0,0));
+            }else{
+                cutter2 = Cutter::CreateCylindricalCutter(p_qlruns.at(ct).cutterRadius, Point(0,0,0));
+            }
+        bx=radialcut(p_qlruns.at(ct));
     }
 }
 
@@ -1816,12 +1873,12 @@ bool MainWindow::radialcut(r_run myrun)
 
     unsigned int nz=myrun.layers;
 
-    double x0=myrun.stock->m_min_x;
-    double x1=myrun.stock->m_max_x;
-    double y0=myrun.stock->m_min_y;
-    double y1=myrun.stock->m_max_y;
-    double z0=myrun.stock->m_min_z;
-    double z1=myrun.stock->m_max_z;
+    double x0=myrun.sminx;
+    double x1=myrun.smaxx;
+    double y0=myrun.sminy;
+    double y1=myrun.smaxy;
+    double z0=myrun.sminz;
+    double z1=myrun.smaxz;
     double ang=0.0;
     double angrotatet=myrun.rotatetotal;
     double ai=myrun.rotatestep;
@@ -1871,33 +1928,41 @@ bool MainWindow::radialcut(r_run myrun)
             if(i==0)
             {
                 hf[hfi] = new HeightField(x0, x1, y0, y1, z0, z1, nx, ny);
-                QProgressBar progress(this);
-                progress.setMaximum(100);
-                progress.show();
+                //QProgressBar progress(this);
+                pbStat->setMaximum(100);
+                pbStat->show();
 
                 DropCutter dropcutter;
                 double workdone = 0;
-                dropcutter.setAsync(false);
-                dropcutter.GeneratePath(*myrun.cutter, *model, *hf[hfi]);
+                dropcutter.setAsync(true);
+
+                dropcutter.GeneratePath(*cutter2, *model, *hf[hfi]);
                 while (!dropcutter.finished(&workdone)) {
+                    pbStat->setValue(workdone);
                     update();
                     QCoreApplication::processEvents();
                 }
-                progress.hide();
+                pbStat->hide();
             }
             SimpleCutter simplecutter;
-            simplecutter.m_radius=myrun.cutter->radius();
+            simplecutter.m_radius=myrun.cutterRadius;
             simplecutter.m_noretrace=true;
 
 
 
             simplecutter.m_compmargin=myrun.margin;
-            simplecutter.m_stock=myrun.stock;
-            simplecutter.m_useLine=myrun.r_useLine;
+//            simplecutter.m_stock=myrun.stock;
+            simplecutter.sminx=myrun.sminx;
+            simplecutter.smaxx=myrun.sminx;
+            simplecutter.sminy=myrun.sminy;
+            simplecutter.smaxy=myrun.sminy;
+            simplecutter.sminz=myrun.sminz;
+            simplecutter.smaxz=myrun.sminz;
+            simplecutter.m_useLine=myrun.useLine;
             simplecutter.m_smooth=myrun.smooth;
             simplecutter.m_radialcut=ai;
             simplecutter.m_radialcutdepth=oz;
-            simplecutter.GenerateCutPath_radial(*hf[hfi], Point(myrun.stock->min_x(), myrun.stock->min_y(), myrun.stock->max_z()), myrun.dir, Zlevel, paths, ang);
+            simplecutter.GenerateCutPath_radial(*hf[hfi], Point(myrun.sminx, myrun.sminy, myrun.smaxz), myrun.dir, Zlevel, paths, ang);
 
             if(myrun.rotatetotal)
             {
@@ -1914,6 +1979,7 @@ bool MainWindow::radialcut(r_run myrun)
 void MainWindow::on_pbClr_clicked()
 {
     clearPath();
+    theGLWidget->updateGL();
 }
 
 void MainWindow::logit(QString qstr)
@@ -1925,12 +1991,134 @@ void MainWindow::logit(QString qstr)
     logfile.write(" ");
 }
 
+void MainWindow::selectRun(int iRun)
+{
+    ttrun=p_qlruns.at(iRun);
+    p_dir=ttrun.dir;
+    p_useLine=ttrun.useLine;
+    p_smooth=ttrun.smooth;
+    stock->m_min_x=ttrun.sminx;
+    stock->m_min_y=ttrun.sminy;
+    stock->m_min_z=ttrun.sminz;
+    stock->m_max_x=ttrun.smaxx;
+    stock->m_max_y=ttrun.smaxy;
+    stock->m_max_z=ttrun.smaxz;
+    delete cutter;
+    if(ttrun.cutterType.compare("Sph")==0)
+        {
+            cutter = Cutter::CreateSphericalCutter(ttrun.cutterRadius, Point(0,0,0));
+        }else{
+            cutter = Cutter::CreateCylindricalCutter(ttrun.cutterRadius, Point(0,0,0));
+        }
+    p_runLines=ttrun.lines;
+    p_runPoints=ttrun.points;
+    p_runLayers=ttrun.layers;
+    p_safez=ttrun.safez;
+    p_FeedSpeed=ttrun.fspd;
+    p_PlungeSpeed=ttrun.pspd;
+    p_comp=ttrun.margin;
+    if(ttrun.rotatetotal)
+    {
+        p_runRotateDegrees=ttrun.rotatetotal;
+        p_runRotateStep=ttrun.rotatestep;
+        p_runRotate=true;
+    }else
+    {
+        p_runRotate=false;
+    }
+}
+
 void MainWindow::on_pbUp_clicked()
 {
-    sbRuncnt->setValue(sbRuncnt->value()+1);
+    upd();
+    if(iRunInd<(p_runs-1))iRunInd++;
+    ttrun=p_qlruns.at(iRunInd);
+    selectRun(iRunInd);
+    theGLWidget->updateGL();
+    leStat->setText(QString::number(iRunInd));
 }
 
 void MainWindow::on_pbDown_clicked()
 {
-    sbRuncnt->setValue(sbRuncnt->value()-1);
+    upd();
+    if(iRunInd>0)iRunInd--;
+    ttrun=p_qlruns.at(iRunInd);
+    selectRun(iRunInd);
+    theGLWidget->updateGL();
+    leStat->setText(QString::number(iRunInd));
+}
+
+void MainWindow::on_pbRun1_clicked()
+{
+    int ct=iRunInd;
+    clearPath();
+    selectRun(ct);
+    delete cutter2;
+    if(p_qlruns.at(ct).cutterType.compare("Sph")==0){
+            cutter2 = Cutter::CreateSphericalCutter(p_qlruns.at(ct).cutterRadius, Point(0,0,0));
+        }else{
+            cutter2 = Cutter::CreateCylindricalCutter(p_qlruns.at(ct).cutterRadius, Point(0,0,0));
+        }
+    radialcut(p_qlruns.at(ct));
+}
+
+void MainWindow::upd()
+{
+
+    if(p_runDirection==1 && p_runRotate==false){
+        ttrun.type=1;
+        ttrun.dir=Point(1,0,0);
+    }
+    if(p_runDirection==2 && p_runRotate==false){
+        ttrun.type=2;
+        ttrun.dir=Point(0,1,0);
+    }
+    if(p_runDirection==3 && p_runRotate==false){
+        ttrun.type=3;
+        ttrun.dir=Point(1,1,0);
+    }
+    if(p_runDirection==1 && p_runRotate==true){
+        ttrun.type=4;
+        ttrun.dir=Point(1,0,0);
+    }
+    if(p_runDirection==2 && p_runRotate==true){
+        ttrun.type=5;
+        ttrun.dir=Point(0,1,0);
+    }
+    if(p_runDirection==3 && p_runRotate==true){
+        ttrun.type=6;
+        ttrun.dir=Point(1,1,0);
+    }
+    ttrun.dir=p_dir;//
+    ttrun.useLine=p_useLine;//
+    ttrun.smooth=p_smooth;
+
+    ttrun.sminx=stock->min_x();
+    ttrun.sminy=stock->min_y();
+    ttrun.sminz=stock->min_z();
+    ttrun.smaxx=stock->max_x();
+    ttrun.smaxy=stock->max_y();
+    ttrun.smaxz=stock->max_z();
+
+
+    ttrun.cutterType=cutter->m_cutterType;
+    ttrun.cutterRadius=cutter->radius();
+
+    ttrun.lines=p_runLines;
+    ttrun.points=p_runPoints;
+    ttrun.layers=p_runLayers;
+    ttrun.safez=p_safez;
+    ttrun.fspd=p_FeedSpeed;
+    ttrun.pspd=p_PlungeSpeed;
+    ttrun.margin=p_comp;
+    if(p_runRotate)
+    {
+        ttrun.rotatetotal=p_runRotateDegrees;
+        ttrun.rotatestep=p_runRotateStep;
+    }else
+    {
+        ttrun.rotatetotal=0.0;
+        ttrun.rotatestep=0.0;
+    }
+    p_qlruns.replace(iRunInd,ttrun);
 }

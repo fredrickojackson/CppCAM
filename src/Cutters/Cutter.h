@@ -57,6 +57,7 @@ public:
     }
     const Point& location() const { return m_location; }
     double radius() const { return m_radius; }
+    void setRadius(double radius){m_radius=radius; m_radiussq=sqr(m_radius);}
 
     virtual bool intersect(const Point& cl_in, const Point& direction, const Triangle& triangle, Point& cl_out, double& d_out, Point& cp_out) const = 0;
 

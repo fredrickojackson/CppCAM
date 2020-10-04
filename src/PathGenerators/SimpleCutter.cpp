@@ -107,8 +107,10 @@ SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point
 {
     SimplePathProcessors pathProcessors;
 
-    double xstep=m_stock->dim_x()/heightfield.width();
-    double ystep=m_stock->dim_y()/heightfield.height();
+    double xstep=(smaxx-sminx)/heightfield.width();
+    //m_stock->dim_x()/heightfield.width();
+    double ystep=(smaxy-sminy)/heightfield.height();
+//    double ystep=m_stock->dim_y()/heightfield.height();
     long di = 1+m_radius/xstep;
     long dj = 1+m_radius/ystep;
     long di1=0;
@@ -168,8 +170,12 @@ bool
 SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point& start, const Point& direction, double z_layer, Path& path)
 {
     SimplePathProcessors pathProcessors;
-    double xstep=m_stock->dim_x()/heightfield.width();
-    double ystep=m_stock->dim_y()/heightfield.height();
+//    double xstep=m_stock->dim_x()/heightfield.width();
+//    double ystep=m_stock->dim_y()/heightfield.height();
+    double xstep=(smaxx-sminx)/heightfield.width();
+    //m_stock->dim_x()/heightfield.width();
+    double ystep=(smaxy-sminy)/heightfield.height();
+//    double ystep=m_stock->dim_y()/heightfield.height();
     long di = 1+m_radius/xstep;
     long dj = 1+m_radius/ystep;
     long di1=0;

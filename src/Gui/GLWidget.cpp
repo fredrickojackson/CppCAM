@@ -35,6 +35,7 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 extern Stock* stock;
 extern Model* model;
 extern Cutter* cutter;
+extern Cutter* cutter2;
 extern std::vector<Path*> paths;
 extern HeightField* heightfield;
 

@@ -35,7 +35,13 @@ public:
 
     double m_radius;
     double m_compmargin;
-    Stock* m_stock;
+//    Stock* m_stock;
+    double sminx;
+    double smaxx;
+    double sminy;
+    double smaxy;
+    double sminz;
+    double smaxz;
     int m_useLine;
     int m_smooth;
     bool m_noretrace=false;

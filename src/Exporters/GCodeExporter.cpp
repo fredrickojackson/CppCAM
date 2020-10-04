@@ -20,6 +20,7 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFile>
 #include <QSettings>
 #include <QString>
+#include <QDateTime>
 
 #include "GCodeExporter.h"
 #include "dlggcodeprop.h"
@@ -54,7 +55,8 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
         time_t rawtime;
         struct tm * timeinfo;
         char buffer[80];
-
+        QDateTime qdt;
+        str=qdt.currentDateTime().toString();
         time (&rawtime);
         timeinfo = localtime(&rawtime);
 
@@ -120,6 +122,9 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
         QString stop_spindle = settings->value("stop_spindle").toString();
         QString beginline = settings->value("beginline").toString();
         QString endline = settings->value("endline").toString();
+        QString begrun;
+
+
         gc.write(header.toUtf8());
         gc.write(preamble.toUtf8());
         gc.write(metric.toUtf8());
@@ -137,7 +142,8 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
         for(std::vector<Path*>::const_iterator p = paths.begin(); p!=paths.end(); ++p) {
             QString s;
 
-            int rodd=0;
+            int rodd=paths.size();
+            rodd=0;
             for(std::vector<Run>::const_iterator r = (*p)->m_runs.begin(); r!=(*p)->m_runs.end(); ++r) {
 
                     std::vector<Point>::const_iterator pt;
@@ -192,6 +198,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                                         slowlineflag=1;
                                     }
                                     if(beginrunflag==2)s=beginrun;
+                                    s.replace("$BEGRUN","T6");
                                     replace(&s,*pt,(*p)->rot_x);
                                     gc.write(s.toUtf8());
                                 }
@@ -288,6 +295,7 @@ GCodeExporter::ExportPath(const std::vector<Path*>& paths, std::string filename)
                                         slowlineflag=1;
                                     }
                                     if(beginrunflag==2)s=beginrun;
+                                    s.replace("$BEGRUN","T1");
                                     replace(&s,pp,(*p)->rot_x);
                                     gc.write(s.toUtf8());
                                 }
@@ -351,4 +359,6 @@ void GCodeExporter::replace(QString *s, Point pt, double ang)
     s->replace("$SAFEZ", QString::number(safez,'f',3));
     s->replace("$F",QString::number(feedspeed,'f',3));
     s->replace("$P",QString::number(plungespeed,'f',3));
+    s->replace("$DRLTYPE",cutter_type);
+    s->replace("$DRLRADIUS",QString::number(cutter_radius,'f',3));
 }

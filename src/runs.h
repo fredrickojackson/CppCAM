@@ -8,9 +8,14 @@
 struct r_run
 {
     int type;    //0=x 1=y 2=rect 3=xrad 4=yrad 5-rectrad
-//    Model* model;
-    Cutter* cutter;
-    Stock* stock;
+    double cutterRadius;
+    QString cutterType;
+    double sminx;
+    double smaxx;
+    double sminy;
+    double smaxy;
+    double sminz;
+    double smaxz;
     int lines;
     int points;
     int layers;
@@ -23,6 +28,6 @@ struct r_run
 
     int smooth;
     Point dir;
-    int r_useLine;
+    int useLine;
 
 };

@@ -28,7 +28,7 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 CylindricalCutter::CylindricalCutter(double radius, const Point& location)
     :BaseCutter(radius, location),m_disk(0) 
 {
-    
+    m_cutterType="Cyl";
 }
  
 CylindricalCutter::~CylindricalCutter()

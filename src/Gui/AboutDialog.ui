@@ -52,7 +52,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="pycam.qrc">:/pycam/icons/logo_gui.png</pixmap>
+    <pixmap>../icons/logo_gui.png</pixmap>
    </property>
    <property name="scaledContents">
     <bool>true</bool>
@@ -61,10 +61,10 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>90</y>
+     <x>60</x>
+     <y>130</y>
      <width>161</width>
-     <height>21</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="font">
@@ -73,14 +73,17 @@
     </font>
    </property>
    <property name="text">
-    <string>pycam++  v0.1.0</string>
+    <string>CppCAM  v0.9.0</string>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::MarkdownText</enum>
    </property>
   </widget>
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>110</y>
+     <x>60</x>
+     <y>100</y>
      <width>151</width>
      <height>21</height>
     </rect>

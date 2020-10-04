@@ -18,6 +18,7 @@ You should have received a copy of the GNU General Public License
 along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <QtGui>
+#include <QList>
 #include "GLWidget.h"
 
 #include "ui_MainWindow.h"
@@ -38,13 +39,7 @@ public:
     MainWindow();
     ~MainWindow();
 
-//    Stock* stock;
-//    Model* model;
-//    Cutter* cutter;
-
     void logit(QString qstr);
-    void resizeEvent(QResizeEvent* event);
-    void mouseMoveEvent(QMouseEvent *ev);
     GLWidget* theGLWidget;
     QString p_modelfilename;
     QString p_projectfilename;
@@ -54,11 +49,9 @@ public:
     double p_runResolution;
     int p_runLayers;
     double p_runStepdown;
-
     bool p_runRotate;
     double p_runRotateDegrees;
     double p_runRotateStep;
-
     unsigned int p_runDirection;
     double p_safez;
     double p_FeedSpeed;
@@ -69,14 +62,19 @@ public:
     double p_comp;
     bool bEnableArcs;
     QTimer *qtimer;
-
-
-    unsigned int p_runs;
-    r_run r_runs[10];
+    int p_runs;
+    QList<r_run> p_qlruns;
     bool radialcut(r_run myrun);
+    void selectRun(int iRun);
     Point p_dir;
+    r_run ttrun;
+    void hole_cut();
+    int iRunInd;
+    void upd();
 
 private slots:
+    void resizeEvent(QResizeEvent* event);
+    void mouseMoveEvent(QMouseEvent *ev);
     void mytimeout();
 
     void on_actionAbout_triggered();
@@ -135,8 +133,6 @@ private slots:
 
     void on_actionRack_Cut_triggered();
 
-    void hole_cut();
-
     void on_actionHole_Cut_triggered();
 
     void on_actionClear_Path_triggered();
@@ -144,7 +140,6 @@ private slots:
     void on_actionAlign_Model_triggered();
 
     void on_actionRadial_Cut_triggered();
-
 
     void on_pbAdd_clicked();
 
@@ -157,6 +152,8 @@ private slots:
     void on_pbUp_clicked();
 
     void on_pbDown_clicked();
+
+    void on_pbRun1_clicked();
 
 private:
     void clearPath();

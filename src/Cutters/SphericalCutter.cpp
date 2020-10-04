@@ -28,7 +28,7 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 SphericalCutter::SphericalCutter(double radius, const Point& location)
     :BaseCutter(radius, location),m_sphere(0) 
 {
-    
+    m_cutterType="Sph";
 }
  
 SphericalCutter::~SphericalCutter()

@@ -70,7 +70,7 @@
      <rect>
       <x>-1</x>
       <y>0</y>
-      <width>454</width>
+      <width>544</width>
       <height>36</height>
      </rect>
     </property>
@@ -103,6 +103,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pbRun1">
+       <property name="text">
+        <string>Run1</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pbUp">
        <property name="text">
         <string>+</string>
@@ -118,16 +125,6 @@
      </item>
     </layout>
    </widget>
-   <widget class="QSpinBox" name="sbRuncnt">
-    <property name="geometry">
-     <rect>
-      <x>480</x>
-      <y>0</y>
-      <width>52</width>
-      <height>32</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pbClr">
     <property name="geometry">
      <rect>
@@ -139,6 +136,19 @@
     </property>
     <property name="text">
      <string>Clr</string>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="pbStat">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>0</y>
+      <width>118</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>24</number>
     </property>
    </widget>
   </widget>
