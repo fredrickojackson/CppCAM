@@ -72,10 +72,10 @@ Model* STLImportHelper::ImportModel()
     {
         QByteArray buffer = f.read(84);
         numfacets = *(long*)buffer.mid(80,4).data();
-//        if (f.size() == 84 + 50*numfacets) {
+        if (f.size() == 84 + 50*numfacets) {
             return nImportBinaryModel();
-//        }
-            /*
+        }else{
+
         buffer.append(f.read(200-84));
         if (buffer.indexOf("solid") >= 0 && buffer.indexOf("facet") >= 0)
         {
@@ -86,7 +86,7 @@ Model* STLImportHelper::ImportModel()
         log_error("STLImporter: STL binary/ascii detection failed");
     }
     return NULL;
-    */
+
 
   }
     return NULL;

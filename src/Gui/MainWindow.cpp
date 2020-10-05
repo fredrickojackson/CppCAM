@@ -113,7 +113,7 @@ MainWindow::MainWindow()
      qtimer->start();
      p_modelfilename="/home/fred/projects/cppcam/data/box.stl";
      model = STLImporter::ImportModel(p_modelfilename.toStdString());
-     p_comp=0.0;
+     p_margin=0.0;
      p_runs=0;
      pbStat->hide();
 
@@ -124,7 +124,20 @@ MainWindow::MainWindow()
 void MainWindow::mytimeout()
 {
     QTime thetime;
+    QString qs;
     letime->setText(thetime.currentTime().toString());
+    qs.setNum(stock->min_x());
+    leSminx->setText(qs);
+    qs.setNum(stock->min_y());
+    leSminy->setText(qs);
+    qs.setNum(stock->min_z());
+    leSminz->setText(qs);
+    qs.setNum(stock->max_x());
+    leSmaxx->setText(qs);
+    qs.setNum(stock->max_y());
+    leSmaxy->setText(qs);
+    qs.setNum(stock->max_z());
+    leSmaxz->setText(qs);
 }
 
 MainWindow::~MainWindow() 
@@ -174,6 +187,7 @@ void MainWindow::on_actionOpen_triggered()
     p_projectfilename=filename;
     filename=p_modelfilename;
     p_modelfilename=setproj.value("p_modelfilename","~/tmp.cam").toString();
+    p_runs=0;
     delete cutter;
     if(setproj.value("p_CutterType","Sph").toString().compare("Sph") == 0)
     {
@@ -207,7 +221,7 @@ void MainWindow::on_actionOpen_triggered()
     p_safez=setproj.value("p_safez",0.0).toDouble();
     p_FeedSpeed=setproj.value("p_FeedSpeed",0.0).toDouble();
     p_PlungeSpeed=setproj.value("p_PlungeSpeed",0.0).toDouble();
-    p_comp=setproj.value("p_comp",0.0).toDouble();
+    p_margin=setproj.value("p_margin",0.0).toDouble();
     p_runDirection=setproj.value("p_runDirection",0.0).toInt();
     p_rectcut=setproj.value("p_rectcut",0.0).toBool();
     p_useLine=setproj.value("p_useLine",0.0).toInt();
@@ -294,7 +308,7 @@ void MainWindow::on_actionSave_triggered()
     setproj.setValue("p_useLine",p_useLine);
     setproj.setValue("p_rectcut",p_rectcut);
     setproj.setValue("p_smooth",p_smooth);
-    setproj.setValue("p_comp",p_comp);
+    setproj.setValue("p_margin",p_margin);
     setproj.beginWriteArray("p_qlruns");
     for (int i = 0; i < p_qlruns.size(); ++i) {
           setproj.setArrayIndex(i);
@@ -549,34 +563,41 @@ void MainWindow::on_actionRotate_Model_triggered()
     if (dlg.result() == QDialog::Accepted) {
         clearPath();
         double rot_x=0,rot_y=0,rot_z=0;
-        if (dlg.radioButton_xmin->isChecked()) {
+        if(dlg.radioButton_xmin->isChecked()) {
             rot_x = -90;
         }
-        if (dlg.radioButton_xcen->isChecked()) {
+        if(dlg.radioButton_xcen->isChecked()) {
             rot_x = 0;
         }
-        if (dlg.radioButton_xplus->isChecked()) {
+        if(dlg.radioButton_xplus->isChecked()) {
             rot_x = +90;
         }
-
-        if (dlg.radioButton_ymin->isChecked()) {
+        if(dlg.radioButton_ymin->isChecked()) {
             rot_y = -90;
         }
-        if (dlg.radioButton_ycen->isChecked()) {
+        if(dlg.radioButton_ycen->isChecked()) {
             rot_y = 0;
         }
-        if (dlg.radioButton_yplus->isChecked()) {
+        if(dlg.radioButton_yplus->isChecked()) {
             rot_y = +90;
         }
-
-        if (dlg.radioButton_zmin->isChecked()) {
+        if(dlg.radioButton_zmin->isChecked()) {
             rot_z = -90;
         }
-        if (dlg.radioButton_zcen->isChecked()) {
+        if(dlg.radioButton_zcen->isChecked()) {
             rot_z = 0;
         }
-        if (dlg.radioButton_zplus->isChecked()) {
+        if(dlg.radioButton_zplus->isChecked()) {
             rot_z = +90;
+        }
+        if(dlg.radioButton_xcustom->isChecked()) {
+            rot_x = dlg.leXrot->text().toDouble();
+        }
+        if(dlg.radioButton_ycustom->isChecked()) {
+            rot_y = dlg.leYrot->text().toDouble();
+        }
+        if(dlg.radioButton_zcustom->isChecked()) {
+            rot_z = dlg.leZrot->text().toDouble();
         }
         model->rotate(rot_x, rot_y, rot_z);
     }
@@ -667,7 +688,7 @@ void MainWindow::on_actionExport_Model_triggered()
     std::cout << "Selected Filter: " << qPrintable(selectedFilter) << std::endl;
     if (!filename.isEmpty()) {
         lastFile = filename;
-        STLExporter::ExportModel(model, filename.toStdString(), selectedFilter.contains("Binary"));
+        STLExporter::ExportModel(model, filename.toStdString(), true);
         p_modelfilename=filename;
     }
 }
@@ -1067,14 +1088,6 @@ void MainWindow::on_actionRectCut_triggered()
 
 }
 
-//void MainWindow::on_pbTst_clicked()
-//{
-//    if(actionShowModel->isChecked())actionShowModel->setChecked(false);
-//    theGLWidget->setShowModel(false);
-////    if(actionShowCutter->isChecked())actionShowCutter->setChecked(false);
-////    theGLWidget->setShowCutter(actionShowCutter->isChecked());
-//    on_actionRack_Cut_triggered();
-//}
 
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
@@ -1539,15 +1552,15 @@ void MainWindow::on_actionRadial_Cut_triggered()
     //ss.setNum(1);
     dlg.ui->leSmooth->setText("0");
     dlg.ui->leUseLine->setText(QString::number(p_useLine));
-    if(p_comp>0.0)
+    if(p_margin>0.0)
     {
         dlg.ui->cbLeaveMargin->setChecked(true);
-        dlg.ui->leMargin->setText(QString::number(p_comp));
+        dlg.ui->leMargin->setText(QString::number(p_margin));
     }else
     {
         dlg.ui->cbLeaveMargin->setChecked(false);
     }
-    ss.setNum(p_comp);
+    ss.setNum(p_margin);
     dlg.ui->leMargin->setText(ss);
 
 
@@ -1613,10 +1626,10 @@ void MainWindow::on_actionRadial_Cut_triggered()
         p_PlungeSpeed=dlg.ui->lePlungeSpeed->text().toDouble();
         if(dlg.ui->cbLeaveMargin->isChecked())
         {
-            p_comp=dlg.ui->leMargin->text().toDouble();
+            p_margin=dlg.ui->leMargin->text().toDouble();
         }else
         {
-            p_comp=0.0;
+            p_margin=0.0;
         }
         p_safez = dlg.ui->le_SafeZ->text().toDouble();
         p_runRotate=dlg.ui->cbRotate->isChecked();
@@ -1828,7 +1841,7 @@ void MainWindow::on_pbAdd_clicked()
     ttrun.safez=p_safez;
     ttrun.fspd=p_FeedSpeed;
     ttrun.pspd=p_PlungeSpeed;
-    ttrun.margin=p_comp;
+    ttrun.margin=p_margin;
     if(p_runRotate)
     {
         ttrun.rotatetotal=p_runRotateDegrees;
@@ -1978,6 +1991,7 @@ bool MainWindow::radialcut(r_run myrun)
 
 void MainWindow::on_pbClr_clicked()
 {
+    bool bx=hasMouseTracking();
     clearPath();
     theGLWidget->updateGL();
 }
@@ -2016,7 +2030,7 @@ void MainWindow::selectRun(int iRun)
     p_safez=ttrun.safez;
     p_FeedSpeed=ttrun.fspd;
     p_PlungeSpeed=ttrun.pspd;
-    p_comp=ttrun.margin;
+    p_margin=ttrun.margin;
     if(ttrun.rotatetotal)
     {
         p_runRotateDegrees=ttrun.rotatetotal;
@@ -2110,7 +2124,7 @@ void MainWindow::upd()
     ttrun.safez=p_safez;
     ttrun.fspd=p_FeedSpeed;
     ttrun.pspd=p_PlungeSpeed;
-    ttrun.margin=p_comp;
+    ttrun.margin=p_margin;
     if(p_runRotate)
     {
         ttrun.rotatetotal=p_runRotateDegrees;
@@ -2121,4 +2135,20 @@ void MainWindow::upd()
         ttrun.rotatestep=0.0;
     }
     p_qlruns.replace(iRunInd,ttrun);
+}
+
+void MainWindow::on_actionNew_triggered()
+{
+    p_qlruns.clear();
+    delete model;
+    p_modelfilename="/home/fred/projects/cppcam/data/box.stl";
+    model = STLImporter::ImportModel(p_modelfilename.toStdString());
+    stock->m_min_x=10.0;
+    stock->m_min_y=10.0;
+    stock->m_min_z=1.0;
+
+    stock->m_max_x=20.0;
+    stock->m_max_y=20.0;
+    stock->m_max_z=2.0;
+    p_runs=0;
 }

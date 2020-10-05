@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>437</width>
-    <height>259</height>
+    <width>400</width>
+    <height>286</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,6 +30,13 @@
       <string>Rotate X</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="radioButton_xplus">
+        <property name="text">
+         <string>+90</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QRadioButton" name="radioButton_xmin">
         <property name="text">
@@ -47,12 +54,15 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QRadioButton" name="radioButton_xplus">
+      <item row="0" column="3">
+       <widget class="QRadioButton" name="radioButton_xcustom">
         <property name="text">
-         <string>+90</string>
+         <string>custom</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLineEdit" name="leXrot"/>
       </item>
      </layout>
     </widget>
@@ -67,6 +77,13 @@
        <widget class="QRadioButton" name="radioButton_ymin">
         <property name="text">
          <string>-90</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QRadioButton" name="radioButton_ycustom">
+        <property name="text">
+         <string>custom</string>
         </property>
        </widget>
       </item>
@@ -86,6 +103,9 @@
          <string>+90</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLineEdit" name="leYrot"/>
       </item>
      </layout>
     </widget>
@@ -113,12 +133,22 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="4">
+       <widget class="QRadioButton" name="radioButton_zcustom">
+        <property name="text">
+         <string>custom</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="2">
        <widget class="QRadioButton" name="radioButton_zplus">
         <property name="text">
          <string>+90</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QLineEdit" name="leZrot"/>
       </item>
      </layout>
     </widget>

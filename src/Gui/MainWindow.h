@@ -59,7 +59,7 @@ public:
     int p_useLine;
     bool p_rectcut;
     int p_smooth;
-    double p_comp;
+    double p_margin;
     bool bEnableArcs;
     QTimer *qtimer;
     int p_runs;
@@ -154,6 +154,8 @@ private slots:
     void on_pbDown_clicked();
 
     void on_pbRun1_clicked();
+
+    void on_actionNew_triggered();
 
 private:
     void clearPath();
