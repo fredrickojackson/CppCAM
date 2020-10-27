@@ -23,9 +23,9 @@ along with CppCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "SimpleCutter.h"
 #include "PathProcessors.h"
 
-bool SimpleCutter::GenerateCutPath_radial(const HeightField& heightfield, const Point& start, const Point& direction, double Zlevel, std::vector<Path*>& paths, double angle)
+bool SimpleCutter::GenerateCutPath_radial(const HeightField& heightfield, const Point& start, const Point& direction, double Zlevel, Path* path, double angle)
 {
-    Path* path = new Path();
+//    Path* path = new Path();
     path->rot_x=angle;
     if (direction.x() != 0 && direction.y() == 0)
     {
@@ -43,7 +43,7 @@ bool SimpleCutter::GenerateCutPath_radial(const HeightField& heightfield, const 
             return false;
         }
     }
-    paths.push_back(path);
+
     return true;
 }
 
@@ -118,6 +118,9 @@ SimpleCutter::GenerateCutPathLayer_x(const HeightField& heightfield, const Point
     long dj1=0;
     long dj2=0;
 
+    path.toolradius=m_radius;
+    path.tooltype=m_type;
+
 
     for(size_t j=0; j<heightfield.width(); j+=(m_useLine)) {
         path.m_runs.resize(path.m_runs.size()+1);
@@ -183,10 +186,12 @@ SimpleCutter::GenerateCutPathLayer_y(const HeightField& heightfield, const Point
     long dj1=0;
     long dj2=0;
 
+    path.toolradius=m_radius;
+    path.tooltype=m_type;
+
 
     for(size_t i=0; i<heightfield.height(); i+=(m_useLine)) {
         path.m_runs.resize(path.m_runs.size()+1);
-
         Run& run = path.m_runs.back();
 //        double last_z = 0;
 
@@ -259,6 +264,9 @@ SimpleCutter::GenerateCutPathLayer_rect(const HeightField& heightfield, const Po
     Point p4=Point(0,0,0);
     Point pmem=Point(0,0,0);
     bool skipflag=false;
+
+    path.toolradius=m_radius;
+    path.tooltype=m_type;
 
     path.m_runs.resize(path.m_runs.size()+1);
     Run& run = path.m_runs.back();
@@ -340,52 +348,3 @@ myexi:
     pathProcessors.process(run.m_points);
     return true;
 }
-
-
-
-
-//    di1=i-di;
-//    if(di1<0) di1=0;
-//    di2=i+di;
-//    if(di2>(size_t)(heightfield.width()-1))di2=heightfield.width()-1;
-//    dj1=j-dj;
-//    if(dj1<0) dj1=0;
-//    dj2=j+dj;
-//    if(dj2>(heightfield.height()-1))dj2=heightfield.height()-1;
-//    double zav = 0.0;
-//    int zcnt = 0;
-//    double zcc = -1000.0;
-
-//    for(long lj=dj1; lj<=dj2; lj++)
-//        for(long li=di1; li<=di2; li++)
-//        {
-//            double dis = sqrt(pow(heightfield.x(li)-heightfield.x(j),2)+pow(heightfield.y(lj)-heightfield.y(i),2));
-//            double zc = -1000.0;
-//            if(!((li == j) && (lj == i)))
-//            {
-//                if(!m_isSpherical)
-//                {
-//                    zc=heightfield.point(li,lj);
-//                }else
-//                {
-//                    zc=heightfield.point(li,lj)-m_radius*sin((dis*3.1415926/(2.0*m_radius)));
-//                }
-//                if((dis<(m_radius+m_compmargin)) && (zc>zcc))
-//                {
-//                    zcc=zc;
-//                }
-//            }
-//            if((labs(li-(long)j)<=m_smooth) && (labs(lj-(long)i)<=m_smooth))
-//            {
-//                zav += heightfield.point(li,lj);
-//                zcnt++;
-//            }
-//        }//lj//li
-
-//    if(m_smooth && zcnt)
-//        z=zav/zcnt;
-
-//    if(zcc>z)z=zcc;
-//    if (z < z_layer) {
-//        z = z_layer;
-//    }

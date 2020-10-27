@@ -20,18 +20,25 @@ along with PyCAM.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __PATH_H
 #define __PATH_H
 
+#include <QString>
+#include <QList>
+
 #include "Point.h"
 #include <vector>
 
 
 struct Run {
     std::vector<Point> m_points;
+    //QList<Point> m_points;
 };
 
 struct Path {
     std::vector<Run> m_runs;
+    double toolradius;
+    QString tooltype;
     double rot_x;
     void to_OpenGL(float minz, float maxz);
+    int qlrunindex;
 };
 
 #endif

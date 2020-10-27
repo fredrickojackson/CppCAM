@@ -23,29 +23,39 @@ RCC_DIR = buildwin32
 }
 
 # Input
-SOURCES += \
-    Gui/dlgholecut.cpp \
-    Gui/dlgradialcutter.cpp \
-    Gui/dlgroundcutter.cpp \
-    Gui/rectcutdialog.cpp \
-    Gui/dlgtoolsize.cpp \
-    cppcam.cpp \
-    Gui/rackcutdlg.cpp \
-    Gui/dlggcodeprop.cpp
-
-SOURCES += Gui/MainWindow.cpp Gui/GLWidget.cpp 
-SOURCES += Gui/PreferencesDialog.cpp Gui/StockModelDialog.cpp
-SOURCES += Gui/ResizeModelDialog.cpp Gui/AlignModelDialog.cpp Gui/RotateModelDialog.cpp
-SOURCES += Geometry/Geometry.cpp Geometry/Boxed.cpp Geometry/Stock.cpp Geometry/Model.cpp 
-SOURCES += Geometry/Path.cpp Geometry/HeightField.cpp
+SOURCES += Gui/dlgholecut.cpp
+SOURCES += Gui/dlgradialcutter.cpp
+SOURCES += Gui/dlgroundcutter.cpp
+SOURCES += Gui/rectcutdialog.cpp
+SOURCES += Gui/dlgtoolsize.cpp
+SOURCES += cppcam.cpp
+SOURCES += Gui/rackcutdlg.cpp
+SOURCES += Gui/dlggcodeprop.cpp
+SOURCES += Gui/MainWindow.cpp
+SOURCES += Gui/GLWidget.cpp
+SOURCES += Gui/PreferencesDialog.cpp
+SOURCES += Gui/StockModelDialog.cpp
+SOURCES += Gui/ResizeModelDialog.cpp
+SOURCES += Gui/AlignModelDialog.cpp
+SOURCES += Gui/RotateModelDialog.cpp
+SOURCES += Geometry/Geometry.cpp
+SOURCES += Geometry/Boxed.cpp
+SOURCES += Geometry/Stock.cpp
+SOURCES += Geometry/Model.cpp
+SOURCES += Geometry/Path.cpp
+SOURCES += Geometry/HeightField.cpp
 SOURCES += Geometry/TestModel.cpp
 SOURCES += Utils/polynomials.cpp
 SOURCES += Importers/STLImporter.cpp
-SOURCES += Cutters/Cutter.cpp Cutters/BaseCutter.cpp 
-SOURCES += Cutters/CylindricalCutter.cpp Cutters/SphericalCutter.cpp
-SOURCES += PathGenerators/DropCutter.cpp PathGenerators/SimpleCutter.cpp
+SOURCES += Cutters/Cutter.cpp
+SOURCES += Cutters/BaseCutter.cpp
+SOURCES += Cutters/CylindricalCutter.cpp
+SOURCES += Cutters/SphericalCutter.cpp
+SOURCES += PathGenerators/DropCutter.cpp
+SOURCES += PathGenerators/SimpleCutter.cpp
 SOURCES += PathProcessors/PathProcessors.cpp
-SOURCES += Exporters/GCodeExporter.cpp Exporters/STLExporter.cpp
+SOURCES += Exporters/GCodeExporter.cpp
+SOURCES += Exporters/STLExporter.cpp
 SOURCES += Tests/TestRunner.cpp
 
 HEADERS += Gui/AboutDialog.h \

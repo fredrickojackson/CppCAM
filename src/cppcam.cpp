@@ -43,8 +43,11 @@ int main(int argc, char* argv[])
     }
 
     QApplication app(argc, argv);
+
     MainWindow w;
+    w.commands=app.arguments();
     w.show();
+
     return app.exec();
 }
 

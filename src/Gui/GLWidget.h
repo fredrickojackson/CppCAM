@@ -24,14 +24,14 @@ class GLWidget : public QGLWidget {
 public:
     GLWidget(QWidget* parent=NULL);
     double scale;
-    void resizeGL(int w, int h);
 private:
-    void initializeGL();
-    void paintGL();
-    void keyPressEvent(QKeyEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent* event);
+    void resizeGL(int w, int h) override;
+    void initializeGL() override;
+    void paintGL() override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent* event) override;
     void normalizeAngle(int& angle);
 public slots:
     void resetView();

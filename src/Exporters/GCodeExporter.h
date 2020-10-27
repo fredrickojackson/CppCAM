@@ -25,23 +25,27 @@ along with PyCAM.  If not, see <http://www.gnu.org/licenses/>.
 #include "Path.h"
 #include "Stock.h"
 #include "Model.h"
+#include "runs.h"
+
 
 
 class GCodeExporter
 {
 public:
     GCodeExporter();
-    bool ExportPath(const std::vector<Path*>& paths, std::string filename);
+    bool ExportPath(const std::vector<Path*> paths, QString filename);
     void replace(QString *s, Point pt, double a);
     double safez;
     double feedspeed;
     double plungespeed;
     bool bEnableArcs;
-    double cutter_radius;
-    QString cutter_type;
     Stock* stk;
     Model* mdl;
     bool m_radial=false;
+
+private:
+    double cutter_radius;
+    QString cutter_type;
 
 };
 

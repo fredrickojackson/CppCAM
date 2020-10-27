@@ -38,6 +38,7 @@ public:
 
     MainWindow();
     ~MainWindow();
+    QStringList commands;
 
     void logit(QString qstr);
     GLWidget* theGLWidget;
@@ -66,15 +67,16 @@ public:
     QList<r_run> p_qlruns;
     bool radialcut(r_run myrun);
     void selectRun(int iRun);
-    Point p_dir;
+    //Point p_dir;
     r_run ttrun;
     void hole_cut();
-    int iRunInd;
-    void upd();
+    int qlRunInd;
+    void getlast();
+    int openFile(QString filename);
+    bool startflag=0;
+    double p_viewscale=0;
 
 private slots:
-    void resizeEvent(QResizeEvent* event);
-    void mouseMoveEvent(QMouseEvent *ev);
     void mytimeout();
 
     void on_actionAbout_triggered();
@@ -153,9 +155,15 @@ private slots:
 
     void on_pbDown_clicked();
 
-    void on_pbRun1_clicked();
-
     void on_actionNew_triggered();
+
+    void on_pbWedits_clicked();
+
+    void on_pbEdit_clicked();
+
+    void on_actionSave_As_triggered();
+
+    void on_pbTmp_clicked();
 
 private:
     void clearPath();
@@ -164,4 +172,7 @@ private:
     PreferencesDialog* m_PreferencesDialog;
     void sim();
 
+protected:
+    void mouseMoveEvent(QMouseEvent *ev) override;
+    void resizeEvent(QResizeEvent* event) override;
 };
