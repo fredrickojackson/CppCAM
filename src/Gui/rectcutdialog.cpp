@@ -136,3 +136,8 @@ void RectCutDialog::on_dsbmaxZ_valueChanged(double /*arg1*/)
 {
     updSize();
 }
+
+void RectCutDialog::on_cbOutside_clicked()
+{
+
+}

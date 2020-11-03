@@ -47,6 +47,7 @@ private slots:
     void on_dsbmaxX_valueChanged(double arg1);
     void on_dsbmaxY_valueChanged(double arg1);
     void on_dsbmaxZ_valueChanged(double arg1);
+    void on_cbOutside_clicked();
 };
 
 #endif // RECTCUTDIALOG_H
