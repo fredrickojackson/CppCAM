@@ -157,6 +157,19 @@
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QPushButton" name="pbToggle">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>140</y>
+     <width>88</width>
+     <height>34</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Toggle</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections>

@@ -17,6 +17,9 @@ public:
 
     Ui::dlgGcodeProp *ui;
 
+private slots:
+    void on_pbToggle_clicked();
+
 private:
 };
 
