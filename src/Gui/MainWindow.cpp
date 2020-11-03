@@ -940,6 +940,7 @@ void MainWindow::on_actionRectCut_triggered()
     double f_boxzmin=0.0;
 
 
+
     RectCutDialog rcdlg(this);
 
     p_rectcut=true;
@@ -978,67 +979,159 @@ void MainWindow::on_actionRectCut_triggered()
 
         while(p.m_z>=rcdlg.ui->dsbminZ->value())
         {
+            p.m_x=rcdlg.ui->dsbminX->value();
+            p.m_y=rcdlg.ui->dsbminY->value();
             if(rcdlg.ui->cbInside->isChecked())
             {
-                p.m_x=rcdlg.ui->dsbminX->value()+cutter->radius();
-                p.m_y=rcdlg.ui->dsbminY->value()+cutter->radius();
-                if(rcdlg.ui->cbroundcorner->isChecked())
-                {
-                  p.m_x=+rcdlg.ui->dsbRoundCorner->value();
-                }
+                p.m_x+=cutter->radius();
+                p.m_y+=cutter->radius();
             }
             if(rcdlg.ui->cbOutside->isChecked())
             {
-                p.m_x=rcdlg.ui->dsbminX->value()-cutter->radius();
-                p.m_y=rcdlg.ui->dsbminY->value()-cutter->radius();
+                p.m_x-=cutter->radius();
+                p.m_y-=cutter->radius();
             }
-
+            if(rcdlg.ui->cbroundcorner->isChecked())
+            {
+                if(rcdlg.ui->cbClockwise->isChecked())
+                    p.m_y+=rcdlg.ui->dsbRoundCorner->value();
+                else
+                    p.m_x+=rcdlg.ui->dsbRoundCorner->value();
+            }
+            p.m_rad=0.0;
             path->m_runs[0].m_points.push_back(p);
 //first corner done
 
-            if(rcdlg.ui->cbClockwise->isChecked())
-            {
-                p.m_x+=f_boxw;
-            }else
-            {
-                p.m_y+=f_boxh;
-            }
-            path->m_runs[0].m_points.push_back(p);
-
-//second corner
 
             if(rcdlg.ui->cbClockwise->isChecked())
             {
                 p.m_y+=f_boxh;
+                if(rcdlg.ui->cbroundcorner->isChecked())
+                    p.m_y-=2.0*rcdlg.ui->dsbRoundCorner->value();
             }else
             {
                 p.m_x+=f_boxw;
+                if(rcdlg.ui->cbroundcorner->isChecked())
+                    p.m_x-=2.0*rcdlg.ui->dsbRoundCorner->value();
             }
+            p.m_rad=0.0;
             path->m_runs[0].m_points.push_back(p);
+
+
+            if(rcdlg.ui->cbroundcorner->isChecked())
+            {
+                if(rcdlg.ui->cbClockwise->isChecked())
+                {
+                    p.m_x+=rcdlg.ui->dsbRoundCorner->value();
+                    p.m_y+=rcdlg.ui->dsbRoundCorner->value();
+                    p.isCC=false;
+                }
+                else
+                {
+                    p.m_x+=rcdlg.ui->dsbRoundCorner->value();
+                    p.m_y+=rcdlg.ui->dsbRoundCorner->value();
+                    p.isCC=true;
+                }
+                p.m_rad=rcdlg.ui->dsbRoundCorner->value();
+                path->m_runs[0].m_points.push_back(p);
+            }
+//second corner done
+
+            if(rcdlg.ui->cbClockwise->isChecked())
+            {
+                p.m_x+=f_boxw;
+                if(rcdlg.ui->cbroundcorner->isChecked())
+                    p.m_x-=2.0*rcdlg.ui->dsbRoundCorner->value();
+            }else
+            {
+                p.m_y+=f_boxh;
+                if(rcdlg.ui->cbroundcorner->isChecked())
+                    p.m_y-=2.0*rcdlg.ui->dsbRoundCorner->value();
+            }
+            p.m_rad=0.0;
+            path->m_runs[0].m_points.push_back(p);
+
+            if(rcdlg.ui->cbroundcorner->isChecked())
+            {
+                if(rcdlg.ui->cbClockwise->isChecked())
+                {
+                    p.m_x+=rcdlg.ui->dsbRoundCorner->value();
+                    p.m_y-=rcdlg.ui->dsbRoundCorner->value();
+                    p.isCC=false;
+                }
+                else
+                {
+                    p.m_x-=rcdlg.ui->dsbRoundCorner->value();
+                    p.m_y+=rcdlg.ui->dsbRoundCorner->value();
+                    p.isCC=true;
+                }
+                p.m_rad=rcdlg.ui->dsbRoundCorner->value();
+                path->m_runs[0].m_points.push_back(p);
+            }
 //third
 
             if(rcdlg.ui->cbClockwise->isChecked())
             {
+                p.m_y-=f_boxh;
+                if(rcdlg.ui->cbroundcorner->isChecked())
+                    p.m_y+=2.0*rcdlg.ui->dsbRoundCorner->value();
+            }else
+            {
                 p.m_x-=f_boxw;
+                if(rcdlg.ui->cbroundcorner->isChecked())
+                    p.m_x+=2.0*rcdlg.ui->dsbRoundCorner->value();
+            }
+            p.m_rad=0.0;
+            path->m_runs[0].m_points.push_back(p);
+            if(rcdlg.ui->cbroundcorner->isChecked())
+            {
+                if(rcdlg.ui->cbClockwise->isChecked())
+                {
+                    p.m_x-=rcdlg.ui->dsbRoundCorner->value();
+                    p.m_y-=rcdlg.ui->dsbRoundCorner->value();
+                    p.isCC=false;
+                }
+                else
+                {
+                    p.m_x-=rcdlg.ui->dsbRoundCorner->value();
+                    p.m_y-=rcdlg.ui->dsbRoundCorner->value();
+                    p.isCC=true;
+                }
+                p.m_rad=rcdlg.ui->dsbRoundCorner->value();
+                path->m_runs[0].m_points.push_back(p);
+            }
+//last
+            if(rcdlg.ui->cbClockwise->isChecked())
+            {
+                p.m_x-=f_boxw;
+                if(rcdlg.ui->cbroundcorner->isChecked())
+                    p.m_x+=2.0*rcdlg.ui->dsbRoundCorner->value();
             }else
             {
                 p.m_y-=f_boxh;
+                if(rcdlg.ui->cbroundcorner->isChecked())
+                    p.m_y+=2.0*rcdlg.ui->dsbRoundCorner->value();
             }
+            p.m_rad=0.0;
             path->m_runs[0].m_points.push_back(p);
 
-//last
-            if(rcdlg.ui->cbInside->isChecked())
+            if(rcdlg.ui->cbroundcorner->isChecked())
             {
-                p.m_x=rcdlg.ui->dsbminX->value()+cutter->radius();
-                p.m_y=rcdlg.ui->dsbminY->value()+cutter->radius();
+                if(rcdlg.ui->cbClockwise->isChecked())
+                {
+                    p.m_x-=rcdlg.ui->dsbRoundCorner->value();
+                    p.m_y+=rcdlg.ui->dsbRoundCorner->value();
+                    p.isCC=false;
+                }
+                else
+                {
+                    p.m_x+=rcdlg.ui->dsbRoundCorner->value();
+                    p.m_y-=rcdlg.ui->dsbRoundCorner->value();
+                    p.isCC=true;
+                }
+                p.m_rad=rcdlg.ui->dsbRoundCorner->value();
+                path->m_runs[0].m_points.push_back(p);
             }
-            if(rcdlg.ui->cbOutside->isChecked())
-            {
-                p.m_x=rcdlg.ui->dsbminX->value()-cutter->radius();
-                p.m_y=rcdlg.ui->dsbminY->value()-cutter->radius();
-            }
-            path->m_runs[0].m_points.push_back(p);
-
 
 
             p.m_z-=rcdlg.ui->dsbStepDown->value();
@@ -2276,6 +2369,6 @@ void MainWindow::on_actionSave_triggered()
 
 void MainWindow::on_pbTmp_clicked()
 {
-    leStat->setText(commands.at(1));
-
+    //leStat->setText(commands.at(1));
+    on_actionRectCut_triggered();
 }
