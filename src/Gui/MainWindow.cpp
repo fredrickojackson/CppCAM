@@ -1171,242 +1171,242 @@ void MainWindow::mouseMoveEvent(QMouseEvent *ev)
 
 void MainWindow::on_actionRack_Cut_triggered()
 {
-//    rackcutdlg dlg;
-//    if (dlg.exec() == QDialog::Accepted)
-//    {
+    rackcutdlg dlg;
+    if (dlg.exec() == QDialog::Accepted)
+    {
 
-//        clearPath();
+        clearPath();
 
-//        double stepdown=dlg.ui->dsbStepDown->value();
-//        double rwid = dlg.ui->dsbWid->value();
-
-
-//        int layers=1;
+        double stepdown=dlg.ui->dsbStepDown->value();
+        double rwid = dlg.ui->dsbWid->value();
 
 
-//        Path *path = NULL;
-
-//        if(dlg.ui->rbSideCut->isChecked())
-//        {
-//            layers=rwid/stepdown+1;
-//        }else
-//            layers=1;
-
-//        Path *mypaths[layers];
-//        for(int ii=0; ii<=layers; ii++)
-//        {
-//            mypaths[ii]=new Path();
-//            mypaths[ii]->m_runs.resize(1);
-//        }
+        int layers=1;
 
 
+        Path *path = NULL;
 
+        if(dlg.ui->rbSideCut->isChecked())
+        {
+            layers=rwid/stepdown+1;
+        }else
+            layers=1;
 
-//        bEnableArcs=true;
-
-//        double rmod = dlg.ui->dsbMod->value();
-//        double rlen = dlg.ui->dsbLen->value();
-//        double step = dlg.ui->dsbStep->value();
-//        double stepover = dlg.ui->dsbStepOver->value();
-//        double pitch = M_PI * rmod;
-//        double prang = dlg.ui->dsbPrAngle->value();
-//        double c = 0.15 * rmod;
-//        double pf = 0.38 * rmod;
-
-//        double d1 = pf*cos(prang*M_PI/180.0);
-//        double d2 = (M_PI * rmod / 2.0) - d1;
-//        double ylin=((d2-d1)/tan(prang*M_PI/180.0))/2.0;
-//        //ylin=(d2-d2)*
-//        double hd1= ylin;
-//        double hd2 = -ylin;
-//        double hd0=ylin-pf*sin(prang*M_PI/180.0)+pf;
-
-
-
-//        double d3 = (M_PI * rmod / 2.0) + d1;
-//        double hd3=hd2;
-
-//        double d4 =3*d1+2*(d2-d1);
-//        //hd1 = hd0-pf*sin(prang*M_PI/180.0);
-//        double hd4= hd1;
-//        double slope1=(hd2-hd1)/(d2-d1);
-//        double slope2=(hd4-hd3)/(d4-d3);
-
-
-
-//        double d5 = M_PI * rmod;
-
-//        double dis=0.0;
-//        double hpf=0.0;
-//        double zl=0.0;
-
-////        QFile logfil("/home/fred/cppcam.log");
-////        QTextStream out(&logfil);
-////        logfil.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
-//        double xbit=0.0;
-//        double ybit=0.0;
-//        double sl = 0.0;
-//        double yd=0.0;
-//        double fudge=-999.0;
-//        double tdist=0.0;
-//        double clry=0.0;
-//        double zlast=999.0;
-//        bool arcflag = 0;
-//        Point p = Point(-rwid/2.0,0.0,hd0);
-//        cutter->moveto(p);
-//        for(dis=0;dis<=rlen;dis+=step)
-//        {
-
-//            tdist=fmod(dis,pitch);
-////            out << "tdist=" << tdist << "\n";
-//            if(tdist<d1)
-//            {
-//                double dy=pow((pow(pf,2.0)-pow(tdist,2.0)),0.5);
-//                hpf=ylin-pf*sin(prang*M_PI/180.0)+dy;
-//                zl=hpf;
-//                if(tdist<=step)
-//                    arcflag=false;
-//                if(tdist==0.0)
-//                {
-//                    ybit=cutter->radius();
-//                    xbit=0.0;
-//                }else
-//                {
-//                    sl=(hd0-zl)/tdist;
-//                    sl = (zl - (ylin-pf*sin(prang*M_PI/180.0)))/(tdist);
-
-//                    double ang = atan(sl)*180.0/M_PI;
-//                    ybit=cutter->radius()*sin(ang*M_PI/180.0);
-//                    xbit=cutter->radius()*cos(ang*M_PI/180.0);
-//                }
-//                if(zl>(hd0-c))
-//                {
-//                    zl=hd0-c;
-//                    xbit=0.0;
-//                    ybit=cutter->radius();
-//                }else
-//                {
-//                    if(arcflag==false)
-//                    {
-//                        arcflag=true;
-//                        p.m_rad=cutter->radius();
-//                    }
-//                }
-//            }else if(tdist>=d1 && tdist<d2)
-//            {
-//                arcflag=false;
-//                hpf=hd1-(tdist-d1)/tan(prang*M_PI/180.0);
-//                zl=hd1+slope1*(tdist-d1);
-//                ybit=cutter->radius()*sin(prang*M_PI/180.0);
-//                xbit=cutter->radius()*cos(prang*M_PI/180.0);
-//            }else if(tdist>=d2 && tdist<d3)
-//            {
-//                if(tdist<(M_PI*rmod/2.0))
-//                {
-//                    yd=pow(pow(pf,2.0)-pow(((pitch/2.0)-(tdist)),2.0),0.5);
-//                    zl=-ylin+pf*sin(prang*M_PI/180.0)-yd;
-//                    sl = (zl - (ylin-pf*sin(prang*M_PI/180.0)))/((pitch/2.0)-(tdist));
-
-//                    //sl=-(hd0-zl)/((pitch/2.0)-(tdist));
-//                    double dy = yd;
-//                    double dx = (M_PI*rmod/2.0)-tdist;
-//                    dy=sqrt(pow(pf,2.0)-pow(dx,2.0));
-//                    sl=dy/dx;
-//                    double ang = atan(sl)*180.0/M_PI;
-//                    ybit=cutter->radius()*sin(ang*M_PI/180.0);
-//                    xbit=cutter->radius()*cos(ang*M_PI/180.0);
-//                }else
-//                {
-//                    yd=pow(pow(pf,2.0)-pow(-((pitch/2.0)-(tdist)),2.0),0.5);
-//                    zl=-ylin+pf*sin(prang*M_PI/180.0)-yd;
-//                    double dy = yd;
-//                    double dx = (M_PI*rmod/2.0)-tdist;
-//                    dy=sqrt(pow(pf,2.0)-pow(dx,2.0));
-//                    sl=fabs(dy/dx);
-//                    double ang = atan(sl)*180.0/M_PI;
-//                    ybit=cutter->radius()*sin(ang*M_PI/180.0);
-//                    xbit=-cutter->radius()*cos(ang*M_PI/180.0);
-//                }
-//            }else if(tdist>=d3 && tdist<d4)
-//            {
-//                zl=hd3+slope2*(tdist-d3);
-//                xbit=-cutter->radius()*cos(prang*M_PI/180.0);
-//                ybit=cutter->radius()*sin(prang*M_PI/180.0);
-//            }else if(tdist>=d4 && tdist<d5)
-//            {
-//                double dy=pow((pow(pf,2.0)-pow(d5-tdist,2.0)),0.5);
-//                hpf=ylin-pf*sin(prang*M_PI/180.0)+dy;
-//                zl=hpf;
-//                sl = (zl - (ylin-pf*sin(prang*M_PI/180.0)))/(pitch-tdist);
-//                double ang = atan(sl)*180.0/M_PI;
-//                ybit=cutter->radius()*sin(ang*M_PI/180.0);
-//                xbit=-cutter->radius()*cos(ang*M_PI/180.0);
-//                if(zl>(hd0-c))
-//                {
-//                    zl=hd0-c;
-//                    xbit=0.0;
-//                    ybit=cutter->radius();
-//                    if(arcflag==false)
-//                    {
-//                        arcflag=true;
-//                        p.m_rad=cutter->radius();
-//                    }
-//                }            }
-//            if(fudge == -999.0)fudge=zl+ybit+cutter->radius();
+        Path *mypaths[layers];
+        for(int ii=0; ii<=layers; ii++)
+        {
+            mypaths[ii]=new Path();
+            mypaths[ii]->m_runs.resize(1);
+        }
 
 
 
 
-//            if(dlg.ui->rbTopCut->isChecked())
-//            {
-//                p.m_z=zl+ybit+cutter->radius()-fudge;
-//                p.m_x=rwid/2.0;
-//                p.m_y=dis+xbit;
-//                path->m_runs[0].m_points.push_back(p);
-//                p.m_x=-rwid/2.0;
-//                path->m_runs[0].m_points.push_back(p);
-//                if(dlg.ui->cbClear->isChecked())
-//                {
-//                    if(tdist <= pitch/2.0 && fabs(zlast-p.m_z) >= stepdown)
-//                    {
+        bEnableArcs=true;
 
-//                        clry=(pitch/2.0-(tdist+xbit))*2.0;
-//                        for(double clrwid=-rwid/2.0;clrwid<=rwid/2.0;clrwid+=stepover)
-//                        {
-//                            p.m_x=clrwid;
-//                            p.m_y=dis+xbit;
-//                            path->m_runs[0].m_points.push_back(p);
-//                            p.m_y=dis+xbit+clry;
-//                            path->m_runs[0].m_points.push_back(p);
-//                        }
-//                        zlast=p.m_z;
-//                    }
-//                }
-//            }else
-//            {
-//                p.m_y=zl+ybit+cutter->radius()-fudge;
-//                p.m_x=dis+xbit;
-//                p.m_z=0;
-//                for(int ii=0; ii<layers; ii++)
-//                {
-//                    p.m_z=-ii*stepdown;
-//                    mypaths[ii]->m_runs[0].m_points.push_back(p);
-//                }
-//                p.m_rad=-1.0;
-//            }
+        double rmod = dlg.ui->dsbMod->value();
+        double rlen = dlg.ui->dsbLen->value();
+        double step = dlg.ui->dsbStep->value();
+        double stepover = dlg.ui->dsbStepOver->value();
+        double pitch = M_PI * rmod;
+        double prang = dlg.ui->dsbPrAngle->value();
+        double c = 0.15 * rmod;
+        double pf = 0.38 * rmod;
 
-
-//       tdist+=0.0;
-//        }//dis
-
-//        for(int ii=0; ii<layers; ii++)
-//        {
-//            paths.push_back(mypaths[ii]);
-//        }
+        double d1 = pf*cos(prang*M_PI/180.0);
+        double d2 = (M_PI * rmod / 2.0) - d1;
+        double ylin=((d2-d1)/tan(prang*M_PI/180.0))/2.0;
+        //ylin=(d2-d2)*
+        double hd1= ylin;
+        double hd2 = -ylin;
+        double hd0=ylin-pf*sin(prang*M_PI/180.0)+pf;
 
 
 
-//    }//dlg accepted
+        double d3 = (M_PI * rmod / 2.0) + d1;
+        double hd3=hd2;
+
+        double d4 =3*d1+2*(d2-d1);
+        //hd1 = hd0-pf*sin(prang*M_PI/180.0);
+        double hd4= hd1;
+        double slope1=(hd2-hd1)/(d2-d1);
+        double slope2=(hd4-hd3)/(d4-d3);
+
+
+
+        double d5 = M_PI * rmod;
+
+        double dis=0.0;
+        double hpf=0.0;
+        double zl=0.0;
+
+//        QFile logfil("/home/fred/cppcam.log");
+//        QTextStream out(&logfil);
+//        logfil.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+        double xbit=0.0;
+        double ybit=0.0;
+        double sl = 0.0;
+        double yd=0.0;
+        double fudge=-999.0;
+        double tdist=0.0;
+        double clry=0.0;
+        double zlast=999.0;
+        bool arcflag = 0;
+        Point p = Point(-rwid/2.0,0.0,hd0);
+        cutter->moveto(p);
+        for(dis=0;dis<=rlen;dis+=step)
+        {
+
+            tdist=fmod(dis,pitch);
+//            out << "tdist=" << tdist << "\n";
+            if(tdist<d1)
+            {
+                double dy=pow((pow(pf,2.0)-pow(tdist,2.0)),0.5);
+                hpf=ylin-pf*sin(prang*M_PI/180.0)+dy;
+                zl=hpf;
+                if(tdist<=step)
+                    arcflag=false;
+                if(tdist==0.0)
+                {
+                    ybit=cutter->radius();
+                    xbit=0.0;
+                }else
+                {
+                    sl=(hd0-zl)/tdist;
+                    sl = (zl - (ylin-pf*sin(prang*M_PI/180.0)))/(tdist);
+
+                    double ang = atan(sl)*180.0/M_PI;
+                    ybit=cutter->radius()*sin(ang*M_PI/180.0);
+                    xbit=cutter->radius()*cos(ang*M_PI/180.0);
+                }
+                if(zl>(hd0-c))
+                {
+                    zl=hd0-c;
+                    xbit=0.0;
+                    ybit=cutter->radius();
+                }else
+                {
+                    if(arcflag==false)
+                    {
+                        arcflag=true;
+                        p.m_rad=cutter->radius();
+                    }
+                }
+            }else if(tdist>=d1 && tdist<d2)
+            {
+                arcflag=false;
+                hpf=hd1-(tdist-d1)/tan(prang*M_PI/180.0);
+                zl=hd1+slope1*(tdist-d1);
+                ybit=cutter->radius()*sin(prang*M_PI/180.0);
+                xbit=cutter->radius()*cos(prang*M_PI/180.0);
+            }else if(tdist>=d2 && tdist<d3)
+            {
+                if(tdist<(M_PI*rmod/2.0))
+                {
+                    yd=pow(pow(pf,2.0)-pow(((pitch/2.0)-(tdist)),2.0),0.5);
+                    zl=-ylin+pf*sin(prang*M_PI/180.0)-yd;
+                    sl = (zl - (ylin-pf*sin(prang*M_PI/180.0)))/((pitch/2.0)-(tdist));
+
+                    //sl=-(hd0-zl)/((pitch/2.0)-(tdist));
+                    double dy = yd;
+                    double dx = (M_PI*rmod/2.0)-tdist;
+                    dy=sqrt(pow(pf,2.0)-pow(dx,2.0));
+                    sl=dy/dx;
+                    double ang = atan(sl)*180.0/M_PI;
+                    ybit=cutter->radius()*sin(ang*M_PI/180.0);
+                    xbit=cutter->radius()*cos(ang*M_PI/180.0);
+                }else
+                {
+                    yd=pow(pow(pf,2.0)-pow(-((pitch/2.0)-(tdist)),2.0),0.5);
+                    zl=-ylin+pf*sin(prang*M_PI/180.0)-yd;
+                    double dy = yd;
+                    double dx = (M_PI*rmod/2.0)-tdist;
+                    dy=sqrt(pow(pf,2.0)-pow(dx,2.0));
+                    sl=fabs(dy/dx);
+                    double ang = atan(sl)*180.0/M_PI;
+                    ybit=cutter->radius()*sin(ang*M_PI/180.0);
+                    xbit=-cutter->radius()*cos(ang*M_PI/180.0);
+                }
+            }else if(tdist>=d3 && tdist<d4)
+            {
+                zl=hd3+slope2*(tdist-d3);
+                xbit=-cutter->radius()*cos(prang*M_PI/180.0);
+                ybit=cutter->radius()*sin(prang*M_PI/180.0);
+            }else if(tdist>=d4 && tdist<d5)
+            {
+                double dy=pow((pow(pf,2.0)-pow(d5-tdist,2.0)),0.5);
+                hpf=ylin-pf*sin(prang*M_PI/180.0)+dy;
+                zl=hpf;
+                sl = (zl - (ylin-pf*sin(prang*M_PI/180.0)))/(pitch-tdist);
+                double ang = atan(sl)*180.0/M_PI;
+                ybit=cutter->radius()*sin(ang*M_PI/180.0);
+                xbit=-cutter->radius()*cos(ang*M_PI/180.0);
+                if(zl>(hd0-c))
+                {
+                    zl=hd0-c;
+                    xbit=0.0;
+                    ybit=cutter->radius();
+                    if(arcflag==false)
+                    {
+                        arcflag=true;
+                        p.m_rad=cutter->radius();
+                    }
+                }            }
+            if(fudge == -999.0)fudge=zl+ybit+cutter->radius();
+
+
+
+
+            if(dlg.ui->rbTopCut->isChecked())
+            {
+                p.m_z=zl+ybit+cutter->radius()-fudge;
+                p.m_x=rwid/2.0;
+                p.m_y=dis+xbit;
+                path->m_runs[0].m_points.push_back(p);
+                p.m_x=-rwid/2.0;
+                path->m_runs[0].m_points.push_back(p);
+                if(dlg.ui->cbClear->isChecked())
+                {
+                    if(tdist <= pitch/2.0 && fabs(zlast-p.m_z) >= stepdown)
+                    {
+
+                        clry=(pitch/2.0-(tdist+xbit))*2.0;
+                        for(double clrwid=-rwid/2.0;clrwid<=rwid/2.0;clrwid+=stepover)
+                        {
+                            p.m_x=clrwid;
+                            p.m_y=dis+xbit;
+                            path->m_runs[0].m_points.push_back(p);
+                            p.m_y=dis+xbit+clry;
+                            path->m_runs[0].m_points.push_back(p);
+                        }
+                        zlast=p.m_z;
+                    }
+                }
+            }else
+            {
+                p.m_y=zl+ybit+cutter->radius()-fudge;
+                p.m_x=dis+xbit;
+                p.m_z=0;
+                for(int ii=0; ii<layers; ii++)
+                {
+                    p.m_z=-ii*stepdown;
+                    mypaths[ii]->m_runs[0].m_points.push_back(p);
+                }
+                p.m_rad=-1.0;
+            }
+
+
+       tdist+=0.0;
+        }//dis
+
+        for(int ii=0; ii<layers; ii++)
+        {
+            paths.push_back(mypaths[ii]);
+        }
+
+
+
+    }//dlg accepted
 }
 
 
@@ -1415,53 +1415,53 @@ void MainWindow::on_actionRack_Cut_triggered()
 void MainWindow::hole_cut()
 {
 
-//    dlgHoleCut dlg;
-//    dlg.exec();
-//    if(dlg.myresult == 1)
-//    {
-//        bEnableArcs=true;
-//        double stepdown=dlg.ui->lestepdown->text().toDouble();
-//        double radius = dlg.ui->leradius->text().toDouble();
-//        Path *path = new Path();
-//        path->m_runs.resize(1);
-//        Point p;
-//        if (dlg.ui->rbinside->isChecked())
-//        {
-//            p.m_x=dlg.ui->leposx->text().toDouble()-radius+cutter->radius();
-//        }else
-//        {
-//            p.m_x=dlg.ui->leposx->text().toDouble()-radius-cutter->radius();
-//        }
-//        p.m_y=dlg.ui->leposy->text().toDouble();
+    dlgHoleCut dlg;
+    dlg.exec();
+    if(dlg.myresult == 1)
+    {
+        bEnableArcs=true;
+        double stepdown=dlg.ui->lestepdown->text().toDouble();
+        double radius = dlg.ui->leradius->text().toDouble();
+        Path *path = new Path();
+        path->m_runs.resize(1);
+        Point p;
+        if (dlg.ui->rbinside->isChecked())
+        {
+            p.m_x=dlg.ui->leposx->text().toDouble()-radius+cutter->radius();
+        }else
+        {
+            p.m_x=dlg.ui->leposx->text().toDouble()-radius-cutter->radius();
+        }
+        p.m_y=dlg.ui->leposy->text().toDouble();
 
-//        for(p.m_z=dlg.ui->leposz->text().toDouble();p.m_z>=(dlg.ui->leposz->text().toDouble()-dlg.ui->ledepth->text().toDouble());p.m_z-=stepdown)
-//        {
-//            p.m_rad=0.0;
-//            path->m_runs[0].m_points.push_back(p);
+        for(p.m_z=dlg.ui->leposz->text().toDouble();p.m_z>=(dlg.ui->leposz->text().toDouble()-dlg.ui->ledepth->text().toDouble());p.m_z-=stepdown)
+        {
+            p.m_rad=0.0;
+            path->m_runs[0].m_points.push_back(p);
 
-//            if (dlg.ui->rbinside->isChecked())
-//            {
-//                p.m_rad=radius-cutter->radius();
-//                p.m_x=dlg.ui->leposx->text().toDouble()+radius-cutter->radius();
-//            }else
-//            {
-//                p.m_rad=radius+cutter->radius();
-//                p.m_x=dlg.ui->leposx->text().toDouble()+radius+cutter->radius();
-//            }
-//            path->m_runs[0].m_points.push_back(p);
-//            if (dlg.ui->rbinside->isChecked())
-//            {
-//                p.m_x=dlg.ui->leposx->text().toDouble()-radius+cutter->radius();
-//            }else
-//            {
-//                p.m_x=dlg.ui->leposx->text().toDouble()-radius-cutter->radius();
-//            }
-//            path->m_runs[0].m_points.push_back(p);
+            if (dlg.ui->rbinside->isChecked())
+            {
+                p.m_rad=radius-cutter->radius();
+                p.m_x=dlg.ui->leposx->text().toDouble()+radius-cutter->radius();
+            }else
+            {
+                p.m_rad=radius+cutter->radius();
+                p.m_x=dlg.ui->leposx->text().toDouble()+radius+cutter->radius();
+            }
+            path->m_runs[0].m_points.push_back(p);
+            if (dlg.ui->rbinside->isChecked())
+            {
+                p.m_x=dlg.ui->leposx->text().toDouble()-radius+cutter->radius();
+            }else
+            {
+                p.m_x=dlg.ui->leposx->text().toDouble()-radius-cutter->radius();
+            }
+            path->m_runs[0].m_points.push_back(p);
 
-//        }
-//        paths.push_back(path);
-//        dlg.exec();
-//    }
+        }
+        paths.push_back(path);
+        dlg.exec();
+    }
 }
 
 void MainWindow::on_actionHole_Cut_triggered()

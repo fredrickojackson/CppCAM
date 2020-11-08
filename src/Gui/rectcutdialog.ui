@@ -284,7 +284,7 @@
     </rect>
    </property>
    <property name="value">
-    <double>5.000000000000000</double>
+    <double>10.000000000000000</double>
    </property>
   </widget>
   <widget class="QLabel" name="lblCutterInf">
@@ -313,7 +313,7 @@
     <string>Clockwise</string>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QCheckBox" name="cbInside">
@@ -345,7 +345,7 @@
     <string>Outside</string>
    </property>
    <property name="checked">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
