@@ -120,13 +120,15 @@ MainWindow::MainWindow()
     setMouseTracking(true);
     startflag=true;
     p_viewscale=theGLWidget->scale;
+    pbAdd->click();
+
 }
 
 void MainWindow::mytimeout()
 {
 //    if(p_projectfilename.length()==0)
 //        openFile(commands.at(1));
-    if(startflag)
+    if(startflag && commands.count()>1)
     {
         clearModelAndPath();
         QString filename = commands.at(1);
@@ -1665,6 +1667,9 @@ void MainWindow::on_actionRadial_Cut_triggered()
     ss=QString("z (%1 : %2) %3").arg(model->min_z()).arg(model->max_z()).arg(model->max_z()-model->min_z());
     dlg.ui->textEditStatus->append(ss);
 
+    ss=QString("\ncutter %1mm %2").arg(cutter->radius()).arg(cutter->m_cutterType);
+    dlg.ui->textEditStatus->append(ss);
+
     dlg.exec();
 
 
@@ -1921,8 +1926,10 @@ void MainWindow::on_pbAdd_clicked()
 
 void MainWindow::on_pbRemove_clicked()
 {
-    if(p_runs>0)p_runs--;
-    p_qlruns.removeAt(qlRunInd);
+    if(p_runs>1){
+        p_runs--;
+        p_qlruns.removeAt(qlRunInd);
+    }
     if(qlRunInd>=p_runs)qlRunInd=p_runs-1;
 }
 

@@ -283,7 +283,7 @@ Model* STLImportHelper::nImportBinaryModel()
 
         double v11 = unpackFloat(f.read(4));
         double v12 = unpackFloat(f.read(4));
-        double v13 = unpackFloat(f.read(4));
+        double v13 = unpackFloat( f.read(4));
 
         Point p1(v11, v12, v13);
 
