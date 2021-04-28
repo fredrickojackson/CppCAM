@@ -84,8 +84,8 @@
    <widget class="QProgressBar" name="pbStat">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>300</y>
+      <x>0</x>
+      <y>310</y>
       <width>118</width>
       <height>23</height>
      </rect>
@@ -251,7 +251,7 @@
      <x>0</x>
      <y>0</y>
      <width>900</width>
-     <height>30</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
